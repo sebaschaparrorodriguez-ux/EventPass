@@ -1,0 +1,17 @@
+node_modules
+dist
+.vercel
+
+# variables de entorno (solo se sube el .env.example)
+.env
+.env.local
+.env.*.local
+
+# credenciales y cosas locales
+*.pem
+credenciales*.json
+n8n/local/
+
+.DS_Store
+Thumbs.db
+*.log
