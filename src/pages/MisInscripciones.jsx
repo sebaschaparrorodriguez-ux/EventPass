@@ -138,7 +138,7 @@ function Inscripcion({ item, token, onCambio }) {
         </span>
       </div>
 
-      {item.evento?.estado === 'CANCELADO' && <p className="nota">⚠️ Este evento fue cancelado.</p>}
+      {item.evento?.estado === 'CANCELADO' && <p className="nota">Este evento fue cancelado por los organizadores.</p>}
 
       {!editando && (
         <p className="mini">

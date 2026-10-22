@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { detalleEvento, inscribirme } from '../api'
 import { useAuth } from '../auth'
 import { EtiquetaCupo } from '../components/EventoCard'
+import Icono from '../components/Icono'
 import { Cargando, ErrorBox, Exito } from '../components/Estado'
 import { formatearFecha, getVisitorId, imagenDe, imagenRespaldo } from '../utils'
 
@@ -92,16 +93,16 @@ export default function Evento() {
 
           <ul className="datos">
             <li>
-              <span>🗓️</span> {formatearFecha(evento.fecha, evento.hora)}
+              <Icono nombre="calendario" /> <span className="capital">{formatearFecha(evento.fecha, evento.hora)}</span>
             </li>
             <li>
-              <span>📍</span> {evento.lugar}
+              <Icono nombre="lugar" /> {evento.lugar}
             </li>
             <li>
-              <span>🙋</span> Organiza: {evento.organizador}
+              <Icono nombre="persona" /> Organiza: {evento.organizador}
             </li>
             <li>
-              <span>👥</span> {evento.confirmados} de {evento.capacidad} cupos ocupados
+              <Icono nombre="grupo" /> {evento.confirmados} de {evento.capacidad} cupos ocupados
               {evento.en_espera > 0 && ` · ${evento.en_espera} en espera`}
             </li>
           </ul>
@@ -154,7 +155,7 @@ export default function Evento() {
                 onChange={(e) => setForm({ ...form, observaciones: e.target.value })}
                 maxLength={200}
                 rows={2}
-                placeholder="Ej: voy con mi perro, necesito acceso en silla de ruedas..."
+                placeholder="Ej: llevo buñuelos para compartir, voy con los niños, necesito acceso en silla de ruedas..."
               />
             </label>
 

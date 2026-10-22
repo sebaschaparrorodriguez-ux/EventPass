@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <p>
-          <strong>EventPass Barrio</strong> · planes de la cuadra, para la cuadra.
+          <strong>EventPass Barrio</strong> · que no falten la natilla, los buñuelos ni los vecinos.
         </p>
         <p className="footer-mini">
           Proyecto académico · Frontend en Vercel, lógica en n8n y datos en Google Sheets.

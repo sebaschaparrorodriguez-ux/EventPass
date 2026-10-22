@@ -30,8 +30,8 @@ export default function Asistente() {
         loadPreviousSession: false,
         defaultLanguage: 'en',
         initialMessages: [
-          '¡Hola, vecino! 👋 Soy el asistente de EventPass Barrio.',
-          'Pregúntame por eventos, fechas, lugares, la lista de espera o cómo vincular Telegram.',
+          '¡Quiubo, vecino! Soy el asistente de EventPass Barrio.',
+          'Pregúntame por las novenas, fechas, lugares, la lista de espera o cómo vincular Telegram.',
         ],
         i18n: {
           en: {

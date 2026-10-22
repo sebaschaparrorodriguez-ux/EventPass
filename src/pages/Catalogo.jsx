@@ -39,20 +39,31 @@ export default function Catalogo() {
   return (
     <>
       <section className="hero">
-        <div className="papel-picado" aria-hidden="true" />
+        <div className="alumbrado" aria-hidden="true" />
         <div className="hero-inner">
-          <p className="hero-kicker">Agenda del barrio</p>
-          <h1>
-            Lo que pasa en tu cuadra, <span>en un solo lugar.</span>
-          </h1>
-          <p className="hero-sub">
-            Conciertos en el parque, torneos, ferias de emprendedores y talleres. Inscríbete,
-            guarda tu cupo y te avisamos por correo y Telegram.
-          </p>
+          <div>
+            <p className="hero-kicker">Diciembre en el barrio</p>
+            <h1>
+              La Navidad se vive <span>en la cuadra.</span>
+            </h1>
+            <p className="hero-sub">
+              Novenas en el parque, noche de velitas, el torneo de fin de año y el bazar de los
+              emprendedores. Aparta tu cupo y te avisamos por correo y Telegram.
+            </p>
+          </div>
+          <blockquote className="hero-frase">
+            “Ven, ven, ven, a nuestras almas, Jesús, ven, ven, ven...”
+            <small>Nos vemos en la novena, vecino.</small>
+          </blockquote>
         </div>
+        <div className="hero-velitas" aria-hidden="true" />
       </section>
 
       <section className="seccion">
+        <div className="seccion-titulo">
+          <h2>Planes de la temporada</h2>
+          <span className="mini">Los cupos se actualizan en tiempo real</span>
+        </div>
         <div className="filtros" role="tablist" aria-label="Filtrar por categoría">
           <button
             className={`chip ${categoria === '' ? 'activo' : ''}`}

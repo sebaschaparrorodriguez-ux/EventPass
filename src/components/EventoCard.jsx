@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { fechaCorta, imagenDe, imagenRespaldo } from '../utils'
+import Icono from './Icono'
 
 export function EtiquetaCupo({ evento }) {
   if (evento.estado === 'CANCELADO') return <span className="tag tag-off">Cancelado</span>
@@ -34,7 +35,7 @@ export default function EventoCard({ evento }) {
         </span>
         <h3>{evento.nombre}</h3>
         <p className="card-lugar">
-          📍 {evento.lugar} · {evento.hora}
+          <Icono nombre="lugar" /> {evento.lugar} · {evento.hora}
         </p>
         <EtiquetaCupo evento={evento} />
       </div>
