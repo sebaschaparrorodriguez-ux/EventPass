@@ -4,6 +4,7 @@ import { detalleEvento, inscribirme } from '../api'
 import { useAuth } from '../auth'
 import { EtiquetaCupo } from '../components/EventoCard'
 import Icono from '../components/Icono'
+import BotonWhatsApp from '../components/BotonWhatsApp'
 import { Cargando, ErrorBox, Exito } from '../components/Estado'
 import { formatearFecha, getVisitorId, imagenDe, imagenRespaldo } from '../utils'
 
@@ -108,6 +109,7 @@ export default function Evento() {
           </ul>
 
           <p className="descripcion">{evento.descripcion}</p>
+          {abierto && <BotonWhatsApp evento={evento} />}
         </div>
       </div>
 
@@ -162,9 +164,9 @@ export default function Evento() {
             {errorInscripcion && (
               <div className="estado estado-error" role="alert">
                 <p>{errorInscripcion.message}</p>
-                {errorInscripcion.codigo === 'TELEGRAM_NO_VINCULADO' && (
+                {errorInscripcion.codigo === 'SIN_CANAL_DE_AVISO' && (
                   <Link to="/perfil" className="btn btn-sm">
-                    Vincular Telegram
+                    Ir a mi perfil
                   </Link>
                 )}
               </div>
@@ -181,7 +183,7 @@ export default function Evento() {
             <Exito
               mensaje={
                 resultado.inscripcion?.estado === 'CONFIRMADA'
-                  ? '¡Listo! Tu cupo está confirmado. Te enviamos la confirmación por correo y Telegram.'
+                  ? '¡Listo! Tu cupo está confirmado. Te enviamos la confirmación por los canales que escogiste.'
                   : `Quedaste en lista de espera (puesto ${resultado.inscripcion?.orden_espera}). Si se libera un cupo te avisamos.`
               }
             />

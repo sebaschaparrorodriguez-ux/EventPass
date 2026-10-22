@@ -127,6 +127,32 @@ img {
   background: var(--error);
 }
 
+.btn-wa {
+  background: #1f8f4e;
+}
+
+.btn-wa:hover:not(:disabled) {
+  background: #17713d;
+}
+
+.avisos {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.avisos label {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+}
+
+.avisos input[type='checkbox'] {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--pino);
+}
+
 .btn-sm {
   padding: 0.4rem 0.9rem;
   font-size: 0.9rem;

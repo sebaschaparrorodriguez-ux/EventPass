@@ -57,6 +57,12 @@ export default function Perfil() {
           }}
           manejarError={manejarError}
         />
+        <Avisos
+          perfil={perfil}
+          token={token}
+          onGuardado={(u) => setPerfil({ ...perfil, ...u })}
+          manejarError={manejarError}
+        />
         <Telegram token={token} manejarError={manejarError} />
         <Desactivar
           token={token}
@@ -135,6 +141,56 @@ function DatosPerfil({ perfil, token, onGuardado, manejarError }) {
   )
 }
 
+function Avisos({ perfil, token, onGuardado, manejarError }) {
+  const [correo, setCorreo] = useState(perfil.avisos_email !== false)
+  const [telegram, setTelegram] = useState(perfil.avisos_telegram !== false)
+  const [guardando, setGuardando] = useState(false)
+  const [ok, setOk] = useState('')
+  const [error, setError] = useState('')
+
+  const guardar = async (e) => {
+    e.preventDefault()
+    setOk('')
+    setError('')
+    if (!correo && !telegram) return setError('Deja al menos un canal marcado.')
+    setGuardando(true)
+    try {
+      const r = await api.actualizarPerfil(token, { avisos_email: correo, avisos_telegram: telegram })
+      onGuardado(r.usuario)
+      setOk('Listo, te avisamos por ahí.')
+    } catch (err) {
+      manejarError(err, setError)
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  return (
+    <form className="form caja" onSubmit={guardar}>
+      <h2>¿Por dónde te avisamos?</h2>
+      <p className="mini">Confirmaciones, cambios de los eventos y recordatorios (un día antes y dos horas antes).</p>
+      <div className="avisos">
+        <label>
+          <input type="checkbox" checked={correo} onChange={(e) => setCorreo(e.target.checked)} />
+          Correo electrónico
+        </label>
+        <label>
+          <input type="checkbox" checked={telegram} onChange={(e) => setTelegram(e.target.checked)} />
+          Telegram <span className="mini">(tienes que vincularlo abajo)</span>
+        </label>
+      </div>
+      <p className="mini">
+        ¿Prefieres WhatsApp? En cada evento y en tus inscripciones está el botón <strong>Recordármelo por WhatsApp</strong>.
+      </p>
+      <ErrorBox mensaje={error} />
+      <Exito mensaje={ok} />
+      <button className="btn" disabled={guardando}>
+        {guardando ? 'Guardando...' : 'Guardar preferencias'}
+      </button>
+    </form>
+  )
+}
+
 function Telegram({ token, manejarError }) {
   const [estado, setEstado] = useState(null)
   const [codigo, setCodigo] = useState(null)
@@ -176,7 +232,7 @@ function Telegram({ token, manejarError }) {
   return (
     <div className="caja">
       <h2>Telegram</h2>
-      <p className="mini">Lo necesitas para inscribirte: por ahí te llegan avisos y recordatorios.</p>
+      <p className="mini">Opcional. Si lo vinculas, también te llegan los avisos por Telegram.</p>
 
       {cargando && <Cargando texto="Un momento..." />}
       <ErrorBox mensaje={error} />

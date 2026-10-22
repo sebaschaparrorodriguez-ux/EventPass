@@ -4,6 +4,7 @@ import * as api from '../api'
 import { useAuth } from '../auth'
 import { Cargando, ErrorBox, Exito } from '../components/Estado'
 import { ESTADO_INSCRIPCION, formatearFecha } from '../utils'
+import BotonWhatsApp from '../components/BotonWhatsApp'
 
 export default function MisInscripciones() {
   const { token, sesionVencida } = useAuth()
@@ -185,6 +186,9 @@ function Inscripcion({ item, token, onCambio }) {
           <button className="btn btn-sec btn-sm" onClick={() => setEditando(true)} disabled={ocupado}>
             Editar datos
           </button>
+          {item.evento?.estado === 'PUBLICADO' && (
+            <BotonWhatsApp evento={{ ...item.evento, evento_id: item.evento_id }} className="btn-sm" />
+          )}
           <button className="btn btn-peligro btn-sm" onClick={cancelar} disabled={ocupado}>
             {ocupado ? 'Procesando...' : 'Cancelar inscripción'}
           </button>
