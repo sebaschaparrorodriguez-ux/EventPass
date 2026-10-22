@@ -4,7 +4,9 @@
 **Estudiante:** Gabriela Silva
 **Proyecto integrador:** desarrollo web + servicios HTTP + IA aplicada + automatización con n8n
 
-**App publicada:** _pendiente (se agrega cuando quede el deploy en Vercel)_
+**App publicada:** https://eventpass-barrio.vercel.app
+
+> La lógica corre en n8n en mi equipo, publicado con ngrok. Para que la página funcione completa, n8n y ngrok tienen que estar encendidos (ver [Cómo correrlo](#cómo-correrlo)).
 
 ---
 
