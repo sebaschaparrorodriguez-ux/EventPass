@@ -10,7 +10,7 @@
 
 ## ¿Qué es?
 
-EventPass Barrio es mi versión de EventPass: una página para inscribirse a los planes que arma la comunidad del barrio, como conciertos en el parque, torneos en la cancha, ferias de emprendedores, talleres y mingas.
+EventPass Barrio es mi versión de EventPass: una página para inscribirse a los planes que arma la comunidad del barrio en temporada navideña. Le di una identidad de **Navidad colombiana**: novenas de aguinaldos, noche de velitas, alumbrados, buñuelos y natilla, el torneo de fin de año y el bazar de los emprendedores.
 
 Desde la página se puede:
 
@@ -274,7 +274,7 @@ Abrir `https://<dominio-de-n8n>/form/ep-admin-eventos`, elegir la acción (CREAR
 
 ## Datos de prueba
 
-8 eventos en 5 categorías (con cupos, lleno, próximo, cancelado, cerrado y un borrador) y 3 usuarios de prueba. Todo explicado en [`docs/datos-de-prueba.md`](docs/datos-de-prueba.md), junto con la prueba completa de lista de espera.
+9 eventos navideños en 5 categorías (con cupos, lleno, próximo, cancelado, cerrado y un borrador) y 3 usuarios de prueba. Todo explicado en [`docs/datos-de-prueba.md`](docs/datos-de-prueba.md), junto con la prueba completa de lista de espera.
 
 ## Estructura del repo
 

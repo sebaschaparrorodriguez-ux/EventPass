@@ -1,19 +1,22 @@
 # Datos de prueba y cómo probar
 
+La temática de esta versión es **la Navidad en el barrio** (estilo colombiano: novenas, velitas, alumbrados, buñuelos y natilla), así que los eventos de prueba son planes de fin de año.
+
 ## Eventos
 
-8 eventos en 5 categorías (el enunciado pide mínimo 6 en 3):
+9 eventos en 5 categorías (el enunciado pide mínimo 6 en 3):
 
 | ID | Evento | Categoría | Fecha | Cap. | Estado | Para qué está |
 |---|---|---|---|---|---|---|
-| EVT-0001 | Rock al Parque del Barrio | Cultura | 2026-11-07 16:00 | 80 | PUBLICADO | **con cupos disponibles** |
-| EVT-0002 | Torneo relámpago de microfútbol | Deportes | 2026-10-31 09:00 | 3 | PUBLICADO | **evento lleno** (3 confirmados de prueba) |
-| EVT-0003 | Mercado de emprendedores de la cuadra | Emprendimiento | 2026-10-24 10:00 | 40 | PUBLICADO | **próximo a realizarse** (dispara recordatorios) |
-| EVT-0004 | Cine al aire libre: noche de terror | Cultura | 2026-10-30 19:00 | 60 | CANCELADO | **evento cancelado** |
-| EVT-0005 | Taller de huerta urbana | Educación | 2026-10-18 10:00 | 20 | CERRADO | **evento cerrado** |
-| EVT-0006 | Minga de limpieza del caño | Comunidad | 2026-11-01 08:00 | 30 | PUBLICADO | con cupos |
-| EVT-0007 | Clases de salsa en la plazoleta | Educación | 2026-11-04 18:30 | 25 | PUBLICADO | con cupos |
-| EVT-0008 | Bazar navideño | Emprendimiento | 2026-12-12 15:00 | 50 | BORRADOR | no debe salir en el catálogo |
+| EVT-0001 | Novena de aguinaldos en el parque | Cultura | 2026-12-16 18:30 | 120 | PUBLICADO | **con cupos disponibles** |
+| EVT-0002 | Torneo de microfútbol de fin de año | Deportes | 2026-11-14 09:00 | 3 | PUBLICADO | **evento lleno** (3 confirmados de prueba) |
+| EVT-0003 | Minga para armar el alumbrado de la cuadra | Comunidad | 2026-10-24 08:00 | 40 | PUBLICADO | **próximo a realizarse** (dispara recordatorios) |
+| EVT-0004 | Cine navideño al aire libre | Cultura | 2026-11-28 19:00 | 60 | CANCELADO | **evento cancelado** |
+| EVT-0005 | Taller de faroles para el Día de las Velitas | Educación | 2026-10-18 15:00 | 20 | CERRADO | **evento cerrado** |
+| EVT-0006 | Noche de velitas en la cuadra | Comunidad | 2026-12-07 18:00 | 150 | PUBLICADO | con cupos |
+| EVT-0007 | Taller de buñuelos y natilla con las abuelas | Educación | 2026-12-12 15:00 | 25 | PUBLICADO | con cupos |
+| EVT-0008 | Bazar navideño de emprendedores | Emprendimiento | 2026-12-13 10:00 | 50 | PUBLICADO | con cupos |
+| EVT-0009 | Concurso de pesebres | Cultura | 2026-12-20 16:00 | 40 | BORRADOR | no debe salir en el catálogo |
 
 Si cuando se revise ya pasó la fecha del "próximo", se le cambia la fecha desde el formulario de WF04 (acción ACTUALIZAR) y listo.
 
