@@ -27,7 +27,7 @@ Las operaciones que necesitan usuario logueado reciben el `token` en el body. Es
 | `enviar_codigo` | `nombre`, `email`, `password` | `200` `{ ok, mensaje, expira_en }` y llega un correo con un código de 6 dígitos |
 | `crear` | `nombre`, `email`, `password`, `codigo` | `201` `{ ok, usuario: { usuario_id, nombre, email } }` + correo de bienvenida |
 | `perfil` | `token` | `200` `{ ok, usuario: { usuario_id, nombre, email, estado, fecha_registro } }` |
-| `actualizar` | `token`, `nombre`, opcional `password_actual` + `password_nueva` | `200` `{ ok, usuario }` |
+| `actualizar` | `token`, `nombre`, opcional `password_actual` + `password_nueva`, opcional `avisos_email` y `avisos_telegram` (true/false, mínimo uno) | `200` `{ ok, usuario }` |
 | `desactivar` | `token`, `password` | `200` `{ ok, mensaje }` |
 
 Errores que pueden salir: `DATOS_INVALIDOS` (400), `EMAIL_DUPLICADO` (409), `ESPERA_UN_MINUTO` (429), `CORREO_NO_ENVIADO` (502), `CODIGO_REQUERIDO` / `CODIGO_INVALIDO` / `CODIGO_INCORRECTO` / `CODIGO_VENCIDO` (400), `DEMASIADOS_INTENTOS` (429), `PASSWORD_INCORRECTO` (401), `SESION_*` (401).
@@ -96,7 +96,7 @@ Cada evento viene con los campos de la hoja más estos calculados:
 | `actualizar` | `token`, `inscripcion_id`, `nombre_acreditacion` y/o `observaciones` | `200` |
 | `cancelar` | `token`, `inscripcion_id` | `200` |
 
-Errores al crear: `TELEGRAM_NO_VINCULADO` (403), `USUARIO_INACTIVO` (403), `EVENTO_NO_EXISTE` (404), `EVENTO_NO_DISPONIBLE` / `EVENTO_PASADO` / `INSCRIPCION_DUPLICADA` (409).
+Errores al crear: `SIN_CANAL_DE_AVISO` (403, no tiene correo activado ni Telegram vinculado), `USUARIO_INACTIVO` (403), `EVENTO_NO_EXISTE` (404), `EVENTO_NO_DISPONIBLE` / `EVENTO_PASADO` / `INSCRIPCION_DUPLICADA` (409).
 
 ## WF10 · Chat
 
