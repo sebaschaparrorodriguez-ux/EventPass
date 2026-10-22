@@ -10,7 +10,7 @@ La temática de esta versión es **la Navidad en el barrio** (estilo colombiano:
 |---|---|---|---|---|---|---|
 | EVT-0001 | Novena de aguinaldos en el parque | Cultura | 2026-12-16 18:30 | 120 | PUBLICADO | **con cupos disponibles** |
 | EVT-0002 | Torneo de microfútbol de fin de año | Deportes | 2026-11-14 09:00 | 3 | PUBLICADO | **evento lleno** (3 confirmados de prueba) |
-| EVT-0003 | Minga para armar el alumbrado de la cuadra | Comunidad | 2026-10-24 08:00 | 40 | PUBLICADO | **próximo a realizarse** (dispara recordatorios) |
+| EVT-0003 | Parche para armar el alumbrado de la cuadra | Comunidad | 2026-10-24 08:00 | 40 | PUBLICADO | **próximo a realizarse** (dispara recordatorios) |
 | EVT-0004 | Cine navideño al aire libre | Cultura | 2026-11-28 19:00 | 60 | CANCELADO | **evento cancelado** |
 | EVT-0005 | Taller de faroles para el Día de las Velitas | Educación | 2026-10-18 15:00 | 20 | CERRADO | **evento cerrado** |
 | EVT-0006 | Noche de velitas en la cuadra | Comunidad | 2026-12-07 18:00 | 150 | PUBLICADO | con cupos |
