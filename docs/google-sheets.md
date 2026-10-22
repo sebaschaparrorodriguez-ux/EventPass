@@ -6,7 +6,7 @@ Los 10 archivos se crean con el workflow **WF00_crear_hojas_y_datos_prueba**: se
 
 | Archivo | Hojas | Lo escribe | Lo leen además |
 |---|---|---|---|
-| EP01_Usuarios | Usuarios, Auditoria_Usuarios | WF01 | WF02, WF06, WF09 |
+| EP01_Usuarios | Usuarios, Auditoria_Usuarios, Verificaciones_Email | WF01 | WF02, WF06, WF09 |
 | EP02_Sesiones | Sesiones | WF02 | – |
 | EP03_Telegram | Codigos_Vinculacion, Vinculaciones | WF03 | WF06, WF09 |
 | EP04_Eventos | Eventos, Auditoria_Eventos | WF04 | WF05, WF06, WF07, WF08, WF10 |
@@ -24,6 +24,10 @@ Los 10 archivos se crean con el workflow **WF00_crear_hojas_y_datos_prueba**: se
 
 **EP01_Usuarios / Auditoria_Usuarios**
 `auditoria_id, usuario_id, accion, fecha, resultado, detalle`
+
+**EP01_Usuarios / Verificaciones_Email** _(extra, para verificar el correo al registrarse)_
+`verificacion_id, email_normalizado, codigo_hash, creado_en, expira_en, estado, intentos, usado_en`
+Estados: `PENDIENTE`, `USADO`, `EXPIRADO`, `CANCELADO`. El código no se guarda, solo `sha256(email:codigo)`.
 
 **EP02_Sesiones / Sesiones**
 `session_id, usuario_id, session_token, creada_en, expira_en, estado, cerrada_en, ultima_validacion`

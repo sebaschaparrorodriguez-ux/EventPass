@@ -24,19 +24,27 @@ Las operaciones que necesitan usuario logueado reciben el `token` en el body. Es
 
 | accion | body | respuesta OK |
 |---|---|---|
-| `crear` | `nombre`, `email`, `password` | `201` `{ ok, usuario: { usuario_id, nombre, email } }` |
+| `enviar_codigo` | `nombre`, `email`, `password` | `200` `{ ok, mensaje, expira_en }` y llega un correo con un código de 6 dígitos |
+| `crear` | `nombre`, `email`, `password`, `codigo` | `201` `{ ok, usuario: { usuario_id, nombre, email } }` + correo de bienvenida |
 | `perfil` | `token` | `200` `{ ok, usuario: { usuario_id, nombre, email, estado, fecha_registro } }` |
 | `actualizar` | `token`, `nombre`, opcional `password_actual` + `password_nueva` | `200` `{ ok, usuario }` |
 | `desactivar` | `token`, `password` | `200` `{ ok, mensaje }` |
 
-Errores que pueden salir: `DATOS_INVALIDOS` (400), `EMAIL_DUPLICADO` (409), `PASSWORD_INCORRECTO` (401), `SESION_*` (401).
+Errores que pueden salir: `DATOS_INVALIDOS` (400), `EMAIL_DUPLICADO` (409), `ESPERA_UN_MINUTO` (429), `CORREO_NO_ENVIADO` (502), `CODIGO_REQUERIDO` / `CODIGO_INVALIDO` / `CODIGO_INCORRECTO` / `CODIGO_VENCIDO` (400), `DEMASIADOS_INTENTOS` (429), `PASSWORD_INCORRECTO` (401), `SESION_*` (401).
 
-Ejemplo:
+El registro va en dos pasos:
 
 ```bash
+# 1. pedir el codigo (llega al correo)
 curl -X POST "$N8N/webhook/ep/usuarios" -H "Content-Type: application/json" \
-  -d '{"accion":"crear","nombre":"Ana Gómez","email":"ana@correo.com","password":"clave1234"}'
+  -d '{"accion":"enviar_codigo","nombre":"Ana Gómez","email":"ana@correo.com","password":"clave1234"}'
+
+# 2. crear la cuenta con el codigo
+curl -X POST "$N8N/webhook/ep/usuarios" -H "Content-Type: application/json" \
+  -d '{"accion":"crear","nombre":"Ana Gómez","email":"ana@correo.com","password":"clave1234","codigo":"482913"}'
 ```
+
+Reglas del código: vence a los 10 minutos, se puede pedir uno cada minuto (al pedir otro, el anterior queda `CANCELADO`), máximo 5 intentos y sirve una sola vez (`USADO`).
 
 ## WF02 · `POST /webhook/ep/auth`
 

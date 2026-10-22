@@ -15,7 +15,8 @@ EventPass Barrio es mi versión de EventPass: una página para inscribirse a los
 Desde la página se puede:
 
 - ver el catálogo de eventos sin cuenta y filtrarlo por categoría
-- registrarse, iniciar y cerrar sesión
+- registrarse confirmando el correo con un código de 6 dígitos (y recibir un correo de bienvenida)
+- iniciar y cerrar sesión
 - ver y editar el perfil, cambiar la contraseña o desactivar la cuenta
 - vincular Telegram con un código
 - inscribirse a un evento (si está lleno se entra a lista de espera)
@@ -73,7 +74,7 @@ Están exportados desde mi instancia de n8n en la carpeta [`n8n/`](n8n/).
 
 | Workflow | Trigger | Google Sheets | Qué hace |
 |---|---|---|---|
-| WF01_usuarios_crud | Webhook `POST ep/usuarios` | EP01_Usuarios | crear, perfil, actualizar, desactivar |
+| WF01_usuarios_crud | Webhook `POST ep/usuarios` | EP01_Usuarios | verificar correo, crear, perfil, actualizar, desactivar |
 | WF02_auth_sesiones | Webhook `POST ep/auth` + Execute Sub-workflow Trigger | EP02_Sesiones | login, logout, validar sesión |
 | WF03_vinculacion_telegram | Webhook `POST ep/telegram` + Telegram Trigger | EP03_Telegram | código de vinculación y `/vincular` |
 | WF04_eventos_crud | n8n Form Trigger | EP04_Eventos | CRUD de eventos (admin) |
@@ -113,7 +114,7 @@ Resumen (con ejemplos completos en [`docs/api.md`](docs/api.md)):
 
 | Método | Ruta | Acciones |
 |---|---|---|
-| POST | `/webhook/ep/usuarios` | `crear`, `perfil`, `actualizar`, `desactivar` |
+| POST | `/webhook/ep/usuarios` | `enviar_codigo`, `crear`, `perfil`, `actualizar`, `desactivar` |
 | POST | `/webhook/ep/auth` | `login`, `logout`, `validar` |
 | POST | `/webhook/ep/telegram` | `solicitar`, `estado` |
 | GET | `/webhook/ep/catalogo` | `tipo=LISTADO \| FILTRO \| DETALLE` |
@@ -130,6 +131,7 @@ Resumen (con ejemplos completos en [`docs/api.md`](docs/api.md)):
 | Usuario | `ACTIVO`, `INACTIVO` |
 | Sesión | `ACTIVA`, `CERRADA`, `EXPIRADA` |
 | Código de vinculación | `PENDIENTE`, `USADO`, `EXPIRADO`, `CANCELADO` |
+| Verificación de correo | `PENDIENTE`, `USADO`, `EXPIRADO`, `CANCELADO` |
 | Vinculación Telegram | `ACTIVA`, `INACTIVA` |
 | Evento | `BORRADOR`, `PUBLICADO`, `CERRADO`, `CANCELADO` |
 | Inscripción | `CONFIRMADA`, `LISTA_ESPERA`, `CANCELADA` |
@@ -158,6 +160,17 @@ const hash = crypto.pbkdf2Sync(password, salt, 100000, 32, 'sha256').toString('h
 En el login (WF02, nodo **"Verificar password"**) se recalcula el hash con la sal guardada y se compara con `crypto.timingSafeEqual`. Si el correo no existe o la clave está mal, el mensaje es el mismo ("Correo o contraseña incorrectos"), para no revelar qué correos están registrados.
 
 Para que el Code node pueda usar `require('crypto')`, n8n se arranca con `NODE_FUNCTION_ALLOW_BUILTIN=crypto` (está en `n8n/iniciar-n8n.ps1`).
+
+## Verificación del correo al registrarse
+
+Para que no se creen cuentas con correos inventados, el registro tiene dos pasos:
+
+1. La persona llena sus datos y pide el código (`enviar_codigo`). WF01 revisa que el correo no esté registrado, genera un código de 6 dígitos con `crypto.randomInt` y lo manda por Gmail. En la hoja `Verificaciones_Email` **no queda el código**, solo `sha256(email:codigo)`, igual que con las contraseñas.
+2. La persona escribe el código y se llama `crear`. Antes de crear la cuenta se revisa que el código coincida, que no haya vencido (10 minutos) y que no lleve más de 5 intentos fallidos. Si está bien, la verificación pasa a `USADO` y se crea el usuario.
+
+Para evitar abusos solo se puede pedir un código por minuto, y al pedir uno nuevo los anteriores quedan `CANCELADO`.
+
+Apenas se crea la cuenta, WF01 llama a WF09 con el tipo `CUENTA_CREADA` y le llega a la persona un **correo de bienvenida** confirmando el registro. El código de verificación se manda directo desde WF01 porque en ese momento la persona todavía no es un usuario registrado; todo lo que va a usuarios ya registrados pasa por WF09.
 
 ## Sesiones
 
@@ -209,7 +222,7 @@ WF09:
 
 Así un fallo de Gmail no esconde lo que pasó con Telegram, ni al revés.
 
-Tipos que se mandan: `INSCRIPCION_CONFIRMADA`, `INGRESO_LISTA_ESPERA`, `INSCRIPCION_CANCELADA`, `REASIGNACION_CUPO`, `RECORDATORIO_24H`, `RECORDATORIO_2H`, `EVENTO_CANCELADO`, `EVENTO_ACTUALIZADO` (cuando el admin cambia fecha, hora o lugar).
+Tipos que se mandan: `CUENTA_CREADA`, `INSCRIPCION_CONFIRMADA`, `INGRESO_LISTA_ESPERA`, `INSCRIPCION_CANCELADA`, `REASIGNACION_CUPO`, `RECORDATORIO_24H`, `RECORDATORIO_2H`, `EVENTO_CANCELADO`, `EVENTO_ACTUALIZADO` (cuando el admin cambia fecha, hora o lugar).
 
 ## Asistente IA (WF10)
 
