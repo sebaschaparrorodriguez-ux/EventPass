@@ -8,7 +8,7 @@
 |---|---|---|---|---|---|---|
 | EVT-0001 | Rock al Parque del Barrio | Cultura | 2026-11-07 16:00 | 80 | PUBLICADO | **con cupos disponibles** |
 | EVT-0002 | Torneo relámpago de microfútbol | Deportes | 2026-10-31 09:00 | 3 | PUBLICADO | **evento lleno** (3 confirmados de prueba) |
-| EVT-0003 | Mercado de emprendedores de la cuadra | Emprendimiento | 2026-10-22 10:00 | 40 | PUBLICADO | **próximo a realizarse** (dispara recordatorios) |
+| EVT-0003 | Mercado de emprendedores de la cuadra | Emprendimiento | 2026-10-24 10:00 | 40 | PUBLICADO | **próximo a realizarse** (dispara recordatorios) |
 | EVT-0004 | Cine al aire libre: noche de terror | Cultura | 2026-10-30 19:00 | 60 | CANCELADO | **evento cancelado** |
 | EVT-0005 | Taller de huerta urbana | Educación | 2026-10-18 10:00 | 20 | CERRADO | **evento cerrado** |
 | EVT-0006 | Minga de limpieza del caño | Comunidad | 2026-11-01 08:00 | 30 | PUBLICADO | con cupos |
