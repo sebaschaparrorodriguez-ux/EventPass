@@ -1,0 +1,473 @@
+[
+  {
+    "updatedAt": "2026-10-22T14:00:07.000Z",
+    "createdAt": "2026-10-22T13:08:36.528Z",
+    "id": "RD1qqKdr6E96Ce3E",
+    "name": "WF05_catalogo_publico",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "name": "Webhook catálogo",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "webhookId": "2a328373-493f-493c-b37c-e4101ec379af",
+        "parameters": {
+          "httpMethod": "GET",
+          "path": "ep/catalogo",
+          "responseMode": "responseNode",
+          "options": {
+            "allowedOrigins": "*"
+          }
+        },
+        "id": "d56c7bd8-b4cd-4aeb-8dd9-752d0ec9c163",
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Leer parámetros",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const q = $input.first().json.query || {};\nlet tipo = String(q.tipo || 'LISTADO').toUpperCase();\nif (!['LISTADO', 'DETALLE', 'FILTRO'].includes(tipo)) tipo = 'LISTADO';\nreturn [{\n  json: {\n    tipo,\n    categoria: String(q.categoria || '').trim(),\n    evento_id: String(q.evento_id || '').trim().toUpperCase(),\n    visitor_id: String(q.visitor_id || 'ANONIMO').slice(0, 40),\n  },\n}];\n"
+        },
+        "id": "f062f35e-b723-47b8-86fc-635c0f750af6",
+        "position": [
+          240,
+          0
+        ]
+      },
+      {
+        "name": "Leer eventos",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ofqyN2hdDDF_k0fwaMA3ME37Y6qMfEsQYCRenW8gfpQ",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Eventos",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "9d038a68-d8d0-4639-aef8-ffc972728203",
+        "position": [
+          480,
+          0
+        ]
+      },
+      {
+        "name": "Solo publicables",
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "85d5a42d-6372-4992-9394-7a9396961717",
+                "leftValue": "={{ $json.evento_id }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              },
+              {
+                "id": "0814d5fe-9ff6-42d9-8d6b-e6fe572cabe2",
+                "leftValue": "={{ $json.estado }}",
+                "rightValue": "BORRADOR",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEquals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "alwaysOutputData": true,
+        "id": "4c0366e3-5a8d-4304-b496-3f6eb9b9e590",
+        "position": [
+          720,
+          0
+        ]
+      },
+      {
+        "name": "Leer inscripciones",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1C3iNDCd5gcdKHzicEzzHqWbNlFnp35t4_Wzhl59Nr7o",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Inscripciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "f7377e2e-b993-40b2-87f5-f6b87ff0f54d",
+        "position": [
+          960,
+          0
+        ]
+      },
+      {
+        "name": "Solo confirmadas y en espera",
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "9644e3c7-a74d-451d-9ec7-b2b2a2785b83",
+                "leftValue": "={{ $json.estado }}",
+                "rightValue": "CANCELADA",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEquals"
+                }
+              },
+              {
+                "id": "bddba4b9-ae3b-48b1-8b71-8d7c63ad8a8a",
+                "leftValue": "={{ $json.inscripcion_id }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "alwaysOutputData": true,
+        "id": "671a55d4-042d-461a-8a85-224769b61e14",
+        "position": [
+          1200,
+          0
+        ]
+      },
+      {
+        "name": "Agrupar inscripciones",
+        "type": "n8n-nodes-base.aggregate",
+        "typeVersion": 1,
+        "parameters": {
+          "aggregate": "aggregateAllItemData",
+          "destinationFieldName": "inscripciones",
+          "options": {}
+        },
+        "alwaysOutputData": true,
+        "id": "823e13f5-95df-4d26-bb14-a9f5b182b102",
+        "position": [
+          1440,
+          0
+        ]
+      },
+      {
+        "name": "Calcular cupos",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const p = $('Leer parámetros').first().json;\nconst eventos = $('Solo publicables').all().map(i => i.json).filter(e => e.evento_id);\nconst inscripciones = ($input.first().json.inscripciones || []).filter(i => i.inscripcion_id);\nconst ahoraMs = Date.now();\n\n// cupos = capacidad - inscripciones CONFIRMADAS (no se guarda a mano en ningun lado)\nconst conCupos = eventos.map(e => {\n  const delEvento = inscripciones.filter(i => i.evento_id === e.evento_id);\n  const confirmados = delEvento.filter(i => i.estado === 'CONFIRMADA').length;\n  const enEspera = delEvento.filter(i => i.estado === 'LISTA_ESPERA').length;\n  const capacidad = Number(e.capacidad) || 0;\n  const inicio = new Date(`${e.fecha}T${e.hora || '00:00'}:00-05:00`).getTime();\n  return {\n    evento_id: e.evento_id, nombre: e.nombre, categoria: e.categoria, descripcion: e.descripcion,\n    fecha: e.fecha, hora: e.hora, lugar: e.lugar, capacidad, imagen_url: e.imagen_url,\n    organizador: e.organizador, estado: e.estado,\n    confirmados, en_espera: enEspera,\n    cupos_disponibles: Math.max(capacidad - confirmados, 0),\n    inscripcion_abierta: e.estado === 'PUBLICADO' && inicio > ahoraMs,\n  };\n});\n\nlet status = 200;\nlet body;\nlet resultado = conCupos;\nif (p.tipo === 'DETALLE') {\n  const ev = conCupos.find(e => e.evento_id === p.evento_id);\n  resultado = ev ? [ev] : [];\n  if (!ev) { status = 404; body = { ok: false, error: 'NO_ENCONTRADO', mensaje: 'No encontramos ese evento.' }; }\n  else body = { ok: true, evento: ev };\n} else {\n  if (p.tipo === 'FILTRO' && p.categoria) resultado = conCupos.filter(e => e.categoria === p.categoria);\n  body = { ok: true, total: resultado.length, eventos: resultado };\n}\nreturn [{ json: { status, body, _count: resultado.length } }];\n"
+        },
+        "id": "bf1286a3-dae7-412b-8d33-3f6816468010",
+        "position": [
+          1680,
+          0
+        ]
+      },
+      {
+        "name": "Responder",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify($json.body) }}",
+          "options": {
+            "responseCode": "={{ $json.status }}"
+          }
+        },
+        "id": "98066b89-8675-422c-9556-71bff6f3a9e4",
+        "position": [
+          1920,
+          0
+        ]
+      },
+      {
+        "name": "Registrar consulta",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const p = $('Leer parámetros').first().json;\nconst r = $('Calcular cupos').first().json;\nreturn [{\n  json: {\n    consulta_id: 'CON-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(),\n    fecha: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n    tipo: p.tipo,\n    evento_id: p.evento_id,\n    categoria: p.categoria,\n    resultado_count: r._count,\n    visitor_id: p.visitor_id,\n    status_http: r.status,\n  },\n}];\n"
+        },
+        "id": "5d643c4a-80a9-4377-9293-e6fd90153528",
+        "position": [
+          2160,
+          0
+        ]
+      },
+      {
+        "name": "Guardar en log",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1IxMSNWn6LgeOzdtSmy4qs6_aySWpn5R7tw7bRPBH0ok",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Consultas_Catalogo",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "12b7e48f-f6b3-49cb-ae48-4e41b93665d5",
+        "position": [
+          2400,
+          0
+        ]
+      },
+      {
+        "id": "935a4020-8330-4786-919d-5477ce5c6024",
+        "name": "Nota 1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -237.99999999999997
+        ],
+        "parameters": {
+          "content": "## WF05 · Catálogo público\n`GET /webhook/ep/catalogo?tipo=LISTADO|FILTRO|DETALLE&categoria=&evento_id=&visitor_id=`\nCupos = capacidad − inscripciones CONFIRMADAS. Cada consulta queda en **EP05_Catalogo_Log**.",
+          "width": 620,
+          "height": 150,
+          "color": 5
+        }
+      }
+    ],
+    "connections": {
+      "Webhook catálogo": {
+        "main": [
+          [
+            {
+              "node": "Leer parámetros",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer parámetros": {
+        "main": [
+          [
+            {
+              "node": "Leer eventos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer eventos": {
+        "main": [
+          [
+            {
+              "node": "Solo publicables",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Solo publicables": {
+        "main": [
+          [
+            {
+              "node": "Leer inscripciones",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer inscripciones": {
+        "main": [
+          [
+            {
+              "node": "Solo confirmadas y en espera",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Solo confirmadas y en espera": {
+        "main": [
+          [
+            {
+              "node": "Agrupar inscripciones",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Agrupar inscripciones": {
+        "main": [
+          [
+            {
+              "node": "Calcular cupos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calcular cupos": {
+        "main": [
+          [
+            {
+              "node": "Responder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Responder": {
+        "main": [
+          [
+            {
+              "node": "Registrar consulta",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Registrar consulta": {
+        "main": [
+          [
+            {
+              "node": "Guardar en log",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "America/Bogota",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "staticData": null,
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "bbf538de-dc9a-4a14-8504-b47d83f0d2c4",
+    "activeVersionId": "bbf538de-dc9a-4a14-8504-b47d83f0d2c4",
+    "versionCounter": 3,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-10-22T13:08:36.530Z",
+        "createdAt": "2026-10-22T13:08:36.530Z",
+        "role": "workflow:owner",
+        "workflowId": "RD1qqKdr6E96Ce3E",
+        "projectId": "8m9LtPd0NFg6kHzT",
+        "project": {
+          "updatedAt": "2026-09-29T13:41:51.281Z",
+          "createdAt": "2026-09-29T13:38:22.142Z",
+          "id": "8m9LtPd0NFg6kHzT",
+          "name": "Joan Chaparro <sebaschaparrorodriguez@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "8ef28f08-bf6d-4d43-a239-45b5425b5f4f"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]
