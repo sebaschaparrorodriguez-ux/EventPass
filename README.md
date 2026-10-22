@@ -1,6 +1,7 @@
 # EventPass Barrio
 
 **Estudiante:** Joan Sebastian Chaparro Rodriguez
+**Estudiante:** Gabriela Silva
 **Proyecto integrador:** desarrollo web + servicios HTTP + IA aplicada + automatización con n8n
 
 **App publicada:** _pendiente (se agrega cuando quede el deploy en Vercel)_
