@@ -645,6 +645,32 @@ details[open] {
   flex-wrap: wrap;
 }
 
+.fila-entre {
+  justify-content: space-between;
+}
+
+.btn-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-weight: 700;
+  color: var(--pino);
+  cursor: pointer;
+}
+
+.btn-link:disabled {
+  color: var(--tinta-suave);
+  cursor: default;
+}
+
+.input-codigo {
+  font-size: 1.8rem;
+  letter-spacing: 0.5em;
+  text-align: center;
+  font-weight: 700;
+}
+
 .check {
   display: inline-flex;
   gap: 0.4rem;

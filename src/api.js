@@ -51,6 +51,11 @@ async function llamar(ruta, { method = 'POST', body, query } = {}) {
 }
 
 // ---- WF01 usuarios
+// paso 1 del registro: manda un codigo de 6 digitos al correo
+export const enviarCodigoRegistro = (datos) =>
+  llamar('ep/usuarios', { body: { accion: 'enviar_codigo', ...datos } })
+
+// paso 2: con el codigo correcto se crea la cuenta
 export const registrarUsuario = (datos) =>
   llamar('ep/usuarios', { body: { accion: 'crear', ...datos } })
 
