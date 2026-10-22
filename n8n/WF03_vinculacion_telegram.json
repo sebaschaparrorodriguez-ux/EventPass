@@ -1,0 +1,1351 @@
+[
+  {
+    "updatedAt": "2026-10-22T13:59:59.000Z",
+    "createdAt": "2026-10-22T13:08:36.523Z",
+    "id": "ErWYgBRcrt4ckS4t",
+    "name": "WF03_vinculacion_telegram",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "name": "Webhook telegram",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "webhookId": "2c3f120a-516a-460a-a713-f516e663dca4",
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "ep/telegram",
+          "responseMode": "responseNode",
+          "options": {
+            "allowedOrigins": "*"
+          }
+        },
+        "id": "d5b84025-9aee-4c28-bff9-69df9f6f64a7",
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Normalizar solicitud",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const b = $input.first().json.body || {};\nreturn [{ json: { accion: String(b.accion || '').trim().toLowerCase(), token: String(b.token || '').trim() } }];\n"
+        },
+        "id": "94aee092-6633-4250-b78e-e6b5f3f0b638",
+        "position": [
+          240,
+          0
+        ]
+      },
+      {
+        "name": "Validar sesión (WF02)",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "uMW3Nj6vVDn6i6um",
+            "mode": "id"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "mode": "each",
+          "options": {
+            "waitForSubWorkflow": true
+          }
+        },
+        "id": "d55e430e-b396-419c-be34-5e9bf40582e3",
+        "position": [
+          480,
+          0
+        ]
+      },
+      {
+        "name": "¿Sesión válida?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "d6babb15-c1a2-4d21-92e7-16bb5e1512e9",
+                "leftValue": "={{ $json.valida }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "95775e17-37fe-4f4a-90c4-bd45256021da",
+        "position": [
+          720,
+          0
+        ]
+      },
+      {
+        "name": "Sesión no válida",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const r = $input.first().json;\nconst mensajes = {\n  NO_EXISTE: 'Necesitas iniciar sesión.',\n  CERRADA: 'Tu sesión fue cerrada. Vuelve a ingresar.',\n  EXPIRADA: 'Tu sesión expiró. Vuelve a ingresar.',\n  USUARIO_INACTIVO: 'Tu cuenta está desactivada.',\n};\nreturn [{\n  json: {\n    status: 401,\n    body: { ok: false, error: 'SESION_' + (r.motivo || 'INVALIDA'), mensaje: mensajes[r.motivo] || 'Sesión no válida.' },\n  },\n}];\n"
+        },
+        "id": "2a9d8228-1e99-4a86-93c3-72b7eca0ef21",
+        "position": [
+          960,
+          255
+        ]
+      },
+      {
+        "name": "Leer vinculaciones",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Vinculaciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "c1de8615-6233-4da3-8b58-2f3519108214",
+        "position": [
+          960,
+          0
+        ]
+      },
+      {
+        "name": "¿Qué acción?",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "f7602d96-630f-4003-b76b-e0c1103121c2",
+                      "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
+                      "rightValue": "solicitar",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "solicitar"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "dafabcbf-3a20-4796-b5b1-8d16140530b9",
+                      "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
+                      "rightValue": "estado",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "estado"
+              }
+            ]
+          },
+          "looseTypeValidation": true,
+          "options": {
+            "fallbackOutput": "extra",
+            "renameFallbackOutput": "otro"
+          }
+        },
+        "id": "41aa53e1-4fa4-4b08-81f3-f08d6cd81d95",
+        "position": [
+          1200,
+          0
+        ]
+      },
+      {
+        "name": "Leer códigos",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Codigos_Vinculacion",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "a4a12b71-e6cb-4cc0-8c2f-7a736ecf6304",
+        "position": [
+          1440,
+          -170
+        ]
+      },
+      {
+        "name": "Generar código",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const crypto = require('crypto');\nconst usuarioId = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst yaVinculado = $('Leer vinculaciones').all().some(i => i.json.usuario_id === usuarioId && i.json.estado === 'ACTIVA');\nif (yaVinculado) {\n  return [{ json: { ok: false, error_status: 409, error_codigo: 'YA_VINCULADO', error_mensaje: 'Tu cuenta ya tiene Telegram vinculado.' } }];\n}\nconst horaCO = (ms) => new Date(ms - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst ahora = Date.now();\nconst MINUTOS = 15;\n// sin 0/O ni 1/I para que no se confundan al escribirlo\nconst letras = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';\nlet codigo = '';\nfor (let i = 0; i < 6; i++) codigo += letras[crypto.randomInt(letras.length)];\n\n// los codigos pendientes anteriores del mismo usuario se cancelan\nconst viejos = $('Leer códigos').all().map(i => i.json)\n  .filter(c => c.usuario_id === usuarioId && c.estado === 'PENDIENTE')\n  .map(c => c.codigo_id);\n\nreturn [{\n  json: {\n    ok: true,\n    codigo_id: 'COD-' + ahora.toString(36).toUpperCase(),\n    usuario_id: usuarioId,\n    codigo,\n    creado_en: horaCO(ahora),\n    expira_en: horaCO(ahora + MINUTOS * 60 * 1000),\n    estado: 'PENDIENTE',\n    usado_en: '',\n    _cancelar: viejos,\n  },\n}];\n"
+        },
+        "id": "eb532637-ccac-48e4-a66b-71378fff398e",
+        "position": [
+          1680,
+          -170
+        ]
+      },
+      {
+        "name": "¿Código generado?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "fc49bbaf-3080-4b3c-b15f-e50225ad2dbc",
+                "leftValue": "={{ $json.ok }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "216e79f7-6595-44bc-9d19-cc0c79904843",
+        "position": [
+          1920,
+          -170
+        ]
+      },
+      {
+        "name": "Guardar código",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Codigos_Vinculacion",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "9dd9e28b-da3d-4bea-821a-5bebf6a83935",
+        "position": [
+          2160,
+          -272
+        ]
+      },
+      {
+        "name": "Respuesta código",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const c = $('Generar código').first().json;\nreturn [{ json: { status: 201, body: { ok: true, codigo: c.codigo, expira_en: c.expira_en } } }];\n"
+        },
+        "id": "5f1b05da-75cd-4deb-93a5-b28ace315a57",
+        "position": [
+          2400,
+          -272
+        ]
+      },
+      {
+        "name": "Códigos anteriores",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const ids = $('Generar código').first().json._cancelar || [];\nreturn ids.map(id => ({ json: { codigo_id: id, estado: 'CANCELADO' } }));\n"
+        },
+        "id": "d1e030e1-fd22-4cc2-958b-c998322b1974",
+        "position": [
+          2160,
+          -102
+        ]
+      },
+      {
+        "name": "Cancelar códigos anteriores",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Codigos_Vinculacion",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "codigo_id"
+            ],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "2bfdf484-ba9b-4890-ae6a-c00477d0659c",
+        "position": [
+          2400,
+          -102
+        ]
+      },
+      {
+        "name": "Estado de vinculación",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const usuarioId = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst v = $('Leer vinculaciones').all().map(i => i.json).find(x => x.usuario_id === usuarioId && x.estado === 'ACTIVA');\nreturn [{ json: { status: 200, body: { ok: true, vinculado: !!v, telegram_username: v ? v.telegram_username : null, fecha_vinculacion: v ? v.fecha_vinculacion : null } } }];\n"
+        },
+        "id": "6ac4549b-7a09-4722-9d0b-480d64803684",
+        "position": [
+          1440,
+          85
+        ]
+      },
+      {
+        "name": "Acción no válida",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return [{ json: { status: 400, body: { ok: false, error: 'ACCION_NO_VALIDA', mensaje: 'La acción enviada no existe.' } } }];\n"
+        },
+        "id": "146a200b-9a52-40cf-a7e6-7a80c551fcf2",
+        "position": [
+          1440,
+          255
+        ]
+      },
+      {
+        "name": "Respuesta error",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const d = $input.first().json;\nreturn [{\n  json: {\n    status: d.error_status || 400,\n    body: { ok: false, error: d.error_codigo || 'ERROR', mensaje: d.error_mensaje || 'No se pudo procesar la solicitud.' },\n  },\n}];\n"
+        },
+        "id": "47af98cd-c8d5-40e4-8947-500b0e08befd",
+        "position": [
+          2160,
+          85
+        ]
+      },
+      {
+        "name": "Responder",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ JSON.stringify($json.body) }}",
+          "options": {
+            "responseCode": "={{ $json.status }}"
+          }
+        },
+        "id": "07d1c473-3220-4ab4-8d11-99febebd31b1",
+        "position": [
+          2880,
+          0
+        ]
+      },
+      {
+        "name": "Mensaje en Telegram",
+        "type": "n8n-nodes-base.telegramTrigger",
+        "typeVersion": 1.2,
+        "webhookId": "c60a9ba0-da2a-4748-8601-2d7fc2bf3b62",
+        "parameters": {
+          "updates": [
+            "message"
+          ],
+          "additionalFields": {}
+        },
+        "credentials": {
+          "telegramApi": {
+            "id": "tuJxI5kkU1LZ9A5Y",
+            "name": "Telegram EventPass Bot"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "070d3fc9-b940-4584-a0f6-97a0bc4bc0f4",
+        "position": [
+          0,
+          680
+        ]
+      },
+      {
+        "name": "Leer mensaje",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const m = $input.first().json.message || {};\nconst texto = String(m.text || '').trim();\nconst partes = texto.split(/\\s+/);\nlet tipo = 'otro';\nif (/^\\/vincular(@\\w+)?$/i.test(partes[0] || '')) tipo = 'vincular';\nelse if (/^\\/start/i.test(texto)) tipo = 'start';\nreturn [{\n  json: {\n    tipo,\n    codigo: String(partes[1] || '').toUpperCase(),\n    chat_id: String(m.chat ? m.chat.id : ''),\n    telegram_username: (m.from && m.from.username) || '',\n    nombre_telegram: (m.from && m.from.first_name) || '',\n  },\n}];\n"
+        },
+        "id": "07a42ca7-1b0e-40f6-a401-a3b2d61e09d3",
+        "position": [
+          240,
+          680
+        ]
+      },
+      {
+        "name": "¿Qué escribió?",
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "34b0f85a-d4cc-4812-baa8-e4f06c0d3f21",
+                      "leftValue": "={{ $json.tipo }}",
+                      "rightValue": "vincular",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "vincular"
+              }
+            ]
+          },
+          "looseTypeValidation": true,
+          "options": {
+            "fallbackOutput": "extra",
+            "renameFallbackOutput": "otro"
+          }
+        },
+        "id": "12ce2cec-93e6-4659-8ce6-14474c33b39f",
+        "position": [
+          480,
+          680
+        ]
+      },
+      {
+        "name": "Leer códigos (bot)",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Codigos_Vinculacion",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "1d56e9c8-766b-4c70-ad32-c553c357338f",
+        "position": [
+          720,
+          595
+        ]
+      },
+      {
+        "name": "Leer vinculaciones (bot)",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Vinculaciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "3c0660b5-9b13-4ae7-b1a1-77574dc01493",
+        "position": [
+          960,
+          595
+        ]
+      },
+      {
+        "name": "Validar código",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const m = $('Leer mensaje').first().json;\nconst codigos = $('Leer códigos (bot)').all().map(i => i.json).filter(c => c.codigo_id);\nconst ahoraMs = Date.now();\nconst ahora = new Date(ahoraMs - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst malo = (msg, extra = {}) => [{ json: { valido: false, chat_id: m.chat_id, mensaje: msg, marcar_expirado: false, ...extra } }];\n\nif (!m.codigo) return malo('Escribe el código así: <b>/vincular ABC123</b>');\nconst c = codigos.find(x => String(x.codigo).toUpperCase() === m.codigo);\nif (!c) return malo('Ese código no existe. Genera uno nuevo desde tu perfil en EventPass.');\nif (c.estado === 'USADO') return malo('Ese código ya fue usado. Cada código sirve una sola vez.');\nif (c.estado === 'CANCELADO') return malo('Ese código fue reemplazado por uno más nuevo. Usa el último que generaste.');\nif (c.estado === 'EXPIRADO' || new Date(c.expira_en).getTime() < ahoraMs) {\n  return malo('Ese código ya venció (duran 15 minutos). Genera uno nuevo desde tu perfil.', {\n    marcar_expirado: c.estado === 'PENDIENTE', codigo_id: c.codigo_id, estado: 'EXPIRADO',\n  });\n}\n\nconst yaActiva = $('Leer vinculaciones (bot)').all().some(i => i.json.usuario_id === c.usuario_id && i.json.estado === 'ACTIVA');\nif (yaActiva) return malo('Tu cuenta de EventPass ya está vinculada.');\n\nreturn [{ json: { valido: true, chat_id: m.chat_id, codigo_id: c.codigo_id, usuario_id: c.usuario_id, estado: 'USADO', usado_en: ahora } }];\n"
+        },
+        "id": "f22ae45d-4db2-4a3e-b971-29c7dff2aa68",
+        "position": [
+          1200,
+          595
+        ]
+      },
+      {
+        "name": "¿Código válido?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "c2db9a03-ac1c-4b14-b1f5-35837ec6e722",
+                "leftValue": "={{ $json.valido }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "b5832800-2e1f-4174-b3a2-7d532605178a",
+        "position": [
+          1440,
+          595
+        ]
+      },
+      {
+        "name": "Marcar código usado",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Codigos_Vinculacion",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "codigo_id"
+            ],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "fc4b19f3-24dd-4b5e-a6d7-18a7b4480003",
+        "position": [
+          1680,
+          510
+        ]
+      },
+      {
+        "name": "Datos de vinculación",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const v = $('Validar código').first().json;\nconst m = $('Leer mensaje').first().json;\nreturn [{\n  json: {\n    vinculacion_id: 'VIN-' + Date.now().toString(36).toUpperCase(),\n    usuario_id: v.usuario_id,\n    chat_id: m.chat_id,\n    telegram_username: m.telegram_username,\n    fecha_vinculacion: v.usado_en,\n    estado: 'ACTIVA',\n  },\n}];\n"
+        },
+        "id": "41b2a1d9-4264-44fd-9f13-be3e73d2bae5",
+        "position": [
+          1920,
+          510
+        ]
+      },
+      {
+        "name": "Guardar vinculación",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Vinculaciones",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "f53fe84b-dc1b-4257-9218-8374b450d5f4",
+        "position": [
+          2160,
+          510
+        ]
+      },
+      {
+        "name": "Confirmar en Telegram",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "webhookId": "703e4e9a-baa7-4f6f-ae18-e7e40e3e6b33",
+        "parameters": {
+          "chatId": "={{ $('Leer mensaje').first().json.chat_id }}",
+          "text": "=✅ <b>¡Listo, {{ $('Leer mensaje').first().json.nombre_telegram || 'vecino' }}!</b>\nTu cuenta de EventPass Barrio quedó vinculada. Por aquí te llegarán las confirmaciones, cambios y recordatorios de tus eventos.",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          }
+        },
+        "credentials": {
+          "telegramApi": {
+            "id": "tuJxI5kkU1LZ9A5Y",
+            "name": "Telegram EventPass Bot"
+          }
+        },
+        "id": "01b0ecda-6677-4697-84cc-b29eef2f7635",
+        "position": [
+          2400,
+          510
+        ]
+      },
+      {
+        "name": "¿Marcar como expirado?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "270589f1-4860-4de2-bc55-2f1ffb41edaa",
+                "leftValue": "={{ $json.marcar_expirado }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "0073ea0c-cd2d-449b-b3d2-5302279bde3b",
+        "position": [
+          1680,
+          731
+        ]
+      },
+      {
+        "name": "Marcar código expirado",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Codigos_Vinculacion",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "codigo_id"
+            ],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "21c5d865-1d0d-4a8e-8100-d076758eeede",
+        "position": [
+          1920,
+          696.9999999999999
+        ]
+      },
+      {
+        "name": "Avisar error",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "webhookId": "a58acc3c-a1b3-4883-858c-37aff0e857d3",
+        "parameters": {
+          "chatId": "={{ $('Validar código').first().json.chat_id }}",
+          "text": "=⚠️ {{ $('Validar código').first().json.mensaje }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          }
+        },
+        "credentials": {
+          "telegramApi": {
+            "id": "tuJxI5kkU1LZ9A5Y",
+            "name": "Telegram EventPass Bot"
+          }
+        },
+        "id": "c8024cd6-1393-4dc6-9add-b6a447e64753",
+        "position": [
+          2160,
+          748.0000000000001
+        ]
+      },
+      {
+        "name": "Ayuda del bot",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "webhookId": "0d088131-71b9-4d72-a86a-cc6ba0ed35ed",
+        "parameters": {
+          "chatId": "={{ $('Leer mensaje').first().json.chat_id }}",
+          "text": "=👋 Hola, soy el bot de <b>EventPass Barrio</b>.\n\nPara vincular tu cuenta:\n1. Entra a tu perfil en la página\n2. Toca \"Generar código de vinculación\"\n3. Envíame <b>/vincular TU_CODIGO</b>\n\nPara dudas sobre eventos usa el asistente de la página.",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          }
+        },
+        "credentials": {
+          "telegramApi": {
+            "id": "tuJxI5kkU1LZ9A5Y",
+            "name": "Telegram EventPass Bot"
+          }
+        },
+        "id": "b83dfb30-53e0-4c60-9f51-fc174079d492",
+        "position": [
+          720,
+          850
+        ]
+      },
+      {
+        "id": "21624b02-228d-45f0-b92b-3b58784e83ef",
+        "name": "Nota 1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -442
+        ],
+        "parameters": {
+          "content": "## WF03 · Vinculación con Telegram\n1) Web: `POST /webhook/ep/telegram` (solicitar | estado) genera un código de 6 caracteres que vence en 15 min.\n2) Bot: el usuario envía `/vincular CODIGO`. Se valida vigencia y que no esté usado, se guarda el chat_id y el código pasa a USADO.\nPersistencia: **EP03_Telegram**.",
+          "width": 620,
+          "height": 190,
+          "color": 5
+        }
+      }
+    ],
+    "connections": {
+      "Webhook telegram": {
+        "main": [
+          [
+            {
+              "node": "Normalizar solicitud",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Normalizar solicitud": {
+        "main": [
+          [
+            {
+              "node": "Validar sesión (WF02)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validar sesión (WF02)": {
+        "main": [
+          [
+            {
+              "node": "¿Sesión válida?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Sesión válida?": {
+        "main": [
+          [
+            {
+              "node": "Leer vinculaciones",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Sesión no válida",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer vinculaciones": {
+        "main": [
+          [
+            {
+              "node": "¿Qué acción?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Sesión no válida": {
+        "main": [
+          [
+            {
+              "node": "Responder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Qué acción?": {
+        "main": [
+          [
+            {
+              "node": "Leer códigos",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Estado de vinculación",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Acción no válida",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer códigos": {
+        "main": [
+          [
+            {
+              "node": "Generar código",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Generar código": {
+        "main": [
+          [
+            {
+              "node": "¿Código generado?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Código generado?": {
+        "main": [
+          [
+            {
+              "node": "Guardar código",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Códigos anteriores",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Respuesta error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Guardar código": {
+        "main": [
+          [
+            {
+              "node": "Respuesta código",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Respuesta código": {
+        "main": [
+          [
+            {
+              "node": "Responder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Códigos anteriores": {
+        "main": [
+          [
+            {
+              "node": "Cancelar códigos anteriores",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Estado de vinculación": {
+        "main": [
+          [
+            {
+              "node": "Responder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Acción no válida": {
+        "main": [
+          [
+            {
+              "node": "Responder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Respuesta error": {
+        "main": [
+          [
+            {
+              "node": "Responder",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mensaje en Telegram": {
+        "main": [
+          [
+            {
+              "node": "Leer mensaje",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer mensaje": {
+        "main": [
+          [
+            {
+              "node": "¿Qué escribió?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Qué escribió?": {
+        "main": [
+          [
+            {
+              "node": "Leer códigos (bot)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Ayuda del bot",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer códigos (bot)": {
+        "main": [
+          [
+            {
+              "node": "Leer vinculaciones (bot)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer vinculaciones (bot)": {
+        "main": [
+          [
+            {
+              "node": "Validar código",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validar código": {
+        "main": [
+          [
+            {
+              "node": "¿Código válido?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Código válido?": {
+        "main": [
+          [
+            {
+              "node": "Marcar código usado",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "¿Marcar como expirado?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Marcar código usado": {
+        "main": [
+          [
+            {
+              "node": "Datos de vinculación",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Datos de vinculación": {
+        "main": [
+          [
+            {
+              "node": "Guardar vinculación",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Guardar vinculación": {
+        "main": [
+          [
+            {
+              "node": "Confirmar en Telegram",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Marcar como expirado?": {
+        "main": [
+          [
+            {
+              "node": "Marcar código expirado",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Avisar error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Marcar código expirado": {
+        "main": [
+          [
+            {
+              "node": "Avisar error",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "America/Bogota",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "staticData": null,
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "e98f8327-a899-449c-8bd3-a2145276aa8f",
+    "activeVersionId": "e98f8327-a899-449c-8bd3-a2145276aa8f",
+    "versionCounter": 3,
+    "triggerCount": 2,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-10-22T13:08:36.524Z",
+        "createdAt": "2026-10-22T13:08:36.524Z",
+        "role": "workflow:owner",
+        "workflowId": "ErWYgBRcrt4ckS4t",
+        "projectId": "8m9LtPd0NFg6kHzT",
+        "project": {
+          "updatedAt": "2026-09-29T13:41:51.281Z",
+          "createdAt": "2026-09-29T13:38:22.142Z",
+          "id": "8m9LtPd0NFg6kHzT",
+          "name": "Joan Chaparro <sebaschaparrorodriguez@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "8ef28f08-bf6d-4d43-a239-45b5425b5f4f"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]
