@@ -64,7 +64,7 @@ La regla principal que seguí: **el frontend es solo un cliente**. No tiene ning
 | Backend / lógica | n8n 2.41 (local, publicado con ngrok) |
 | Persistencia | Google Sheets (10 archivos) |
 | Notificaciones | Gmail + bot de Telegram |
-| IA | Google Gemini 2.5 Flash con el nodo AI Agent |
+| IA | Google Gemini (`gemini-flash-latest`, con `gemini-flash-lite-latest` de respaldo) en el nodo AI Agent |
 
 ---
 
@@ -233,7 +233,7 @@ Cómo funciona:
 1. el `conversation_id` se genera con un hash del `sessionId` del widget (`CNV-XXXX`)
 2. si el usuario tiene sesión, el widget manda el token y se valida con WF02; si no, se usa el `visitor_id`
 3. se leen los eventos y las inscripciones **en modo solo lectura** y se arma un contexto con datos reales (cupos, fechas, lugares y las inscripciones del usuario si está logueado)
-4. el AI Agent con **Gemini** responde usando ese contexto, con memoria de los últimos mensajes de esa conversación
+4. el AI Agent con **Gemini** responde usando ese contexto, con memoria de los últimos mensajes de esa conversación. Si el modelo principal está saturado (pasa seguido con la capa gratis), el agente usa un modelo de respaldo más liviano; tiene 3 reintentos y, si aun así falla, responde un mensaje amable en vez de romper el chat
 5. se guarda la conversación en `Conversaciones` y **cada mensaje** (`USER`, `ASSISTANT` y uno `SYSTEM` al inicio) en `Mensajes`. Filtrando por `conversation_id` se reconstruye la conversación completa.
 
 **Restricciones:** el asistente no tiene ninguna tool conectada, entonces aunque quisiera no podría escribir nada. Además el prompt le dice que no puede crear usuarios, iniciar sesión, inscribir, cancelar, modificar eventos, cambiar cupos ni estados, que no invente datos y que no pida contraseñas. Si le piden algo de eso, explica cómo hacerlo en la página.
