@@ -1,13 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-  <rect width="800" height="500" fill="#7a4fa3"/>
-  <g stroke="#2a1a12" stroke-width="6" stroke-linejoin="round">
-    <path d="M160 140h220q20 0 20 20v240q-20-20-40-20H160z" fill="#fff6e9"/>
-    <path d="M640 140H420q-20 0-20 20v240q20-20 40-20h200z" fill="#fff6e9"/>
-    <path d="M520 90l40 20-90 180-40 20 0-45z" fill="#f2b33d"/>
+  <!-- taller: buñuelos y natilla sobre el mantel -->
+  <rect width="800" height="500" fill="#b3262e"/>
+  <g fill="#9e1f27"><rect y="0" width="800" height="40"/><rect y="80" width="800" height="40"/><rect y="160" width="800" height="40"/></g>
+  <rect y="230" width="800" height="270" fill="#fff4d6"/>
+  <g fill="#1f7a4d" opacity=".18"><rect x="0" y="230" width="60" height="270"/><rect x="120" y="230" width="60" height="270"/><rect x="240" y="230" width="60" height="270"/><rect x="360" y="230" width="60" height="270"/><rect x="480" y="230" width="60" height="270"/><rect x="600" y="230" width="60" height="270"/><rect x="720" y="230" width="60" height="270"/></g>
+  <ellipse cx="270" cy="370" rx="180" ry="60" fill="#e9e1cf"/><ellipse cx="270" cy="360" rx="170" ry="52" fill="#fff"/>
+  <g>
+    <circle cx="200" cy="335" r="38" fill="#d9952f"/><circle cx="190" cy="325" r="10" fill="#f0bd5f" opacity=".7"/>
+    <circle cx="285" cy="325" r="40" fill="#cf8a26"/><circle cx="275" cy="313" r="11" fill="#f0bd5f" opacity=".7"/>
+    <circle cx="245" cy="380" r="36" fill="#dc9b35"/><circle cx="236" cy="370" r="10" fill="#f0bd5f" opacity=".7"/>
+    <circle cx="335" cy="375" r="34" fill="#d4902c"/><circle cx="326" cy="366" r="9" fill="#f0bd5f" opacity=".7"/>
   </g>
-  <g stroke="#2a1a12" stroke-width="5" stroke-linecap="round">
-    <path d="M200 200h150M200 240h150M200 280h110"/>
-    <path d="M450 330h140M450 360h100"/>
-  </g>
-  <circle cx="680" cy="80" r="30" fill="#f2b33d"/>
+  <rect x="490" y="300" width="230" height="130" rx="14" fill="#e9e1cf"/>
+  <g fill="#c98e5a"><rect x="505" y="312" width="62" height="50" rx="4"/><rect x="575" y="312" width="62" height="50" rx="4"/><rect x="645" y="312" width="62" height="50" rx="4"/>
+  <rect x="505" y="368" width="62" height="50" rx="4"/><rect x="575" y="368" width="62" height="50" rx="4"/><rect x="645" y="368" width="62" height="50" rx="4"/></g>
+  <g fill="#6b3d1e" opacity=".5"><circle cx="530" cy="330" r="4"/><circle cx="610" cy="340" r="4"/><circle cx="680" cy="328" r="4"/><circle cx="540" cy="395" r="4"/><circle cx="660" cy="390" r="4"/></g>
 </svg>

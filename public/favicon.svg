@@ -1,6 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <path d="M8 16a4 4 0 0 1 4-4h40a4 4 0 0 1 4 4v8a8 8 0 0 0 0 16v8a4 4 0 0 1-4 4H12a4 4 0 0 1-4-4v-8a8 8 0 0 0 0-16z" fill="#d2552b" stroke="#2a1a12" stroke-width="3"/>
-  <path d="M40 14v36" stroke="#2a1a12" stroke-width="2.5" stroke-dasharray="4 4"/>
-  <path d="M15 40l7-16 6 10 4-6 4 12z" fill="#f2b33d" stroke="#2a1a12" stroke-width="2.5" stroke-linejoin="round"/>
-  <circle cx="48" cy="32" r="3.5" fill="#fff6e9"/>
+  <!-- farolito -->
+  <path d="M32 4v6" stroke="#14213d" stroke-width="3" stroke-linecap="round"/>
+  <rect x="20" y="10" width="24" height="7" rx="2" fill="#14213d"/>
+  <path d="M18 17h28l-2 34H20z" fill="#b3262e"/>
+  <path d="M25 17l-1 34M39 17l1 34" stroke="#8a1c22" stroke-width="2"/>
+  <path d="M32 26c6 7 6 14 0 18c-6-4-6-11 0-18z" fill="#f4c542"/>
+  <path d="M32 33c2.5 3 2.5 6 0 8c-2.5-2-2.5-5 0-8z" fill="#fff4d6"/>
+  <rect x="20" y="51" width="24" height="7" rx="2" fill="#14213d"/>
 </svg>

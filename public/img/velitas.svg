@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="90" viewBox="0 0 240 90">
+  <!-- velitas y faroles en el anden, como el 7 de diciembre -->
+  <g>
+    <rect x="22" y="52" width="10" height="30" rx="2" fill="#fff4d6"/>
+    <path d="M27 36c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/><path d="M27 42c2 3 2 6 0 8c-2-2-2-5 0-8z" fill="#e63946"/>
+    <rect x="70" y="44" width="34" height="38" rx="6" fill="#e63946" opacity=".9"/>
+    <rect x="76" y="40" width="22" height="6" rx="2" fill="#0d1a2b"/><rect x="76" y="80" width="22" height="5" rx="2" fill="#0d1a2b"/>
+    <path d="M87 54c4 5 4 10 0 13c-4-3-4-8 0-13z" fill="#f4c542"/>
+    <path d="M70 56h34M70 70h34" stroke="#b3262e" stroke-width="2"/>
+    <rect x="132" y="56" width="10" height="26" rx="2" fill="#fff4d6"/>
+    <path d="M137 40c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/><path d="M137 46c2 3 2 6 0 8c-2-2-2-5 0-8z" fill="#e63946"/>
+    <rect x="170" y="44" width="34" height="38" rx="6" fill="#2bb673" opacity=".9"/>
+    <rect x="176" y="40" width="22" height="6" rx="2" fill="#0d1a2b"/><rect x="176" y="80" width="22" height="5" rx="2" fill="#0d1a2b"/>
+    <path d="M187 54c4 5 4 10 0 13c-4-3-4-8 0-13z" fill="#f4c542"/>
+    <path d="M170 56h34M170 70h34" stroke="#1f7a4d" stroke-width="2"/>
+    <rect x="222" y="58" width="10" height="24" rx="2" fill="#fff4d6"/>
+    <path d="M227 42c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/>
+  </g>
+  <rect y="84" width="240" height="6" fill="#0d1a2b" opacity=".5"/>
+</svg>

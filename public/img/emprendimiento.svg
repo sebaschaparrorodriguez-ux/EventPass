@@ -1,13 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-  <rect width="800" height="500" fill="#d94f7c"/>
-  <g stroke="#2a1a12" stroke-width="6" stroke-linejoin="round">
-    <path d="M120 200h560l-40-90H160z" fill="#fff6e9"/>
-    <path d="M120 200q35 40 70 0q35 40 70 0q35 40 70 0q35 40 70 0q35 40 70 0q35 40 70 0q35 40 70 0q35 40 70 0" fill="#f2b33d"/>
-    <path d="M160 230v200M640 230v200" fill="none"/>
-    <path d="M140 330h520v40H140z" fill="#2a1a12"/>
-    <circle cx="250" cy="305" r="28" fill="#d2552b"/>
-    <circle cx="330" cy="310" r="22" fill="#2f7d5b"/>
-    <rect x="410" y="280" width="60" height="50" fill="#f2b33d"/>
-    <path d="M520 330l30-60 30 60z" fill="#fff6e9"/>
+  <!-- puesto del bazar navideño -->
+  <rect width="800" height="500" fill="#1f4d3a"/>
+  <path d="M0 60 Q100 100 200 60 T400 60 T600 60 T800 60" fill="none" stroke="#0d1a2b" stroke-width="3"/>
+  <g><circle cx="50" cy="85" r="8" fill="#e63946"/><circle cx="150" cy="85" r="8" fill="#f4c542"/><circle cx="250" cy="85" r="8" fill="#fff4d6"/><circle cx="350" cy="85" r="8" fill="#e63946"/>
+  <circle cx="450" cy="85" r="8" fill="#f4c542"/><circle cx="550" cy="85" r="8" fill="#fff4d6"/><circle cx="650" cy="85" r="8" fill="#e63946"/><circle cx="750" cy="85" r="8" fill="#f4c542"/></g>
+  <path d="M130 230h540l-40-90H170z" fill="#fff4d6"/>
+  <g fill="#b3262e"><path d="M170 140h60l-10 90h-80z"/><path d="M290 140h60l10 90h-80z"/><path d="M410 140h60l30 90h-80z"/><path d="M530 140h60l50 90h-80z"/></g>
+  <path d="M130 230q34 30 68 0q34 30 68 0q34 30 68 0q34 30 68 0q34 30 68 0q34 30 68 0q34 30 68 0q34 30 68 0" fill="#e8b04b"/>
+  <path d="M170 255v200M630 255v200" stroke="#7a4b2a" stroke-width="12"/>
+  <rect x="150" y="350" width="500" height="34" fill="#7a4b2a"/>
+  <g>
+    <rect x="200" y="300" width="60" height="50" rx="4" fill="#e63946"/><path d="M200 318h60M230 300v50" stroke="#f4c542" stroke-width="5"/>
+    <circle cx="330" cy="325" r="25" fill="#d9952f"/><circle cx="370" cy="330" r="20" fill="#cf8a26"/>
+    <path d="M430 350l35-70 35 70z" fill="#2bb673"/><circle cx="465" cy="285" r="6" fill="#f4c542"/>
+    <rect x="530" y="310" width="70" height="40" rx="6" fill="#fff4d6"/><path d="M540 330h50" stroke="#b3262e" stroke-width="4"/>
   </g>
 </svg>

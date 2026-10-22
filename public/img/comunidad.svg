@@ -1,22 +1,25 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500">
-  <rect width="800" height="500" fill="#2c5d8f"/>
-  <path d="M0 420h800v80H0z" fill="#2a1a12"/>
-  <g stroke="#2a1a12" stroke-width="6" stroke-linejoin="round">
-    <path d="M90 420V230l90-70 90 70v190z" fill="#f2b33d"/>
-    <path d="M270 420V200h160v220z" fill="#d94f7c"/>
-    <path d="M430 420V250l90-80 90 80v170z" fill="#fff6e9"/>
-    <path d="M610 420V210h120v210z" fill="#d2552b"/>
+  <!-- cuadra con alumbrado y velitas en el anden -->
+  <rect width="800" height="500" fill="#14213d"/>
+  <g fill="#fff4d6" opacity=".7"><circle cx="80" cy="50" r="2"/><circle cx="300" cy="35" r="2"/><circle cx="520" cy="55" r="2"/><circle cx="730" cy="40" r="2"/></g>
+  <path d="M60 420V250l90-70 90 70v170z" fill="#f2e3c6"/><path d="M50 258l100-82 100 82" fill="none" stroke="#b3262e" stroke-width="16" stroke-linecap="round"/>
+  <path d="M240 420V215h170v205z" fill="#e8b04b"/><path d="M230 220h190" stroke="#8a1c22" stroke-width="14" stroke-linecap="round"/>
+  <path d="M410 420V260l100-80 100 80v160z" fill="#cfe3d6"/><path d="M400 268l110-90 110 90" fill="none" stroke="#1f7a4d" stroke-width="16" stroke-linecap="round"/>
+  <path d="M610 420V230h140v190z" fill="#f2e3c6"/><path d="M600 235h160" stroke="#b3262e" stroke-width="14" stroke-linecap="round"/>
+  <g fill="#14213d" opacity=".85">
+    <rect x="130" y="320" width="40" height="100" rx="4"/><rect x="270" y="260" width="40" height="40"/><rect x="340" y="260" width="40" height="40"/>
+    <rect x="275" y="340" width="45" height="80" rx="4"/><rect x="490" y="330" width="40" height="90" rx="4"/><rect x="650" y="270" width="60" height="50"/>
   </g>
-  <g fill="#2a1a12">
-    <rect x="160" y="300" width="40" height="120"/>
-    <rect x="300" y="240" width="40" height="40"/><rect x="360" y="240" width="40" height="40"/>
-    <rect x="300" y="310" width="40" height="40"/><rect x="360" y="310" width="40" height="40"/>
-    <rect x="500" y="320" width="40" height="100"/>
-    <rect x="640" y="250" width="60" height="50"/>
-  </g>
-  <path d="M40 120h720" stroke="#fff6e9" stroke-width="3"/>
-  <g fill="#f2b33d" stroke="#2a1a12" stroke-width="3">
-    <path d="M90 120l18 34h-36z"/><path d="M210 120l18 34h-36z"/><path d="M330 120l18 34h-36z"/>
-    <path d="M450 120l18 34h-36z"/><path d="M570 120l18 34h-36z"/><path d="M690 120l18 34h-36z"/>
+  <path d="M0 140 Q100 190 200 140 T400 140 T600 140 T800 140" fill="none" stroke="#0d1a2b" stroke-width="3"/>
+  <g><circle cx="50" cy="170" r="9" fill="#e63946"/><circle cx="150" cy="170" r="9" fill="#f4c542"/><circle cx="250" cy="170" r="9" fill="#2bb673"/><circle cx="350" cy="170" r="9" fill="#fff4d6"/>
+  <circle cx="450" cy="170" r="9" fill="#e63946"/><circle cx="550" cy="170" r="9" fill="#f4c542"/><circle cx="650" cy="170" r="9" fill="#2bb673"/><circle cx="750" cy="170" r="9" fill="#fff4d6"/></g>
+  <rect y="420" width="800" height="80" fill="#3b4a5e"/>
+  <g>
+    <rect x="80" y="440" width="10" height="26" fill="#fff4d6"/><path d="M85 424c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/>
+    <rect x="200" y="440" width="10" height="26" fill="#fff4d6"/><path d="M205 424c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/>
+    <rect x="320" y="440" width="10" height="26" fill="#fff4d6"/><path d="M325 424c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/>
+    <rect x="440" y="440" width="10" height="26" fill="#fff4d6"/><path d="M445 424c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/>
+    <rect x="560" y="440" width="10" height="26" fill="#fff4d6"/><path d="M565 424c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/>
+    <rect x="680" y="440" width="10" height="26" fill="#fff4d6"/><path d="M685 424c5 6 5 12 0 15c-5-3-5-9 0-15z" fill="#f4c542"/>
   </g>
 </svg>
