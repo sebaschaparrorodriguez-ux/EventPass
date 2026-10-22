@@ -1,0 +1,959 @@
+[
+  {
+    "updatedAt": "2026-10-22T20:15:51.000Z",
+    "createdAt": "2026-10-22T13:08:36.540Z",
+    "id": "hnh0v8y0O013CFCD",
+    "name": "WF10_eventpass_assistant",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "name": "Chat del asistente",
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.3,
+        "webhookId": "94443865-d7fe-42c0-b765-256c26c8365d",
+        "parameters": {
+          "public": true,
+          "mode": "webhook",
+          "options": {
+            "allowedOrigins": "*",
+            "responseMode": "lastNode"
+          }
+        },
+        "id": "5341585e-495d-4d92-b8cf-5757726b1728",
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Identificar conversación",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const crypto = require('crypto');\nconst d = $input.first().json;\nconst meta = d.metadata || {};\nconst sessionId = String(d.sessionId || 'sin-sesion');\nreturn [{\n  json: {\n    conversation_id: 'CNV-' + crypto.createHash('sha1').update(sessionId).digest('hex').slice(0, 12).toUpperCase(),\n    visitor_id: String(meta.visitor_id || 'ANONIMO').slice(0, 40),\n    token: String(meta.token || ''),\n    mensaje: String(d.chatInput || '').slice(0, 1000),\n  },\n}];\n"
+        },
+        "id": "b6cf72ca-9869-4b67-9f36-26754cee9e65",
+        "position": [
+          240,
+          0
+        ]
+      },
+      {
+        "name": "¿Viene con sesión?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "b01a9821-6836-4ec6-870a-cdf6117312a8",
+                "leftValue": "={{ $json.token }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "ef2e1372-28aa-46e7-bb78-16a29b5c51a4",
+        "position": [
+          480,
+          0
+        ]
+      },
+      {
+        "name": "Validar sesión (WF02)",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "uMW3Nj6vVDn6i6um",
+            "mode": "id"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "mode": "each",
+          "options": {
+            "waitForSubWorkflow": true
+          }
+        },
+        "id": "1ac0ea62-ba42-4858-968e-7e5755d114aa",
+        "position": [
+          720,
+          -102
+        ]
+      },
+      {
+        "name": "Leer conversaciones",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1LpsBOvirib3LryBYAIwsmKslP5ck5G3PjG5PxyS6l4s",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Conversaciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "3b8cd989-7a7e-4a70-824d-122c68e60a66",
+        "position": [
+          960,
+          0
+        ]
+      },
+      {
+        "name": "Leer eventos (solo lectura)",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ofqyN2hdDDF_k0fwaMA3ME37Y6qMfEsQYCRenW8gfpQ",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Eventos",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "fafb73ef-b364-4f7c-a353-2a429ed7f958",
+        "position": [
+          1200,
+          0
+        ]
+      },
+      {
+        "name": "Leer inscripciones (solo lectura)",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1C3iNDCd5gcdKHzicEzzHqWbNlFnp35t4_Wzhl59Nr7o",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Inscripciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "bd2fc552-b5e8-4865-b45e-33cd286889fc",
+        "position": [
+          1440,
+          0
+        ]
+      },
+      {
+        "name": "Contexto para la IA",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const c = $('Identificar conversación').first().json;\n    let usuario = null;\n    try {\n      const v = $('Validar sesión (WF02)').first().json;\n      if (v.valida) usuario = v.usuario;\n    } catch (e) { /* visitante sin sesion */ }\n\n    const eventos = $('Leer eventos (solo lectura)').all().map(i => i.json).filter(e => e.evento_id && e.estado !== 'BORRADOR');\n    const ins = $('Leer inscripciones (solo lectura)').all().map(i => i.json).filter(i => i.inscripcion_id);\n    const ahora = new Date(Date.now() - 5 * 3600 * 1000);\n    const ahoraTxt = ahora.toISOString().slice(0, 16).replace('T', ' ');\n\n    const lineas = eventos.map(e => {\n      const conf = ins.filter(i => i.evento_id === e.evento_id && i.estado === 'CONFIRMADA').length;\n      const esp = ins.filter(i => i.evento_id === e.evento_id && i.estado === 'LISTA_ESPERA').length;\n      const libres = Math.max(Number(e.capacidad) - conf, 0);\n      return `- [${e.evento_id}] ${e.nombre} | ${e.categoria} | ${e.fecha} ${e.hora} | ${e.lugar} | estado ${e.estado} | cupos libres ${libres} de ${e.capacidad} | en espera ${esp} | organiza ${e.organizador} | ${String(e.descripcion || '').slice(0, 160)}`;\n    }).join('\\n');\n\n    let bloqueUsuario = 'El usuario es un VISITANTE sin sesión. Si pregunta por sus inscripciones, dile que inicie sesión en la página.';\n    if (usuario) {\n      const mias = ins.filter(i => i.usuario_id === usuario.usuario_id).map(i => {\n        const e = eventos.find(x => x.evento_id === i.evento_id) || {};\n        return `- ${e.nombre || i.evento_id} (${e.fecha || ''}): ${i.estado}`;\n      }).join('\\n') || '- (no tiene inscripciones)';\n      bloqueUsuario = `El usuario tiene sesión iniciada. Se llama ${usuario.nombre}. Sus inscripciones:\\n${mias}`;\n    }\n\n    const system = `Eres \"el Asistente del Barrio\", el asistente de soporte de EventPass Barrio, una página web para inscribirse a eventos culturales, deportivos y de comunidad del barrio.\nFecha y hora actual (Colombia): ${ahoraTxt}.\n\nREGLAS (obligatorias):\n1. Eres SOLO informativo. NO puedes crear usuarios, iniciar sesión, inscribir, cancelar inscripciones, modificar eventos, cambiar cupos ni cambiar ningún estado. Si te lo piden, explica amablemente que tú no puedes hacerlo y dile cómo hacerlo en la página.\n2. Usa solo la información de abajo. Si algo no está, di que no lo sabes. Nunca inventes eventos, fechas, lugares ni cupos.\n3. Responde en español, en tono cercano de barrio, corto (máximo 120 palabras). Puedes usar listas.\n4. Nunca pidas contraseñas ni códigos de vinculación.\n\nCÓMO FUNCIONA EVENTPASS:\n- Registro con nombre, correo y contraseña (mínimo 8 caracteres). Luego \"Ingresar\".\n- Para inscribirse es obligatorio vincular Telegram: en \"Mi perfil\" se genera un código (dura 15 minutos y sirve una vez) y se le envía al bot: /vincular CODIGO.\n- Al inscribirse: si hay cupo queda CONFIRMADA; si el evento está lleno queda en LISTA_ESPERA.\n- Lista de espera: cuando alguien cancela, cada 2 minutos el sistema asigna el cupo a quien lleva más tiempo esperando (orden de inscripción) y le avisa.\n- Estados de inscripción: CONFIRMADA, LISTA_ESPERA, CANCELADA. Estados de evento: PUBLICADO (abierto), CERRADO (ya no recibe inscripciones), CANCELADO.\n- Cancelar: en \"Mis inscripciones\" → \"Cancelar inscripción\". Ahí también se edita el nombre de la escarapela.\n- Avisos: confirmaciones, cambios y recordatorios (24 horas y 2 horas antes) llegan por correo (Gmail) y por Telegram.\n- Categorías: Cultura, Deportes, Comunidad, Educación, Emprendimiento.\n\nEVENTOS ACTUALES (datos reales del sistema):\n${lineas || '- No hay eventos publicados en este momento.'}\n\nUSUARIO:\n${bloqueUsuario}`;\n\n    const existe = $('Leer conversaciones').all().some(i => i.json.conversation_id === c.conversation_id);\n    return [{ json: { ...c, usuario_id: usuario ? usuario.usuario_id : '', system_prompt: system, nueva: !existe } }];\n"
+        },
+        "id": "1191f6f9-e85d-4707-90ff-d2bff30c03e3",
+        "position": [
+          1680,
+          0
+        ]
+      },
+      {
+        "name": "¿Conversación nueva?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "d3fab0d0-928e-4137-92e0-c156fddc024c",
+                "leftValue": "={{ $json.nueva }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "eb80860a-99fc-4ef6-8f41-3cfd09e30b6e",
+        "position": [
+          1920,
+          0
+        ]
+      },
+      {
+        "name": "Datos conversación nueva",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const c = $input.first().json;\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nreturn [{ json: { conversation_id: c.conversation_id, usuario_id: c.usuario_id, visitor_id: c.visitor_id, fecha_inicio: ahora, fecha_ultima_interaccion: ahora, estado: 'ABIERTA' } }];\n"
+        },
+        "id": "c6ebee65-d33a-4ad3-9a0f-d83146d1f9ce",
+        "position": [
+          2160,
+          -102
+        ]
+      },
+      {
+        "name": "Crear conversación",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1LpsBOvirib3LryBYAIwsmKslP5ck5G3PjG5PxyS6l4s",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Conversaciones",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "3fb55c12-719e-4713-9bc4-38be9f94042e",
+        "position": [
+          2400,
+          -102
+        ]
+      },
+      {
+        "name": "Mensaje SYSTEM",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const c = $('Contexto para la IA').first().json;\nreturn [{\n  json: {\n    message_id: 'MSG-' + Date.now().toString(36).toUpperCase() + 'S',\n    conversation_id: c.conversation_id, usuario_id: c.usuario_id, visitor_id: c.visitor_id,\n    rol: 'SYSTEM', mensaje: 'Conversación iniciada. Asistente informativo, sin permisos de escritura sobre el negocio.',\n    timestamp: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n  },\n}];\n"
+        },
+        "id": "041a5700-1086-43d8-aa48-1fe755456f23",
+        "position": [
+          2640,
+          -102
+        ]
+      },
+      {
+        "name": "Guardar mensaje SYSTEM",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1LpsBOvirib3LryBYAIwsmKslP5ck5G3PjG5PxyS6l4s",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Mensajes",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "dc4eaa50-69c4-4275-bb08-8b0ba342199e",
+        "position": [
+          2880,
+          -102
+        ]
+      },
+      {
+        "name": "Datos conversación existente",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const c = $input.first().json;\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\n// si se despide se marca CERRADA; si vuelve a escribir se reabre\nconst despedida = /^(chao|ch[aá]o|adi[oó]s|bye|hasta luego|gracias,? chao)\\b/i.test(c.mensaje.trim());\nconst fila = { conversation_id: c.conversation_id, fecha_ultima_interaccion: ahora, estado: despedida ? 'CERRADA' : 'ABIERTA' };\nif (c.usuario_id) fila.usuario_id = c.usuario_id;\nreturn [{ json: fila }];\n"
+        },
+        "id": "16e49d8e-610f-4e52-8a4c-0b004d6bcc02",
+        "position": [
+          2160,
+          102
+        ]
+      },
+      {
+        "name": "Actualizar conversación",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1LpsBOvirib3LryBYAIwsmKslP5ck5G3PjG5PxyS6l4s",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Conversaciones",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "conversation_id"
+            ],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "c516b5fd-6e12-4ae8-b0ce-bf0de48288f5",
+        "position": [
+          2400,
+          102
+        ]
+      },
+      {
+        "name": "Mensaje USER",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const c = $('Contexto para la IA').first().json;\nreturn [{\n  json: {\n    message_id: 'MSG-' + Date.now().toString(36).toUpperCase() + 'U',\n    conversation_id: c.conversation_id, usuario_id: c.usuario_id, visitor_id: c.visitor_id,\n    rol: 'USER', mensaje: c.mensaje,\n    timestamp: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n  },\n}];\n"
+        },
+        "id": "b6e2a942-c888-4082-86d2-8ace7ebbf6c4",
+        "position": [
+          3120,
+          0
+        ]
+      },
+      {
+        "name": "Guardar mensaje USER",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1LpsBOvirib3LryBYAIwsmKslP5ck5G3PjG5PxyS6l4s",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Mensajes",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "70eb0790-d600-42c9-88cb-0f87470a0324",
+        "position": [
+          3360,
+          0
+        ]
+      },
+      {
+        "name": "Asistente IA",
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 2.2,
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $('Contexto para la IA').first().json.mensaje }}",
+          "needsFallback": true,
+          "options": {
+            "systemMessage": "={{ $('Contexto para la IA').first().json.system_prompt }}"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 3,
+        "waitBetweenTries": 3000,
+        "onError": "continueRegularOutput",
+        "id": "9a31714f-ecf5-44a4-9077-0a1c467a65d0",
+        "position": [
+          3600,
+          0
+        ]
+      },
+      {
+        "name": "Gemini",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "parameters": {
+          "modelName": "models/gemini-flash-latest",
+          "options": {
+            "temperature": 0.3,
+            "maxOutputTokens": 2048
+          }
+        },
+        "credentials": {
+          "googlePalmApi": {
+            "id": "qGkVYIMVN0kHlYgu",
+            "name": "Gemini EventPass"
+          }
+        },
+        "id": "8092a360-0854-47b6-b0ab-c73b27519e44",
+        "position": [
+          3408,
+          204
+        ]
+      },
+      {
+        "name": "Gemini de respaldo",
+        "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+        "typeVersion": 1,
+        "parameters": {
+          "modelName": "models/gemini-flash-lite-latest",
+          "options": {
+            "temperature": 0.3,
+            "maxOutputTokens": 2048
+          }
+        },
+        "credentials": {
+          "googlePalmApi": {
+            "id": "qGkVYIMVN0kHlYgu",
+            "name": "Gemini EventPass"
+          }
+        },
+        "id": "2517a035-fd3d-4285-8f12-353ef0e7e0fe",
+        "position": [
+          3600,
+          204
+        ]
+      },
+      {
+        "name": "Memoria de la conversación",
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $('Contexto para la IA').first().json.conversation_id }}",
+          "contextWindowLength": 10
+        },
+        "id": "88a1a8cd-84f4-462b-873f-d6acada7962b",
+        "position": [
+          3792,
+          204
+        ]
+      },
+      {
+        "name": "Mensaje ASSISTANT",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const c = $('Contexto para la IA').first().json;\nconst r = $input.first().json;\nconst texto = String(r.output || (r.error\n  ? 'Uy, vecino, en este momento el asistente está con mucha demanda. Intenta de nuevo en un minutico.'\n  : 'Uy, no te entendí bien. ¿Me lo repites?'));\nreturn [{\n  json: {\n    message_id: 'MSG-' + Date.now().toString(36).toUpperCase() + 'A',\n    conversation_id: c.conversation_id, usuario_id: c.usuario_id, visitor_id: c.visitor_id,\n    rol: 'ASSISTANT', mensaje: texto,\n    timestamp: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n  },\n}];\n"
+        },
+        "id": "a902b1b2-7eab-461e-8fa1-a5a19aceb23b",
+        "position": [
+          3840,
+          0
+        ]
+      },
+      {
+        "name": "Guardar mensaje ASSISTANT",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1LpsBOvirib3LryBYAIwsmKslP5ck5G3PjG5PxyS6l4s",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Mensajes",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "d9a53712-0429-4608-9bd5-74f69468058b",
+        "position": [
+          4080,
+          0
+        ]
+      },
+      {
+        "name": "Respuesta al chat",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return [{ json: { output: $('Mensaje ASSISTANT').first().json.mensaje } }];\n"
+        },
+        "id": "ce113023-de6d-422e-8211-5ff287a11796",
+        "position": [
+          4320,
+          0
+        ]
+      },
+      {
+        "id": "d7edce47-915e-4975-bca3-8e41287b899d",
+        "name": "Nota 1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -340
+        ],
+        "parameters": {
+          "content": "## WF10 · EventPass Assistant\nChat Trigger público (widget en la web). Gemini con reglas: **solo informa**, no tiene tools de escritura.\nLee eventos e inscripciones en modo lectura y arma el contexto.\nconversation_id = hash del sessionId del widget. Cada mensaje (USER / ASSISTANT / SYSTEM) se guarda en **EP10_Soporte**.",
+          "width": 640,
+          "height": 190,
+          "color": 5
+        }
+      }
+    ],
+    "connections": {
+      "Chat del asistente": {
+        "main": [
+          [
+            {
+              "node": "Identificar conversación",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Identificar conversación": {
+        "main": [
+          [
+            {
+              "node": "¿Viene con sesión?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Viene con sesión?": {
+        "main": [
+          [
+            {
+              "node": "Validar sesión (WF02)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Leer conversaciones",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validar sesión (WF02)": {
+        "main": [
+          [
+            {
+              "node": "Leer conversaciones",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer conversaciones": {
+        "main": [
+          [
+            {
+              "node": "Leer eventos (solo lectura)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer eventos (solo lectura)": {
+        "main": [
+          [
+            {
+              "node": "Leer inscripciones (solo lectura)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer inscripciones (solo lectura)": {
+        "main": [
+          [
+            {
+              "node": "Contexto para la IA",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Contexto para la IA": {
+        "main": [
+          [
+            {
+              "node": "¿Conversación nueva?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Conversación nueva?": {
+        "main": [
+          [
+            {
+              "node": "Datos conversación nueva",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Datos conversación existente",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Datos conversación nueva": {
+        "main": [
+          [
+            {
+              "node": "Crear conversación",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Crear conversación": {
+        "main": [
+          [
+            {
+              "node": "Mensaje SYSTEM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mensaje SYSTEM": {
+        "main": [
+          [
+            {
+              "node": "Guardar mensaje SYSTEM",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Guardar mensaje SYSTEM": {
+        "main": [
+          [
+            {
+              "node": "Mensaje USER",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Datos conversación existente": {
+        "main": [
+          [
+            {
+              "node": "Actualizar conversación",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Actualizar conversación": {
+        "main": [
+          [
+            {
+              "node": "Mensaje USER",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mensaje USER": {
+        "main": [
+          [
+            {
+              "node": "Guardar mensaje USER",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Guardar mensaje USER": {
+        "main": [
+          [
+            {
+              "node": "Asistente IA",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Asistente IA": {
+        "main": [
+          [
+            {
+              "node": "Mensaje ASSISTANT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Mensaje ASSISTANT": {
+        "main": [
+          [
+            {
+              "node": "Guardar mensaje ASSISTANT",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Guardar mensaje ASSISTANT": {
+        "main": [
+          [
+            {
+              "node": "Respuesta al chat",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Asistente IA",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gemini de respaldo": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "Asistente IA",
+              "type": "ai_languageModel",
+              "index": 1
+            }
+          ]
+        ]
+      },
+      "Memoria de la conversación": {
+        "ai_memory": [
+          [
+            {
+              "node": "Asistente IA",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "America/Bogota",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "staticData": null,
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "5afcc032-04b3-423a-bed5-392d673ca6a0",
+    "activeVersionId": "5afcc032-04b3-423a-bed5-392d673ca6a0",
+    "versionCounter": 6,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-10-22T13:08:36.541Z",
+        "createdAt": "2026-10-22T13:08:36.541Z",
+        "role": "workflow:owner",
+        "workflowId": "hnh0v8y0O013CFCD",
+        "projectId": "8m9LtPd0NFg6kHzT",
+        "project": {
+          "updatedAt": "2026-09-29T13:41:51.281Z",
+          "createdAt": "2026-09-29T13:38:22.142Z",
+          "id": "8m9LtPd0NFg6kHzT",
+          "name": "Joan Chaparro <sebaschaparrorodriguez@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "8ef28f08-bf6d-4d43-a239-45b5425b5f4f"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

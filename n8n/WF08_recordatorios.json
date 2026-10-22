@@ -1,0 +1,690 @@
+[
+  {
+    "updatedAt": "2026-10-22T14:00:19.000Z",
+    "createdAt": "2026-10-22T13:08:36.535Z",
+    "id": "ICYeczVF40EiA66w",
+    "name": "WF08_recordatorios",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "name": "Cada 15 minutos",
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.2,
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 15
+              }
+            ]
+          }
+        },
+        "id": "8d51f9e2-1333-463e-a8c4-5a1c96c98720",
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Leer eventos",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ofqyN2hdDDF_k0fwaMA3ME37Y6qMfEsQYCRenW8gfpQ",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Eventos",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "41248f89-c8ea-44dd-beff-a2ea090e0313",
+        "position": [
+          240,
+          0
+        ]
+      },
+      {
+        "name": "Eventos publicados",
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "a1a5895e-83ce-47af-9583-a44eff7d767e",
+                "leftValue": "={{ $json.estado }}",
+                "rightValue": "PUBLICADO",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "alwaysOutputData": true,
+        "id": "5b055687-6a82-45bf-82ff-9cce0acf0cde",
+        "position": [
+          480,
+          0
+        ]
+      },
+      {
+        "name": "Leer inscripciones",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1C3iNDCd5gcdKHzicEzzHqWbNlFnp35t4_Wzhl59Nr7o",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Inscripciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "7046a0a9-7027-4148-8f82-f2682837e811",
+        "position": [
+          720,
+          0
+        ]
+      },
+      {
+        "name": "Solo confirmadas",
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "900166b9-8f91-4577-a2ad-c1012994a5e3",
+                "leftValue": "={{ $json.estado }}",
+                "rightValue": "CONFIRMADA",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "alwaysOutputData": true,
+        "id": "5a376f53-6b47-466c-a60c-520f3edbff3d",
+        "position": [
+          960,
+          0
+        ]
+      },
+      {
+        "name": "Leer recordatorios",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1kj1NU-K9M2fWhdgOtSajAjxyyXPXnyUmZ_9LPb7zy2c",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Recordatorios",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "29eb9d1a-9467-4139-8c9a-c9cb38710904",
+        "position": [
+          1200,
+          0
+        ]
+      },
+      {
+        "name": "Calcular recordatorios",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const eventos = $('Eventos publicados').all().map(i => i.json).filter(e => e.evento_id);\nconst confirmadas = $('Solo confirmadas').all().map(i => i.json).filter(i => i.inscripcion_id);\nconst previos = $('Leer recordatorios').all().map(i => i.json).filter(r => r.recordatorio_id);\nconst claves = new Set(previos.map(r => r.clave_idempotencia));\nconst HORA = 3600 * 1000;\nconst ahoraMs = Date.now();\nconst iso = (ms) => new Date(ms - 5 * HORA).toISOString().slice(0, 19) + '-05:00';\n// dos recordatorios: uno el dia antes y otro 2 horas antes\nconst TIPOS = [{ tipo: 'RECORDATORIO_24H', horas: 24 }, { tipo: 'RECORDATORIO_2H', horas: 2 }];\nconst out = [];\n\nfor (const i of confirmadas) {\n  const e = eventos.find(x => x.evento_id === i.evento_id);\n  if (!e) continue;\n  const inicio = new Date(`${e.fecha}T${e.hora || '00:00'}:00-05:00`).getTime();\n  const falta = inicio - ahoraMs;\n  if (falta <= 0) continue;\n  for (const t of TIPOS) {\n    if (falta > t.horas * HORA) continue; // todavia no toca\n    const clave = `${i.usuario_id}|${i.evento_id}|${t.tipo}`;\n    // si el de 24h nunca salio y ya estamos dentro de las 2h, se omite (no tiene sentido mandar los dos juntos)\n    const omitir = t.tipo === 'RECORDATORIO_24H' && falta <= 2 * HORA;\n    out.push({\n      json: {\n        recordatorio_id: 'REC-' + Date.now().toString(36).toUpperCase() + out.length,\n        usuario_id: i.usuario_id,\n        evento_id: i.evento_id,\n        inscripcion_id: i.inscripcion_id,\n        tipo_recordatorio: t.tipo,\n        fecha_programada: iso(inicio - t.horas * HORA),\n        fecha_envio: '',\n        estado: omitir ? 'OMITIDO' : 'PENDIENTE',\n        clave_idempotencia: clave,\n        ya_enviado: claves.has(clave),\n        _evento: { nombre: e.nombre, fecha: e.fecha, hora: e.hora, lugar: e.lugar },\n      },\n    });\n  }\n}\nreturn out;\n"
+        },
+        "id": "3fec145d-93f2-464f-a8da-db4378cc7f8c",
+        "position": [
+          1440,
+          0
+        ]
+      },
+      {
+        "name": "No enviados antes (idempotencia)",
+        "type": "n8n-nodes-base.filter",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "b2f1decb-45d5-4136-80f1-da6144a6dab5",
+                "leftValue": "={{ $json.ya_enviado }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "false",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "alwaysOutputData": false,
+        "id": "531f5930-a633-4471-b6e7-529c0798aecd",
+        "position": [
+          1680,
+          0
+        ]
+      },
+      {
+        "name": "¿Se envía?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "e75d5b9a-e12d-4e8b-a4c9-1a3e342659f5",
+                "leftValue": "={{ $json.estado }}",
+                "rightValue": "PENDIENTE",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "75f4e489-cb9a-472b-b95b-ba826617a42e",
+        "position": [
+          1920,
+          0
+        ]
+      },
+      {
+        "name": "Registrar PENDIENTE",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1kj1NU-K9M2fWhdgOtSajAjxyyXPXnyUmZ_9LPb7zy2c",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Recordatorios",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "d28c6d15-de58-449b-a25d-5512ea66897e",
+        "position": [
+          2160,
+          -85
+        ]
+      },
+      {
+        "name": "Registrar OMITIDO",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1kj1NU-K9M2fWhdgOtSajAjxyyXPXnyUmZ_9LPb7zy2c",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Recordatorios",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "c89beb5d-3f54-4124-aa81-2b4f5cea908d",
+        "position": [
+          2160,
+          136
+        ]
+      },
+      {
+        "name": "Datos notificación",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return $('¿Se envía?').all().map(it => {\n  const r = it.json;\n  const e = r._evento;\n  const cuando = r.tipo_recordatorio === 'RECORDATORIO_24H' ? 'mañana' : 'en un par de horas';\n  return {\n    json: {\n      usuario_id: r.usuario_id, evento_id: r.evento_id, inscripcion_id: r.inscripcion_id,\n      tipo: r.tipo_recordatorio,\n      titulo: `Recordatorio: ${e.nombre} es ${cuando}`,\n      mensaje: `Te recordamos que \"${e.nombre}\" es ${cuando}: ${e.fecha} a las ${e.hora} en ${e.lugar}. Si ya no puedes ir, cancela desde la página para liberar tu cupo a otra persona.`,\n    },\n  };\n});\n"
+        },
+        "id": "e522efaf-cccb-4188-93dc-0ec9d767f171",
+        "position": [
+          2400,
+          -85
+        ]
+      },
+      {
+        "name": "Notificar (WF09)",
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "znfHCNLf2jPIvhZl",
+            "mode": "id"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "mode": "each",
+          "options": {
+            "waitForSubWorkflow": true
+          }
+        },
+        "id": "b21b1122-10b2-4bd8-ae81-8afa64d739da",
+        "position": [
+          2640,
+          -85
+        ]
+      },
+      {
+        "name": "Resultado del envío",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const recs = $('¿Se envía?').all();\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nreturn $input.all().map((it, idx) => {\n  const r = it.json || {};\n  const algunoOk = r.gmail_estado === 'ENVIADO' || r.telegram_estado === 'ENVIADO' || r.duplicada === true;\n  return { json: { recordatorio_id: recs[idx].json.recordatorio_id, estado: algunoOk ? 'ENVIADO' : 'ERROR', fecha_envio: algunoOk ? ahora : '' } };\n});\n"
+        },
+        "id": "25269812-0285-40a4-949a-5e8f405cd6b7",
+        "position": [
+          2880,
+          -85
+        ]
+      },
+      {
+        "name": "Actualizar estado",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "update",
+          "documentId": {
+            "__rl": true,
+            "value": "1kj1NU-K9M2fWhdgOtSajAjxyyXPXnyUmZ_9LPb7zy2c",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Recordatorios",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [
+              "recordatorio_id"
+            ],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "cd47f6f2-3d93-4141-b2cc-05e979be1e83",
+        "position": [
+          3120,
+          -85
+        ]
+      },
+      {
+        "id": "c87e0d8b-695c-4702-91ac-1ccf22d812ea",
+        "name": "Nota 1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -306
+        ],
+        "parameters": {
+          "content": "## WF08 · Recordatorios\nCada 15 min busca inscripciones CONFIRMADAS de eventos que empiezan en ≤ 24 h y ≤ 2 h.\nClave de idempotencia: `usuario_id|evento_id|tipo_recordatorio`; si ya existe en **EP08_Recordatorios** no se vuelve a enviar.\nEstados: PENDIENTE → ENVIADO / ERROR, u OMITIDO.",
+          "width": 640,
+          "height": 190,
+          "color": 5
+        }
+      }
+    ],
+    "connections": {
+      "Cada 15 minutos": {
+        "main": [
+          [
+            {
+              "node": "Leer eventos",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer eventos": {
+        "main": [
+          [
+            {
+              "node": "Eventos publicados",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Eventos publicados": {
+        "main": [
+          [
+            {
+              "node": "Leer inscripciones",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer inscripciones": {
+        "main": [
+          [
+            {
+              "node": "Solo confirmadas",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Solo confirmadas": {
+        "main": [
+          [
+            {
+              "node": "Leer recordatorios",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer recordatorios": {
+        "main": [
+          [
+            {
+              "node": "Calcular recordatorios",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Calcular recordatorios": {
+        "main": [
+          [
+            {
+              "node": "No enviados antes (idempotencia)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "No enviados antes (idempotencia)": {
+        "main": [
+          [
+            {
+              "node": "¿Se envía?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Se envía?": {
+        "main": [
+          [
+            {
+              "node": "Registrar PENDIENTE",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Registrar OMITIDO",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Registrar PENDIENTE": {
+        "main": [
+          [
+            {
+              "node": "Datos notificación",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Datos notificación": {
+        "main": [
+          [
+            {
+              "node": "Notificar (WF09)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Notificar (WF09)": {
+        "main": [
+          [
+            {
+              "node": "Resultado del envío",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Resultado del envío": {
+        "main": [
+          [
+            {
+              "node": "Actualizar estado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "America/Bogota",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "staticData": {
+      "node:Cada 15 minutos": {
+        "recurrenceRules": [
+          null
+        ],
+        "recurrenceRuleSignatures": [
+          null
+        ]
+      }
+    },
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "a3b7d392-9b8f-42d2-8e07-1460e497dc9a",
+    "activeVersionId": "a3b7d392-9b8f-42d2-8e07-1460e497dc9a",
+    "versionCounter": 3,
+    "triggerCount": 1,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-10-22T13:08:36.537Z",
+        "createdAt": "2026-10-22T13:08:36.537Z",
+        "role": "workflow:owner",
+        "workflowId": "ICYeczVF40EiA66w",
+        "projectId": "8m9LtPd0NFg6kHzT",
+        "project": {
+          "updatedAt": "2026-09-29T13:41:51.281Z",
+          "createdAt": "2026-09-29T13:38:22.142Z",
+          "id": "8m9LtPd0NFg6kHzT",
+          "name": "Joan Chaparro <sebaschaparrorodriguez@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "8ef28f08-bf6d-4d43-a239-45b5425b5f4f"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]

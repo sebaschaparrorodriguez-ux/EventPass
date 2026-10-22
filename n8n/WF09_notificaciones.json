@@ -1,0 +1,842 @@
+[
+  {
+    "updatedAt": "2026-10-22T14:00:24.000Z",
+    "createdAt": "2026-10-22T13:08:36.538Z",
+    "id": "znfHCNLf2jPIvhZl",
+    "name": "WF09_notificaciones",
+    "description": null,
+    "active": true,
+    "isArchived": false,
+    "nodes": [
+      {
+        "name": "Al recibir notificación",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "id": "19adf4ab-df55-45a3-944e-a68f4096f84c",
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "name": "Validar entrada",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const d = $input.first().json;\nconst faltan = ['usuario_id', 'tipo', 'titulo', 'mensaje'].filter(k => !d[k]);\n// la clave evita mandar dos veces lo mismo si un flujo se reintenta\nconst clave = [d.tipo, d.usuario_id, d.evento_id || '', d.inscripcion_id || '', d.clave_extra || ''].join('|');\nreturn [{\n  json: {\n    valida: faltan.length === 0,\n    error: faltan.length ? 'Faltan campos: ' + faltan.join(', ') : '',\n    usuario_id: String(d.usuario_id || ''),\n    tipo: String(d.tipo || ''),\n    titulo: String(d.titulo || ''),\n    mensaje: String(d.mensaje || ''),\n    evento_id: String(d.evento_id || ''),\n    inscripcion_id: String(d.inscripcion_id || ''),\n    clave_idempotencia: clave,\n  },\n}];\n"
+        },
+        "id": "4e5ef744-67ce-4199-95be-18b0f4c54d23",
+        "position": [
+          240,
+          0
+        ]
+      },
+      {
+        "name": "¿Entrada completa?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "dd653271-3cc4-40ae-bbd2-ca62a47ec6f0",
+                "leftValue": "={{ $json.valida }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "d67b6f78-0e23-4059-9985-e362ffe79d0c",
+        "position": [
+          480,
+          0
+        ]
+      },
+      {
+        "name": "Entrada inválida",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return [{ json: { ok: false, error: $input.first().json.error, gmail_estado: 'NO_APLICA', telegram_estado: 'NO_APLICA' } }];\n"
+        },
+        "id": "2f2dc5c9-246c-40e3-be8d-d6f32898f36c",
+        "position": [
+          720,
+          204
+        ]
+      },
+      {
+        "name": "Leer usuario",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1YrsfCMzmB51WhgNdi4Wg-2K1OOMFaZ7L_sT3IvpciG4",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Usuarios",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "45e6d486-3339-4f8a-b566-0c84e178637f",
+        "position": [
+          720,
+          0
+        ]
+      },
+      {
+        "name": "Leer chat_id",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ZhOu4SmRPxvKZhknqcQ9-ik-Z5jhXfxyYx35t-D6oe0",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Vinculaciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "8745cd34-16fd-4d51-b663-3edeb01910ff",
+        "position": [
+          960,
+          0
+        ]
+      },
+      {
+        "name": "Leer notificaciones",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1VGj6_KmoFPw00zVP9S5UvLOvT-PA5mrjHp27ewZNElY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Notificaciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "0148dc2b-9b81-4e7d-905d-cb1b7e759563",
+        "position": [
+          1200,
+          0
+        ]
+      },
+      {
+        "name": "Preparar mensaje",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const d = $('Validar entrada').first().json;\n    const u = $('Leer usuario').all().map(i => i.json).find(x => x.usuario_id === d.usuario_id) || {};\n    const v = $('Leer chat_id').all().map(i => i.json).find(x => x.usuario_id === d.usuario_id && x.estado === 'ACTIVA');\n    const yaEnviada = $('Leer notificaciones').all().map(i => i.json)\n      .some(x => x.clave_idempotencia === d.clave_idempotencia && (x.gmail_estado === 'ENVIADO' || x.telegram_estado === 'ENVIADO'));\n\n    const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');\n    const nombre = (u.nombre || 'vecino').split(' ')[0];\n    const email = u.email_normalizado || '';\n    // los usuarios de prueba usan example.com, a esos no se les manda correo\n    const correoDePrueba = /@example\\.(com|org|net)$/i.test(email);\n\n    const html = `\n<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:540px;margin:0 auto;border-radius:14px;overflow:hidden;border:1px solid #e7dfd1\">\n  <div style=\"background:#14213d;color:#fff4d6;padding:16px 22px;font-size:20px;font-weight:bold;border-bottom:4px solid #b3262e\">EventPass <span style=\"color:#e8b04b\">Barrio</span></div>\n  <div style=\"padding:22px;background:#fbf7ef;color:#1d1a17;line-height:1.5\">\n    <h2 style=\"margin:0 0 12px\">${esc(d.titulo)}</h2>\n    <p>Hola ${esc(nombre)},</p>\n    <p>${esc(d.mensaje)}</p>\n    <p style=\"color:#5f5850;font-size:13px;margin-top:24px\">Este aviso también te llegó por Telegram si tienes la cuenta vinculada. ¡Feliz Navidad, vecino!</p>\n  </div>\n</div>`.trim();\n\n    return [{\n      json: {\n        ...d,\n        ya_enviada: yaEnviada,\n        email: correoDePrueba ? '' : email,\n        chat_id: v ? String(v.chat_id) : '',\n        html,\n        texto_telegram: `<b>${esc(d.titulo)}</b>\\n\\n${esc(d.mensaje)}`,\n      },\n    }];\n"
+        },
+        "id": "d27f3167-0d50-4b6f-9c81-7a96396090fe",
+        "position": [
+          1440,
+          0
+        ]
+      },
+      {
+        "name": "¿Ya se envió antes?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "1e1de331-d577-44b3-a14e-349d3362a748",
+                "leftValue": "={{ $json.ya_enviada }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "boolean",
+                  "operation": "true",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "4eb87ac8-22fa-4e53-b5c3-e1ba831a1566",
+        "position": [
+          1680,
+          0
+        ]
+      },
+      {
+        "name": "Duplicada",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return [{ json: { ok: true, duplicada: true, clave_idempotencia: $input.first().json.clave_idempotencia, gmail_estado: 'DUPLICADA', telegram_estado: 'DUPLICADA' } }];\n"
+        },
+        "id": "aba7d536-f55f-4179-b2e9-ed62fc7a853b",
+        "position": [
+          1920,
+          -204
+        ]
+      },
+      {
+        "name": "¿Tiene correo?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "e485d7c4-7c5f-49bb-b540-d9ff53a66fe7",
+                "leftValue": "={{ $json.email }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "8b42e7c3-fff7-4c7a-82cf-a7e6111bad99",
+        "position": [
+          1920,
+          0
+        ]
+      },
+      {
+        "name": "Enviar Gmail",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "webhookId": "51245c1a-8423-4ff3-9eca-33490a739343",
+        "parameters": {
+          "sendTo": "={{ $json.email }}",
+          "subject": "={{ $json.titulo }}",
+          "emailType": "html",
+          "message": "={{ $json.html }}",
+          "options": {
+            "appendAttribution": false,
+            "senderName": "EventPass Barrio"
+          }
+        },
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "PUke4EgZqAjHVpWX",
+            "name": "Gmail EventPass"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "id": "944a6283-304f-4b12-998a-cb1d7795440a",
+        "position": [
+          2160,
+          -85
+        ]
+      },
+      {
+        "name": "Gmail enviado",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return [{ json: { ...$('Preparar mensaje').first().json, gmail_estado: 'ENVIADO', gmail_error: '' } }];\n"
+        },
+        "id": "d22acdf0-fcae-4027-b181-50a3852de931",
+        "position": [
+          2400,
+          -136
+        ]
+      },
+      {
+        "name": "Gmail falló",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const e = $input.first().json.error;\nconst msg = typeof e === 'string' ? e : (e && e.message) || JSON.stringify(e || 'Error desconocido');\nreturn [{ json: { ...$('Preparar mensaje').first().json, gmail_estado: 'ERROR', gmail_error: String(msg).slice(0, 300) } }];\n"
+        },
+        "id": "d5ad2bf0-2c5c-41ee-accc-3a10dc004272",
+        "position": [
+          2400,
+          -34
+        ]
+      },
+      {
+        "name": "Gmail no aplica",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return [{ json: { ...$input.first().json, gmail_estado: 'NO_APLICA', gmail_error: '' } }];\n"
+        },
+        "id": "877e2691-34a1-440d-82e4-4a108685f952",
+        "position": [
+          2400,
+          102
+        ]
+      },
+      {
+        "name": "¿Tiene Telegram?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "loose",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "b6e6ad44-2a2d-4744-a167-b14801c50ae9",
+                "leftValue": "={{ $json.chat_id }}",
+                "rightValue": "",
+                "operator": {
+                  "type": "string",
+                  "operation": "notEmpty",
+                  "singleValue": true
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "looseTypeValidation": true,
+          "options": {}
+        },
+        "id": "efcddd6c-1faf-4c4e-8570-020014dbd997",
+        "position": [
+          2640,
+          0
+        ]
+      },
+      {
+        "name": "Enviar Telegram",
+        "type": "n8n-nodes-base.telegram",
+        "typeVersion": 1.2,
+        "webhookId": "b5a70f56-fd0c-4cef-9727-52b5afcd471a",
+        "parameters": {
+          "chatId": "={{ $json.chat_id }}",
+          "text": "={{ $json.texto_telegram }}",
+          "additionalFields": {
+            "appendAttribution": false,
+            "parse_mode": "HTML"
+          }
+        },
+        "credentials": {
+          "telegramApi": {
+            "id": "tuJxI5kkU1LZ9A5Y",
+            "name": "Telegram EventPass Bot"
+          }
+        },
+        "onError": "continueErrorOutput",
+        "id": "c9616bcd-8277-4e3d-b242-5874974cdc7b",
+        "position": [
+          2880,
+          -85
+        ]
+      },
+      {
+        "name": "Telegram enviado",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return [{ json: { ...$('¿Tiene Telegram?').first().json, telegram_estado: 'ENVIADO', telegram_error: '' } }];\n"
+        },
+        "id": "c2e2b32b-3ef4-4ab9-b60c-4b31208f05f5",
+        "position": [
+          3120,
+          -136
+        ]
+      },
+      {
+        "name": "Telegram falló",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const e = $input.first().json.error;\nconst msg = typeof e === 'string' ? e : (e && e.message) || JSON.stringify(e || 'Error desconocido');\nreturn [{ json: { ...$('¿Tiene Telegram?').first().json, telegram_estado: 'ERROR', telegram_error: String(msg).slice(0, 300) } }];\n"
+        },
+        "id": "4446e59e-8321-4bb2-8236-204d0e9093eb",
+        "position": [
+          3120,
+          -34
+        ]
+      },
+      {
+        "name": "Telegram no aplica",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "return [{ json: { ...$input.first().json, telegram_estado: 'NO_APLICA', telegram_error: '' } }];\n"
+        },
+        "id": "d685179d-e777-4ed1-a034-3dd7a7c39df4",
+        "position": [
+          3120,
+          102
+        ]
+      },
+      {
+        "name": "Armar registro",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const d = $input.first().json;\nreturn [{\n  json: {\n    notificacion_id: 'NOT-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 4).toUpperCase(),\n    usuario_id: d.usuario_id,\n    tipo: d.tipo,\n    titulo: d.titulo,\n    mensaje: d.mensaje,\n    evento_id: d.evento_id,\n    inscripcion_id: d.inscripcion_id,\n    fecha: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n    gmail_estado: d.gmail_estado,\n    telegram_estado: d.telegram_estado,\n    gmail_error: d.gmail_error || '',\n    telegram_error: d.telegram_error || '',\n    clave_idempotencia: d.clave_idempotencia,\n  },\n}];\n"
+        },
+        "id": "f7ea13ea-9a91-4baf-92b0-57e0c2db57ae",
+        "position": [
+          3360,
+          0
+        ]
+      },
+      {
+        "name": "Guardar notificación",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "append",
+          "documentId": {
+            "__rl": true,
+            "value": "1VGj6_KmoFPw00zVP9S5UvLOvT-PA5mrjHp27ewZNElY",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Notificaciones",
+            "mode": "name"
+          },
+          "columns": {
+            "mappingMode": "autoMapInputData",
+            "value": {},
+            "matchingColumns": [],
+            "schema": []
+          },
+          "options": {
+            "cellFormat": "RAW",
+            "handlingExtraData": "ignoreIt"
+          }
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "b9b8703c-7b69-4da7-bdf2-7dcb923f6a92",
+        "position": [
+          3600,
+          0
+        ]
+      },
+      {
+        "name": "Resultado",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const r = $('Armar registro').first().json;\nreturn [{ json: { ok: true, notificacion_id: r.notificacion_id, gmail_estado: r.gmail_estado, telegram_estado: r.telegram_estado } }];\n"
+        },
+        "id": "fc1d9cc7-b4d3-432d-b95e-06d77af0d293",
+        "position": [
+          3840,
+          0
+        ]
+      },
+      {
+        "id": "c1bb7aba-22cd-4915-ac2a-2481b7e0887e",
+        "name": "Nota 1",
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          0,
+          -408
+        ],
+        "parameters": {
+          "content": "## WF09 · Servicio central de notificaciones\nSub-workflow que llaman WF04, WF06, WF07 y WF08.\nEntrada: usuario_id, tipo, titulo, mensaje, evento_id, inscripcion_id.\nIntenta **Gmail** y **Telegram** por separado: si uno falla el otro igual se intenta, y cada resultado queda en su columna de **EP09_Notificaciones**.",
+          "width": 640,
+          "height": 190,
+          "color": 5
+        }
+      }
+    ],
+    "connections": {
+      "Al recibir notificación": {
+        "main": [
+          [
+            {
+              "node": "Validar entrada",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Validar entrada": {
+        "main": [
+          [
+            {
+              "node": "¿Entrada completa?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Entrada completa?": {
+        "main": [
+          [
+            {
+              "node": "Leer usuario",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Entrada inválida",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer usuario": {
+        "main": [
+          [
+            {
+              "node": "Leer chat_id",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer chat_id": {
+        "main": [
+          [
+            {
+              "node": "Leer notificaciones",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer notificaciones": {
+        "main": [
+          [
+            {
+              "node": "Preparar mensaje",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Preparar mensaje": {
+        "main": [
+          [
+            {
+              "node": "¿Ya se envió antes?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Ya se envió antes?": {
+        "main": [
+          [
+            {
+              "node": "Duplicada",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "¿Tiene correo?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Tiene correo?": {
+        "main": [
+          [
+            {
+              "node": "Enviar Gmail",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Gmail no aplica",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Enviar Gmail": {
+        "main": [
+          [
+            {
+              "node": "Gmail enviado",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Gmail falló",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail enviado": {
+        "main": [
+          [
+            {
+              "node": "¿Tiene Telegram?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail falló": {
+        "main": [
+          [
+            {
+              "node": "¿Tiene Telegram?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail no aplica": {
+        "main": [
+          [
+            {
+              "node": "¿Tiene Telegram?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "¿Tiene Telegram?": {
+        "main": [
+          [
+            {
+              "node": "Enviar Telegram",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Telegram no aplica",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Enviar Telegram": {
+        "main": [
+          [
+            {
+              "node": "Telegram enviado",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Telegram falló",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram enviado": {
+        "main": [
+          [
+            {
+              "node": "Armar registro",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram falló": {
+        "main": [
+          [
+            {
+              "node": "Armar registro",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Telegram no aplica": {
+        "main": [
+          [
+            {
+              "node": "Armar registro",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Armar registro": {
+        "main": [
+          [
+            {
+              "node": "Guardar notificación",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Guardar notificación": {
+        "main": [
+          [
+            {
+              "node": "Resultado",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "settings": {
+      "executionOrder": "v1",
+      "timezone": "America/Bogota",
+      "callerPolicy": "workflowsFromSameOwner"
+    },
+    "staticData": null,
+    "meta": null,
+    "nodeGroups": [],
+    "pinData": {},
+    "versionId": "5c0c2c9c-0a25-45d9-888a-462a0e9151d1",
+    "activeVersionId": "5c0c2c9c-0a25-45d9-888a-462a0e9151d1",
+    "versionCounter": 3,
+    "triggerCount": 0,
+    "sourceWorkflowId": null,
+    "tags": [],
+    "shared": [
+      {
+        "updatedAt": "2026-10-22T13:08:36.539Z",
+        "createdAt": "2026-10-22T13:08:36.539Z",
+        "role": "workflow:owner",
+        "workflowId": "znfHCNLf2jPIvhZl",
+        "projectId": "8m9LtPd0NFg6kHzT",
+        "project": {
+          "updatedAt": "2026-09-29T13:41:51.281Z",
+          "createdAt": "2026-09-29T13:38:22.142Z",
+          "id": "8m9LtPd0NFg6kHzT",
+          "name": "Joan Chaparro <sebaschaparrorodriguez@gmail.com>",
+          "type": "personal",
+          "icon": null,
+          "description": null,
+          "customTelemetryTags": [],
+          "creatorId": "8ef28f08-bf6d-4d43-a239-45b5425b5f4f"
+        }
+      }
+    ],
+    "versionMetadata": {
+      "name": null,
+      "description": null
+    }
+  }
+]
