@@ -109,6 +109,17 @@ export const editarInscripcion = (token, inscripcionId, datos) =>
     body: { accion: 'actualizar', token, inscripcion_id: inscripcionId, ...datos },
   })
 
+// ---- panel (SUPERVISOR y ADMINISTRADOR)
+export const inscritosPorEvento = (token) =>
+  llamar('ep/inscripciones', { body: { accion: 'inscritos', token } })
+
+export const listarUsuarios = (token) => llamar('ep/usuarios', { body: { accion: 'usuarios', token } })
+
+export const asignarRol = (token, usuarioId, rol) =>
+  llamar('ep/usuarios', { body: { accion: 'asignar_rol', token, usuario_id: usuarioId, rol } })
+
+export const urlFormularioEventos = () => `${BASE}/form/ep-admin-eventos`
+
 export const cancelarInscripcion = (token, inscripcionId) =>
   llamar('ep/inscripciones', {
     body: { accion: 'cancelar', token, inscripcion_id: inscripcionId },

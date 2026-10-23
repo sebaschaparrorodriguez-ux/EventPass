@@ -854,6 +854,116 @@ details[open] {
   margin: 0;
 }
 
+/* ---------- panel ---------- */
+.panel-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.panel-eventos {
+  display: grid;
+  gap: 0.5rem;
+  max-height: 70vh;
+  overflow: auto;
+}
+
+.panel-evento {
+  text-align: left;
+  background: var(--papel);
+  border: 1.5px solid var(--borde);
+  border-radius: 12px;
+  padding: 0.7rem 0.9rem;
+  font: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.panel-evento.activo {
+  border-color: var(--pino);
+  box-shadow: inset 4px 0 0 var(--pino);
+}
+
+.contadores {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.contadores div {
+  background: var(--crema);
+  border-radius: 10px;
+  padding: 0.6rem;
+  text-align: center;
+}
+
+.contadores strong {
+  display: block;
+  font-family: 'Young Serif', serif;
+  font-weight: 400;
+  font-size: 1.6rem;
+  color: var(--rojo);
+}
+
+.contadores span {
+  font-size: 0.8rem;
+  color: var(--tinta-suave);
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.93rem;
+}
+
+.tabla th,
+.tabla td {
+  text-align: left;
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid var(--borde);
+  vertical-align: top;
+}
+
+.tabla th {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--tinta-suave);
+}
+
+.tabla select,
+.buscador {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1.5px solid var(--borde);
+  border-radius: 8px;
+  background: #fff;
+}
+
+a.chip {
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .panel-grid {
+    grid-template-columns: 1fr;
+  }
+  .panel-eventos {
+    max-height: none;
+  }
+  .contadores {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* ---------- como funciona ---------- */
 .pasos {
   list-style: none;

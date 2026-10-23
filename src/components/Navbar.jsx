@@ -48,6 +48,11 @@ export default function Navbar() {
               <NavLink to="/mis-inscripciones" onClick={cerrar}>
                 Mis inscripciones
               </NavLink>
+              {['SUPERVISOR', 'ADMINISTRADOR'].includes(usuario.rol) && (
+                <NavLink to="/panel" onClick={cerrar}>
+                  Panel
+                </NavLink>
+              )}
               <NavLink to="/perfil" onClick={cerrar}>
                 Hola, {usuario.nombre?.split(' ')[0]}
               </NavLink>

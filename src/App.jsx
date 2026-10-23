@@ -10,6 +10,7 @@ import Registro from './pages/Registro'
 import Perfil from './pages/Perfil'
 import MisInscripciones from './pages/MisInscripciones'
 import ComoFunciona from './pages/ComoFunciona'
+import Panel from './pages/Panel'
 import { Cargando } from './components/Estado'
 
 function Privada({ children }) {
@@ -43,6 +44,14 @@ export default function App() {
             element={
               <Privada>
                 <MisInscripciones />
+              </Privada>
+            }
+          />
+          <Route
+            path="/panel"
+            element={
+              <Privada>
+                <Panel />
               </Privada>
             }
           />
