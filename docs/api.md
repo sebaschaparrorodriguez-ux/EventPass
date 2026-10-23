@@ -107,3 +107,17 @@ No es un endpoint que yo llame con fetch: lo usa el widget `@n8n/chat` contra la
 - **WF04** se maneja con el formulario de n8n: `https://<dominio-de-n8n>/form/ep-admin-eventos` (solo admin).
 - **WF07** y **WF08** corren solos con Schedule Trigger.
 - **WF09** es un sub-workflow, solo lo llaman otros workflows.
+
+## Roles y panel
+
+El login (`ep/auth`) y la validación de sesión devuelven `usuario.rol`: `VECINO`, `SUPERVISOR` o `ADMINISTRADOR`. Los permisos se revisan en n8n; sin el rol correcto la respuesta es `403 SIN_PERMISO`.
+
+| Webhook | accion | Quién | body | respuesta OK |
+|---|---|---|---|---|
+| `ep/usuarios` | `usuarios` | ADMINISTRADOR | `token` | `200` `{ ok, usuarios: [{ usuario_id, nombre, email, rol, estado, fecha_registro }] }` |
+| `ep/usuarios` | `asignar_rol` | ADMINISTRADOR | `token`, `usuario_id`, `rol` | `200` `{ ok, mensaje, usuario_id, rol }` |
+| `ep/inscripciones` | `inscritos` | SUPERVISOR o ADMINISTRADOR | `token` | `200` `{ ok, rol, eventos: [{ ...evento, confirmados, en_espera, canceladas, inscritos: [...] }] }` |
+
+Errores de `asignar_rol`: `ROL_INVALIDO` (400), `NO_A_TI_MISMO` (400, nadie puede cambiar su propio rol), `NO_ENCONTRADO` (404), `SIN_CAMBIO` (409).
+
+El supervisor recibe los correos tapados (`ju***@example.com`) y no ve los eventos en BORRADOR; el administrador ve todo.

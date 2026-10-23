@@ -24,11 +24,11 @@ Si cuando se revise ya pasó la fecha del "próximo", se le cambia la fecha desd
 
 Contraseña de los tres: `Vecino2026*`
 
-| Usuario | Correo |
-|---|---|
-| Marta Rodríguez | marta.vecina@example.com |
-| Don Julio Pérez | julio.tienda@example.com |
-| Camila Torres | camila.torres@example.com |
+| Usuario | Correo | Rol |
+|---|---|---|
+| Marta Rodríguez | marta.vecina@example.com | **SUPERVISOR** (hace de representante del barrio para probar el Panel) |
+| Don Julio Pérez | julio.tienda@example.com | VECINO |
+| Camila Torres | camila.torres@example.com | VECINO |
 
 Usan correos `example.com` a propósito: WF09 no les manda Gmail (queda `NO_APLICA`) para no generar rebotes. Tampoco tienen Telegram vinculado.
 

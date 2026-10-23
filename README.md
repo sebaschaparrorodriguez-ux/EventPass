@@ -34,6 +34,8 @@ Y de forma automática:
 
 Los eventos los administra solo el administrador, con un formulario de n8n.
 
+Además tiene **roles**: VECINO, SUPERVISOR (por ejemplo el representante del barrio, que puede ver quién está inscrito en cada evento) y ADMINISTRADOR (asigna roles y administra los eventos).
+
 ---
 
 ## Arquitectura
@@ -117,13 +119,15 @@ Resumen (con ejemplos completos en [`docs/api.md`](docs/api.md)):
 
 | Método | Ruta | Acciones |
 |---|---|---|
-| POST | `/webhook/ep/usuarios` | `enviar_codigo`, `crear`, `perfil`, `actualizar`, `desactivar` |
+| POST | `/webhook/ep/usuarios` | `enviar_codigo`, `crear`, `perfil`, `actualizar`, `desactivar`, `usuarios`*, `asignar_rol`* |
 | POST | `/webhook/ep/auth` | `login`, `logout`, `validar` |
 | POST | `/webhook/ep/telegram` | `solicitar`, `estado` |
 | GET | `/webhook/ep/catalogo` | `tipo=LISTADO \| FILTRO \| DETALLE` |
-| POST | `/webhook/ep/inscripciones` | `crear`, `mis`, `actualizar`, `cancelar` |
+| POST | `/webhook/ep/inscripciones` | `crear`, `mis`, `actualizar`, `cancelar`, `inscritos`** |
 | POST | `/webhook/<id>/chat` | chat del asistente (lo usa el widget) |
-| – | `/form/ep-admin-eventos` | formulario del administrador |
+| – | `/form/ep-admin-eventos` | formulario del administrador (pide correo y contraseña de un ADMINISTRADOR) |
+
+* solo ADMINISTRADOR · ** SUPERVISOR o ADMINISTRADOR
 
 ---
 
@@ -135,6 +139,7 @@ Resumen (con ejemplos completos en [`docs/api.md`](docs/api.md)):
 | Sesión | `ACTIVA`, `CERRADA`, `EXPIRADA` |
 | Código de vinculación | `PENDIENTE`, `USADO`, `EXPIRADO`, `CANCELADO` |
 | Verificación de correo | `PENDIENTE`, `USADO`, `EXPIRADO`, `CANCELADO` |
+| Rol de usuario | `VECINO`, `SUPERVISOR`, `ADMINISTRADOR` |
 | Vinculación Telegram | `ACTIVA`, `INACTIVA` |
 | Evento | `BORRADOR`, `PUBLICADO`, `CERRADO`, `CANCELADO` |
 | Inscripción | `CONFIRMADA`, `LISTA_ESPERA`, `CANCELADA` |
@@ -235,6 +240,24 @@ Tipos que se mandan: `CUENTA_CREADA`, `INSCRIPCION_CONFIRMADA`, `INGRESO_LISTA_E
 - WF09 sigue intentando **Gmail y Telegram por separado**, cada uno con su registro independiente.
 - **WhatsApp:** en el detalle del evento y en "Mis inscripciones" hay un botón **"Recordármelo por WhatsApp"** que abre WhatsApp con el recordatorio ya escrito (evento, fecha, hora, lugar y link) usando `wa.me`. No es un envío automático: para eso se necesita la API de WhatsApp Business de Meta, que pide cuenta de empresa y plantillas aprobadas, y no tenía sentido para un proyecto académico.
 
+## Roles (extra)
+
+| Rol | Puede |
+|---|---|
+| `VECINO` | todo lo normal: ver eventos, inscribirse, su perfil. Es el rol con el que se crea toda cuenta |
+| `SUPERVISOR` | lo del vecino + el **Panel**: ver quién está inscrito en cada evento (confirmados, lista de espera con su puesto, cancelados), contadores de cupos y **descargar la lista en CSV** para Excel. Ve los correos tapados a medias (`ma***@gmail.com`) |
+| `ADMINISTRADOR` | lo del supervisor (con correos completos y también los eventos en BORRADOR) + **asignar roles** a cualquier usuario + usar el **formulario de administración de eventos** |
+
+Cómo está hecho:
+
+- El rol se guarda en la columna `rol` de la hoja Usuarios (vacío = `VECINO`).
+- WF02 devuelve el rol en el login y en la validación de sesión, así cada workflow sabe quién está pidiendo qué. **Los permisos se revisan en n8n**, no en la página: aunque alguien llame el webhook a mano, si no tiene el rol recibe `403 SIN_PERMISO`.
+- **WF01** tiene dos acciones nuevas solo para administradores: `usuarios` (lista) y `asignar_rol`. Un administrador no puede cambiar su propio rol (así nunca se queda el sistema sin administradores). Cada cambio queda en `Auditoria_Usuarios` (`ASIGNAR_ROL`, con quién lo hizo) y a la persona le llega un aviso por WF09.
+- **WF06** tiene la acción `inscritos` para supervisores y administradores (solo lectura).
+- **WF04** (formulario de eventos) ahora pide **correo y contraseña de un ADMINISTRADOR** antes de hacer cualquier cosa; antes cualquiera con el link podía usarlo. En la auditoría de eventos queda qué admin hizo el cambio.
+- Como en WF01, WF02 y WF04 viajan contraseñas, esos workflows **no guardan las ejecuciones exitosas** (`saveDataSuccessExecution: none`), para que no queden contraseñas en el historial de n8n.
+- Los eventos se siguen creando y editando **solo desde el formulario de n8n**, como pide el enunciado; el panel del administrador tiene un botón que lo abre.
+
 ## Asistente IA (WF10)
 
 Es el globito de chat abajo a la derecha. Usa el widget `@n8n/chat` contra un **Chat Trigger** público.
@@ -292,7 +315,7 @@ En Vercel: importar el repo, framework **Vite**, y agregar las tres variables `V
 
 ### Administrar eventos
 
-Abrir `https://<dominio-de-n8n>/form/ep-admin-eventos`, elegir la acción (CREAR, CONSULTAR, ACTUALIZAR, CANCELAR o CERRAR) y llenar los campos.
+Entrar con una cuenta ADMINISTRADOR → **Panel → Administrar eventos** (o abrir `https://<dominio-de-n8n>/form/ep-admin-eventos`), poner el correo y la contraseña de administrador, elegir la acción (CREAR, CONSULTAR, ACTUALIZAR, CANCELAR o CERRAR) y llenar los campos.
 
 ---
 
