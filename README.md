@@ -127,7 +127,7 @@ Resumen (con ejemplos completos en [`docs/api.md`](docs/api.md)):
 | POST | `/webhook/<id>/chat` | chat del asistente (lo usa el widget) |
 | – | `/form/ep-admin-eventos` | formulario del administrador (pide correo y contraseña de un ADMINISTRADOR) |
 
-* solo ADMINISTRADOR · ** SUPERVISOR o ADMINISTRADOR
+\* solo ADMINISTRADOR · \*\* SUPERVISOR o ADMINISTRADOR
 
 ---
 
