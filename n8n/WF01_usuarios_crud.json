@@ -1,6 +1,6 @@
 [
   {
-    "updatedAt": "2026-10-22T21:29:55.000Z",
+    "updatedAt": "2026-10-23T12:25:12.000Z",
     "createdAt": "2026-10-22T13:08:36.515Z",
     "id": "iKvVAgDkWYfMNJ04",
     "name": "WF01_usuarios_crud",
@@ -12,7 +12,7 @@
         "name": "Webhook usuarios",
         "type": "n8n-nodes-base.webhook",
         "typeVersion": 2.1,
-        "webhookId": "bcd7ac61-f148-4d14-a4d9-18835ae5833d",
+        "webhookId": "4bbe1259-b8f4-412a-a3ac-e4521bc05bd9",
         "parameters": {
           "httpMethod": "POST",
           "path": "ep/usuarios",
@@ -21,7 +21,7 @@
             "allowedOrigins": "*"
           }
         },
-        "id": "0fc7a3e0-43fd-4dc2-8b99-48abdab1c535",
+        "id": "5d84711a-a495-422c-8c65-3995dec4be89",
         "position": [
           0,
           0
@@ -34,7 +34,7 @@
         "parameters": {
           "jsCode": "const b = $input.first().json.body || {};\nreturn [{\n  json: {\n    accion: String(b.accion || '').trim().toLowerCase(),\n    token: String(b.token || '').trim(),\n    nombre: String(b.nombre || '').trim().replace(/\\s+/g, ' '),\n    email: String(b.email || '').trim().toLowerCase(),\n    password: String(b.password || ''),\n    password_actual: String(b.password_actual || ''),\n    password_nueva: String(b.password_nueva || ''),\n    codigo: String(b.codigo || '').replace(/\\D/g, '').slice(0, 6),\n    // preferencias de aviso (llegan como true/false desde el perfil)\n    avisos_email: b.avisos_email === undefined ? null : !!b.avisos_email,\n    avisos_telegram: b.avisos_telegram === undefined ? null : !!b.avisos_telegram,\n  },\n}];\n"
         },
-        "id": "ae89ec36-052a-411b-bba4-c4a088fff82d",
+        "id": "7bf642b9-c649-4481-947a-53e0da6c8240",
         "position": [
           240,
           0
@@ -57,7 +57,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "7faf8da8-e454-489e-8b54-81a30f0bf415",
+                      "id": "f047e423-5662-49e0-909d-1e837bdf4d34",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "crear",
                       "operator": {
@@ -81,7 +81,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "8953fe0e-a792-46ed-b352-ef25852a6122",
+                      "id": "f336355b-66e7-4ff3-b107-650524bcbe3e",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "perfil",
                       "operator": {
@@ -105,7 +105,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "5e50295c-0c7a-4ba4-80a1-35ffb9f320df",
+                      "id": "1c18d916-e973-43d3-a899-79dd2d0d650d",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "actualizar",
                       "operator": {
@@ -129,7 +129,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "568a208c-f741-43e7-942a-a2613381b1ed",
+                      "id": "98c41169-fe33-4ab1-b904-558c964e516e",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "desactivar",
                       "operator": {
@@ -153,7 +153,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "d45ee112-ef3f-47ab-baf2-789215e48866",
+                      "id": "ce376674-ae62-4df1-a19d-e4a2106b9bf8",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "enviar_codigo",
                       "operator": {
@@ -175,7 +175,7 @@
             "renameFallbackOutput": "otro"
           }
         },
-        "id": "856a1730-a01f-4c48-8c21-05f24fd20b88",
+        "id": "4361fc50-64e0-45a1-934b-1ea8319874af",
         "position": [
           480,
           0
@@ -188,7 +188,7 @@
         "parameters": {
           "jsCode": "const d = $input.first().json;\nconst errores = [];\nif (d.nombre.length < 3 || d.nombre.length > 60) errores.push('el nombre debe tener entre 3 y 60 caracteres');\nif (d.email.length > 120 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(d.email)) errores.push('el correo no es válido');\nif (d.password.length < 8) errores.push('la contraseña debe tener mínimo 8 caracteres');\nif (errores.length) {\n  const msg = errores.join(', ');\n  return [{ json: { ...d, valido: false, error_status: 400, error_codigo: 'DATOS_INVALIDOS', error_mensaje: msg.charAt(0).toUpperCase() + msg.slice(1) + '.' } }];\n}\nreturn [{ json: { ...d, valido: true } }];\n"
         },
-        "id": "af79c26b-3f60-4804-be2a-c75f1ce622fe",
+        "id": "80e4207e-d80e-4b67-81bb-96c98f445bb8",
         "position": [
           720,
           -1190
@@ -208,7 +208,7 @@
             },
             "conditions": [
               {
-                "id": "6712b7ef-9771-447d-ae13-3854e439e7d4",
+                "id": "bf5cba31-8f5f-4609-a563-014d7961ecf0",
                 "leftValue": "={{ $json.valido }}",
                 "rightValue": "",
                 "operator": {
@@ -223,7 +223,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "e389a1cf-ae4e-44cf-907a-6a3978e25267",
+        "id": "b3793896-f99c-44f7-843e-ed4cc40156e4",
         "position": [
           960,
           -1190
@@ -258,7 +258,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "bbdd03bc-1122-466a-b6e3-56eeb656dd53",
+        "id": "6926c6f3-e177-4dea-a3f4-b8c1e04380d8",
         "position": [
           1200,
           -1190
@@ -293,7 +293,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "d90a6c2b-64ed-4c31-9e7c-62d3e0ce5b0a",
+        "id": "9c8a3c13-0059-4995-a202-7f7aac18fb02",
         "position": [
           1440,
           -1190
@@ -306,7 +306,7 @@
         "parameters": {
           "jsCode": "const crypto = require('crypto');\nconst d = $('Validar datos (código)').first().json;\nconst no = (s, c, m) => [{ json: { ok: false, error_status: s, error_codigo: c, error_mensaje: m } }];\nif ($('Leer usuarios (código)').all().some(i => i.json.email_normalizado === d.email)) {\n  return no(409, 'EMAIL_DUPLICADO', 'Ya existe una cuenta con ese correo.');\n}\nconst ahoraMs = Date.now();\nconst horaCO = (ms) => new Date(ms - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst pendientes = $('Leer verificaciones').all().map(i => i.json)\n  .filter(v => v.email_normalizado === d.email && v.estado === 'PENDIENTE');\n// para que no se puedan pedir codigos sin parar: uno por minuto\nconst ultimo = pendientes.map(v => new Date(v.creado_en).getTime()).sort((a, b) => b - a)[0];\nif (ultimo && ahoraMs - ultimo < 60 * 1000) {\n  return no(429, 'ESPERA_UN_MINUTO', 'Ya te enviamos un código hace un momento. Espera un minuto para pedir otro.');\n}\nconst codigo = String(crypto.randomInt(0, 1000000)).padStart(6, '0');\n// en la hoja no queda el codigo, solo su hash\nconst hash = crypto.createHash('sha256').update(d.email + ':' + codigo).digest('hex');\nreturn [{\n  json: {\n    ok: true,\n    verificacion_id: 'VER-' + ahoraMs.toString(36).toUpperCase(),\n    email_normalizado: d.email,\n    codigo_hash: hash,\n    creado_en: horaCO(ahoraMs),\n    expira_en: horaCO(ahoraMs + 10 * 60 * 1000),\n    estado: 'PENDIENTE',\n    intentos: 0,\n    usado_en: '',\n    _codigo: codigo,\n    _nombre: d.nombre,\n    _cancelar: pendientes.map(v => v.verificacion_id),\n  },\n}];\n"
         },
-        "id": "c9c4a95b-2885-43a5-afd3-e7f25cf7aa29",
+        "id": "71d2e20e-058d-4328-9b3f-f242682a1365",
         "position": [
           1680,
           -1190
@@ -326,7 +326,7 @@
             },
             "conditions": [
               {
-                "id": "353d1805-296c-49f3-992d-a21c5073bcbf",
+                "id": "788e64c7-ba77-4b65-ab00-89b236498764",
                 "leftValue": "={{ $json.ok }}",
                 "rightValue": "",
                 "operator": {
@@ -341,7 +341,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "13266c8b-ec0a-47ca-82a8-3a9b724cd90e",
+        "id": "f32eeb5f-14fb-450a-990f-72e7efa4ff5e",
         "position": [
           1920,
           -1190
@@ -383,7 +383,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "bacf54da-a120-4941-b2e9-46d8028f14dc",
+        "id": "d6761cd2-91a0-4631-9b9a-c86b2e7c32a8",
         "position": [
           2160,
           -1275
@@ -396,7 +396,7 @@
         "parameters": {
           "jsCode": "const v = $('Generar código de verificación').first().json;\n    const nombre = v._nombre.split(' ')[0];\n    const html = `\n<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:540px;margin:0 auto;border-radius:14px;overflow:hidden;border:1px solid #e7dfd1\">\n  <div style=\"background:#14213d;color:#fff4d6;padding:16px 22px;font-size:20px;font-weight:bold;border-bottom:4px solid #b3262e\">EventPass <span style=\"color:#e8b04b\">Barrio</span></div>\n  <div style=\"padding:22px;background:#fbf7ef;color:#1d1a17;line-height:1.5\">\n    <p>Hola ${nombre},</p>\n    <p>Este es tu código para terminar de crear la cuenta:</p>\n    <p style=\"font-size:32px;font-weight:bold;letter-spacing:8px;color:#b3262e;text-align:center;margin:18px 0\">${v._codigo}</p>\n    <p>Vence en 10 minutos. Si no fuiste tú, ignora este correo.</p>\n  </div>\n</div>`.trim();\n    return [{ json: { email: v.email_normalizado, titulo: `Tu código de EventPass Barrio: ${v._codigo}`, html } }];\n"
         },
-        "id": "260e8e51-a614-4ee4-9ef8-05aa9e0b4417",
+        "id": "504f927a-c99b-4281-bafe-8077fe2b1fdb",
         "position": [
           2400,
           -1275
@@ -406,7 +406,7 @@
         "name": "Enviar código por Gmail",
         "type": "n8n-nodes-base.gmail",
         "typeVersion": 2.2,
-        "webhookId": "443ceaf5-7625-4ba9-b415-c8b47dfe6c70",
+        "webhookId": "c9dac79b-4730-44d6-9f6c-101f1435767d",
         "parameters": {
           "sendTo": "={{ $json.email }}",
           "subject": "={{ $json.titulo }}",
@@ -424,7 +424,7 @@
           }
         },
         "onError": "continueErrorOutput",
-        "id": "b7e64b9f-1bf4-4e6b-8001-8ff83dc217bd",
+        "id": "0c8c9e29-3a11-4639-b485-6b851ba199c9",
         "position": [
           2640,
           -1275
@@ -437,7 +437,7 @@
         "parameters": {
           "jsCode": "const v = $('Generar código de verificación').first().json;\nreturn [{ json: { status: 200, body: { ok: true, mensaje: 'Te enviamos un código a tu correo.', expira_en: v.expira_en } } }];\n"
         },
-        "id": "ac87974b-b701-43e8-8406-b494922f820b",
+        "id": "dec7c112-423a-4ba7-9e06-9868813bb28b",
         "position": [
           2880,
           -1326
@@ -450,7 +450,7 @@
         "parameters": {
           "jsCode": "return [{ json: { status: 502, body: { ok: false, error: 'CORREO_NO_ENVIADO', mensaje: 'No pudimos enviar el correo. Revisa que la dirección exista e intenta de nuevo.' } } }];\n"
         },
-        "id": "e7305495-a804-4f66-a7c6-4aa54c3991ac",
+        "id": "db33266e-aed8-4251-bab0-83a8ca01bc4d",
         "position": [
           2880,
           -1224
@@ -463,7 +463,7 @@
         "parameters": {
           "jsCode": "const ids = $('Generar código de verificación').first().json._cancelar || [];\nreturn ids.map(id => ({ json: { verificacion_id: id, estado: 'CANCELADO' } }));\n"
         },
-        "id": "fce76611-6464-45c7-92ab-a87eea5826c5",
+        "id": "f796f258-03b0-4608-8937-379e6e2ab152",
         "position": [
           2160,
           -1105
@@ -507,7 +507,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "6abc3881-51ed-4197-9920-d8842687f005",
+        "id": "1532ad83-5f8d-4ed2-97f9-255461f9fe0d",
         "position": [
           2400,
           -1105
@@ -520,7 +520,7 @@
         "parameters": {
           "jsCode": "const d = $input.first().json;\nconst errores = [];\nif (d.nombre.length < 3 || d.nombre.length > 60) errores.push('el nombre debe tener entre 3 y 60 caracteres');\nif (d.email.length > 120 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(d.email)) errores.push('el correo no es válido');\nif (d.password.length < 8) errores.push('la contraseña debe tener mínimo 8 caracteres');\nif (errores.length) {\n  const msg = errores.join(', ');\n  return [{ json: { ...d, valido: false, error_status: 400, error_codigo: 'DATOS_INVALIDOS', error_mensaje: msg.charAt(0).toUpperCase() + msg.slice(1) + '.' } }];\n}\nreturn [{ json: { ...d, valido: true } }];\n"
         },
-        "id": "b8bedd7f-23be-4ef4-9cf2-4543ddf844e4",
+        "id": "a8e75686-6f18-4c71-a7ae-5404adb17d94",
         "position": [
           720,
           -510
@@ -540,7 +540,7 @@
             },
             "conditions": [
               {
-                "id": "51d57ff9-9fae-49e6-b2f8-9b8b7c643f83",
+                "id": "293c1768-fb1b-48cd-8090-30741f688d82",
                 "leftValue": "={{ $json.valido }}",
                 "rightValue": "",
                 "operator": {
@@ -555,7 +555,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "a05b929d-4eb5-4498-9713-dd32e1342836",
+        "id": "1426a7b3-8fa7-43a5-a1ac-a02b87121ebf",
         "position": [
           960,
           -510
@@ -590,7 +590,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "aa4bbb27-35ff-411e-9dc2-7f86bac18637",
+        "id": "400029b0-ee8c-4d88-b635-eb0185290cf4",
         "position": [
           1200,
           -510
@@ -603,7 +603,7 @@
         "parameters": {
           "jsCode": "const d = $('Validar datos registro').first().json;\nconst existe = $('Leer usuarios (crear)').all().some(i => i.json.email_normalizado === d.email);\nif (existe) {\n  return [{ json: { ...d, duplicado: true, error_status: 409, error_codigo: 'EMAIL_DUPLICADO', error_mensaje: 'Ya existe una cuenta con ese correo.' } }];\n}\nreturn [{ json: { ...d, duplicado: false } }];\n"
         },
-        "id": "e3a26ef8-8c24-483c-b78c-089ada33bdcb",
+        "id": "2526e93a-942f-465a-a7be-d24d45c9116b",
         "position": [
           1440,
           -510
@@ -623,7 +623,7 @@
             },
             "conditions": [
               {
-                "id": "dec60351-270f-4108-92f0-86ea8af3b0d8",
+                "id": "fcc77ac6-ab63-42ac-a189-076cab7e599e",
                 "leftValue": "={{ $json.duplicado }}",
                 "rightValue": "",
                 "operator": {
@@ -638,7 +638,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "e4e75dbc-8634-4adb-a468-cd5a1a74dde0",
+        "id": "8624a886-fccc-423b-befa-665c06cee132",
         "position": [
           1680,
           -510
@@ -673,7 +673,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "656b79e1-df01-4def-8f96-4f29c76063c4",
+        "id": "b7b74b8c-55a4-4129-a162-041cda80972a",
         "position": [
           1920,
           -748.0000000000001
@@ -686,7 +686,7 @@
         "parameters": {
           "jsCode": "const crypto = require('crypto');\nconst d = $('Validar datos registro').first().json;\nconst ahoraMs = Date.now();\nconst ahora = new Date(ahoraMs - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst no = (s, c, m, extra = {}) => [{ json: { ok: false, error_status: s, error_codigo: c, error_mensaje: m, ...extra } }];\n\nif (!/^\\d{6}$/.test(d.codigo)) return no(400, 'CODIGO_REQUERIDO', 'Escribe el código de 6 dígitos que te llegó al correo.');\nconst v = $('Leer verificaciones (crear)').all().map(i => i.json)\n  .filter(x => x.email_normalizado === d.email && x.estado === 'PENDIENTE')\n  .sort((a, b) => String(b.creado_en).localeCompare(String(a.creado_en)))[0];\nif (!v) return no(400, 'CODIGO_INVALIDO', 'No hay un código activo para este correo. Pide uno nuevo.');\n\nconst intentos = Number(v.intentos || 0);\nif (new Date(v.expira_en).getTime() < ahoraMs) {\n  return no(400, 'CODIGO_VENCIDO', 'El código ya venció. Pide uno nuevo.', { actualizar: true, verificacion_id: v.verificacion_id, estado: 'EXPIRADO' });\n}\nif (intentos >= 5) {\n  return no(429, 'DEMASIADOS_INTENTOS', 'Fallaste el código muchas veces. Pide uno nuevo.', { actualizar: true, verificacion_id: v.verificacion_id, estado: 'CANCELADO' });\n}\nconst hash = crypto.createHash('sha256').update(d.email + ':' + d.codigo).digest('hex');\nif (hash !== v.codigo_hash) {\n  const quedan = 4 - intentos;\n  return no(400, 'CODIGO_INCORRECTO', `El código no coincide. Te quedan ${quedan} intento${quedan === 1 ? '' : 's'}.`, { actualizar: true, verificacion_id: v.verificacion_id, intentos: intentos + 1 });\n}\nreturn [{ json: { ok: true, actualizar: true, verificacion_id: v.verificacion_id, estado: 'USADO', usado_en: ahora, intentos: intentos + 1 } }];\n"
         },
-        "id": "ef16c6f1-ca29-4cc9-aa0e-e735476da754",
+        "id": "d85370ac-98a6-4573-b816-df5bb9d06859",
         "position": [
           2160,
           -748.0000000000001
@@ -706,7 +706,7 @@
             },
             "conditions": [
               {
-                "id": "6076326a-212b-48b9-8ba1-2c7fa97c4f12",
+                "id": "672a0245-ccd4-4a98-b19b-ded1efbc2731",
                 "leftValue": "={{ $json.actualizar }}",
                 "rightValue": "",
                 "operator": {
@@ -721,7 +721,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "1adbc63b-f238-4f0b-a85e-33c27881eb62",
+        "id": "19373685-5665-4128-acc4-1c83a29be709",
         "position": [
           2400,
           -748.0000000000001
@@ -765,7 +765,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "eedf7866-4d71-462b-9702-57b35b38a795",
+        "id": "4ed1e2b0-73fe-4906-a791-a5b19201fe2c",
         "position": [
           2640,
           -781.9999999999999
@@ -785,7 +785,7 @@
             },
             "conditions": [
               {
-                "id": "d0f46035-3743-49ea-9fa4-c952931d376f",
+                "id": "2a3432b3-bafa-4785-b1a0-fb3ff2f382f4",
                 "leftValue": "={{ $('Verificar código del correo').first().json.ok }}",
                 "rightValue": "",
                 "operator": {
@@ -800,7 +800,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "d6651d81-54e4-460b-b57a-7692300f4ba2",
+        "id": "60dfc0df-b7ed-4b7f-9f46-4189b8ae7e29",
         "position": [
           2880,
           -781.9999999999999
@@ -813,7 +813,7 @@
         "parameters": {
           "jsCode": "const v = $('Verificar código del correo').first().json;\nreturn [{ json: { status: v.error_status, body: { ok: false, error: v.error_codigo, mensaje: v.error_mensaje } } }];\n"
         },
-        "id": "49be04dc-d334-48aa-afc8-04df8d643c17",
+        "id": "cfcd3413-7fae-4f7f-a74c-3b9c8824158d",
         "position": [
           3120,
           -612
@@ -826,7 +826,7 @@
         "parameters": {
           "jsCode": "const crypto = require('crypto');\nconst d = $('Validar datos registro').first().json;\n// sal aleatoria por usuario + pbkdf2 (100k iteraciones, sha256). Nunca se guarda la clave\nconst salt = crypto.randomBytes(16).toString('hex');\nconst hash = crypto.pbkdf2Sync(d.password, salt, 100000, 32, 'sha256').toString('hex');\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nreturn [{\n  json: {\n    usuario_id: 'USR-' + Date.now().toString(36).toUpperCase() + crypto.randomBytes(2).toString('hex').toUpperCase(),\n    nombre: d.nombre,\n    email_normalizado: d.email,\n    password_hash: hash,\n    password_salt: salt,\n    estado: 'ACTIVO',\n    fecha_registro: ahora,\n    fecha_actualizacion: ahora,\n    avisos_email: 'SI',\n    avisos_telegram: 'SI',\n  },\n}];\n"
         },
-        "id": "0d9ae8d0-6255-481b-a71f-5345a8dbe272",
+        "id": "3b20d835-cef7-45d5-bde4-07b7cfc14b23",
         "position": [
           1920,
           -680
@@ -868,7 +868,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "9f3c4528-25df-4e3b-b644-573ca9777395",
+        "id": "52e8edb7-2b50-4964-b96d-33459f0a399b",
         "position": [
           2160,
           -680
@@ -881,7 +881,7 @@
         "parameters": {
           "jsCode": "const u = $('Generar hash y salt').first().json;\nreturn [{\n  json: {\n    auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase(),\n    usuario_id: u.usuario_id,\n    accion: 'CREAR',\n    fecha: u.fecha_registro,\n    resultado: 'OK',\n    detalle: 'Registro desde la web',\n  },\n}];\n"
         },
-        "id": "d01994a7-c4c3-47ee-9b08-8a87643c791f",
+        "id": "95d5f46e-58e9-4bd2-a622-f98873f513a7",
         "position": [
           2400,
           -680
@@ -923,7 +923,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "8d4e206d-5937-41c1-8d46-53345032f508",
+        "id": "762c1b89-c0e9-4e8f-a2e7-e48d99c85ace",
         "position": [
           2640,
           -680
@@ -936,7 +936,7 @@
         "parameters": {
           "jsCode": "const u = $('Generar hash y salt').first().json;\nreturn [{ json: { status: 201, body: { ok: true, mensaje: 'Cuenta creada.', usuario: { usuario_id: u.usuario_id, nombre: u.nombre, email: u.email_normalizado } } } }];\n"
         },
-        "id": "adb862d6-8f77-4c34-9b88-c40f9b3da423",
+        "id": "d6f93d20-864e-41b2-8d40-2515a52e45fc",
         "position": [
           2880,
           -680
@@ -953,7 +953,7 @@
             "responseCode": "={{ $json.status }}"
           }
         },
-        "id": "03d60741-3d90-4fd1-aafd-02e5e746f7df",
+        "id": "c945b7ca-a2ad-4b83-af98-a7051d74262a",
         "position": [
           3120,
           -680
@@ -966,7 +966,7 @@
         "parameters": {
           "jsCode": "const u = $('Generar hash y salt').first().json;\nreturn [{\n  json: {\n    usuario_id: u.usuario_id,\n    tipo: 'CUENTA_CREADA',\n    titulo: '¡Bienvenido a EventPass Barrio!',\n    mensaje: `Tu cuenta quedó creada y verificada con el correo ${u.email_normalizado}. Ya puedes ingresar, vincular tu Telegram desde tu perfil y apartar cupo en las novenas, la noche de velitas y todos los planes de diciembre.`,\n  },\n}];\n"
         },
-        "id": "86422e8b-5393-4f38-a0eb-542fbd7a8392",
+        "id": "d96b8a50-eb56-4e81-ab1c-6c51f1bafb8e",
         "position": [
           3360,
           -680
@@ -995,7 +995,7 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "1d7d6f3c-7c62-4a58-a0a3-6bd43ae3cfb0",
+        "id": "56b40edc-dc26-442d-bd89-20e4ec1bf06f",
         "position": [
           3600,
           -680
@@ -1008,7 +1008,7 @@
         "parameters": {
           "jsCode": "return [{ json: { token: $('Normalizar solicitud').first().json.token } }];\n"
         },
-        "id": "a85386d9-b431-4606-a83c-9995be13cc18",
+        "id": "50e075c7-cc87-4374-8113-17cccf253f6d",
         "position": [
           720,
           0
@@ -1037,7 +1037,7 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "1123cf55-8fda-4268-bea6-cfc19302b718",
+        "id": "1e24eb35-9e53-46fa-a0c0-144600b8a53c",
         "position": [
           960,
           0
@@ -1057,7 +1057,7 @@
             },
             "conditions": [
               {
-                "id": "950c2a63-c369-4fb5-a58d-2804e9c9baec",
+                "id": "9b51b769-0c68-4e14-98bc-e4dc4e937476",
                 "leftValue": "={{ $json.valida }}",
                 "rightValue": "",
                 "operator": {
@@ -1072,7 +1072,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "1ae6a461-710f-46b8-885e-173227098b38",
+        "id": "113c2ad1-2ddd-445d-a9ef-4a70081f35e6",
         "position": [
           1200,
           0
@@ -1085,7 +1085,7 @@
         "parameters": {
           "jsCode": "const r = $input.first().json;\nconst mensajes = {\n  NO_EXISTE: 'Necesitas iniciar sesión.',\n  CERRADA: 'Tu sesión fue cerrada. Vuelve a ingresar.',\n  EXPIRADA: 'Tu sesión expiró. Vuelve a ingresar.',\n  USUARIO_INACTIVO: 'Tu cuenta está desactivada.',\n};\nreturn [{\n  json: {\n    status: 401,\n    body: { ok: false, error: 'SESION_' + (r.motivo || 'INVALIDA'), mensaje: mensajes[r.motivo] || 'Sesión no válida.' },\n  },\n}];\n"
         },
-        "id": "1b972862-5bd1-4a37-ad4c-09936414325a",
+        "id": "de34c675-c40b-4efb-9441-8d593f9a635a",
         "position": [
           1440,
           237.99999999999997
@@ -1108,7 +1108,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "227a9c67-9ab5-4ef3-8743-cc6d1a258d64",
+                      "id": "003e962e-9977-4e4e-a782-50901d4fe72a",
                       "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
                       "rightValue": "perfil",
                       "operator": {
@@ -1132,7 +1132,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "a14fa148-70b9-4949-a22e-86725233f9db",
+                      "id": "6a57c548-dd57-4dd5-b6fe-5a7e0fed4f2d",
                       "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
                       "rightValue": "actualizar",
                       "operator": {
@@ -1156,7 +1156,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "63dd0296-fc13-4c4e-b1f6-1014e8e987f3",
+                      "id": "15a4b2bb-e772-4c98-b4a4-1d7fc2238748",
                       "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
                       "rightValue": "desactivar",
                       "operator": {
@@ -1178,7 +1178,7 @@
             "renameFallbackOutput": "otro"
           }
         },
-        "id": "db35acfe-0815-45ee-8333-b1dcf1423e5f",
+        "id": "4543d329-50b0-4b7a-a916-16643c8c749f",
         "position": [
           1440,
           0
@@ -1213,7 +1213,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "f3dbea4c-9846-479f-ae9f-a852564eb053",
+        "id": "646768f7-5ce5-4b95-b953-b5557c8fde55",
         "position": [
           1680,
           -204
@@ -1224,9 +1224,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const id = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst u = $('Leer usuarios (perfil)').all().map(i => i.json).find(x => x.usuario_id === id);\nif (!u) return [{ json: { status: 404, body: { ok: false, error: 'NO_ENCONTRADO', mensaje: 'No encontramos tu usuario.' } } }];\nreturn [{\n  json: {\n    status: 200,\n    body: {\n      ok: true,\n      usuario: {\n        usuario_id: u.usuario_id, nombre: u.nombre, email: u.email_normalizado, estado: u.estado, fecha_registro: u.fecha_registro,\n        // vacio cuenta como SI (usuarios creados antes de que existieran estas columnas)\n        avisos_email: u.avisos_email !== 'NO',\n        avisos_telegram: u.avisos_telegram !== 'NO',\n      },\n    },\n  },\n}];\n"
+          "jsCode": "const id = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst u = $('Leer usuarios (perfil)').all().map(i => i.json).find(x => x.usuario_id === id);\nif (!u) return [{ json: { status: 404, body: { ok: false, error: 'NO_ENCONTRADO', mensaje: 'No encontramos tu usuario.' } } }];\nreturn [{\n  json: {\n    status: 200,\n    body: {\n      ok: true,\n      usuario: {\n        usuario_id: u.usuario_id, nombre: u.nombre, email: u.email_normalizado, estado: u.estado, fecha_registro: u.fecha_registro,\n        // vacio cuenta como SI (usuarios creados antes de que existieran estas columnas)\n        avisos_email: u.avisos_email !== 'NO',\n        avisos_telegram: true,\n      },\n    },\n  },\n}];\n"
         },
-        "id": "2be9597f-da75-4fad-9334-0f297a8aad6a",
+        "id": "f2c576dd-14fe-4cc6-91c8-76c03c1265ac",
         "position": [
           1920,
           -204
@@ -1261,7 +1261,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "c771f7b3-a14d-4f41-b4d4-1f991df46988",
+        "id": "e8b64418-395e-4e88-b453-a79a3e3492ad",
         "position": [
           1680,
           0
@@ -1272,9 +1272,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const crypto = require('crypto');\nconst d = $('Normalizar solicitud').first().json;\nconst id = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst u = $('Leer usuarios (actualizar)').all().map(i => i.json).find(x => x.usuario_id === id);\nconst error = (status, codigo, mensaje) => [{ json: { ok: false, error_status: status, error_codigo: codigo, error_mensaje: mensaje } }];\n\nif (!u) return error(404, 'NO_ENCONTRADO', 'No encontramos tu usuario.');\nconst nombre = d.nombre || u.nombre;\nif (nombre.length < 3 || nombre.length > 60) return error(400, 'DATOS_INVALIDOS', 'El nombre debe tener entre 3 y 60 caracteres.');\n\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst cambios = { usuario_id: id, nombre, fecha_actualizacion: ahora };\nconst detalle = [];\nif (nombre !== u.nombre) detalle.push('nombre');\n\nif (d.password_nueva) {\n  if (d.password_nueva.length < 8) return error(400, 'DATOS_INVALIDOS', 'La nueva contraseña debe tener mínimo 8 caracteres.');\n  const actual = crypto.pbkdf2Sync(d.password_actual, String(u.password_salt), 100000, 32, 'sha256').toString('hex');\n  if (actual !== String(u.password_hash)) return error(401, 'PASSWORD_INCORRECTO', 'La contraseña actual no es correcta.');\n  const salt = crypto.randomBytes(16).toString('hex');\n  cambios.password_salt = salt;\n  cambios.password_hash = crypto.pbkdf2Sync(d.password_nueva, salt, 100000, 32, 'sha256').toString('hex');\n  detalle.push('contraseña');\n}\n\n// canales por los que quiere recibir avisos: minimo uno\nconst email = d.avisos_email === null ? u.avisos_email !== 'NO' : d.avisos_email;\nconst telegram = d.avisos_telegram === null ? u.avisos_telegram !== 'NO' : d.avisos_telegram;\nif (!email && !telegram) return error(400, 'SIN_CANALES', 'Deja al menos un canal para avisarte (correo o Telegram).');\nif (d.avisos_email !== null || d.avisos_telegram !== null) {\n  cambios.avisos_email = email ? 'SI' : 'NO';\n  cambios.avisos_telegram = telegram ? 'SI' : 'NO';\n  detalle.push(`avisos (correo: ${cambios.avisos_email}, telegram: ${cambios.avisos_telegram})`);\n}\nreturn [{ json: { ok: true, ...cambios, _detalle: detalle.join(', ') || 'sin cambios', _email: u.email_normalizado, _avisos_email: email, _avisos_telegram: telegram } }];\n"
+          "jsCode": "const crypto = require('crypto');\nconst d = $('Normalizar solicitud').first().json;\nconst id = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst u = $('Leer usuarios (actualizar)').all().map(i => i.json).find(x => x.usuario_id === id);\nconst error = (status, codigo, mensaje) => [{ json: { ok: false, error_status: status, error_codigo: codigo, error_mensaje: mensaje } }];\n\nif (!u) return error(404, 'NO_ENCONTRADO', 'No encontramos tu usuario.');\nconst nombre = d.nombre || u.nombre;\nif (nombre.length < 3 || nombre.length > 60) return error(400, 'DATOS_INVALIDOS', 'El nombre debe tener entre 3 y 60 caracteres.');\n\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst cambios = { usuario_id: id, nombre, fecha_actualizacion: ahora };\nconst detalle = [];\nif (nombre !== u.nombre) detalle.push('nombre');\n\nif (d.password_nueva) {\n  if (d.password_nueva.length < 8) return error(400, 'DATOS_INVALIDOS', 'La nueva contraseña debe tener mínimo 8 caracteres.');\n  const actual = crypto.pbkdf2Sync(d.password_actual, String(u.password_salt), 100000, 32, 'sha256').toString('hex');\n  if (actual !== String(u.password_hash)) return error(401, 'PASSWORD_INCORRECTO', 'La contraseña actual no es correcta.');\n  const salt = crypto.randomBytes(16).toString('hex');\n  cambios.password_salt = salt;\n  cambios.password_hash = crypto.pbkdf2Sync(d.password_nueva, salt, 100000, 32, 'sha256').toString('hex');\n  detalle.push('contraseña');\n}\n\n// Telegram siempre queda activo (es obligatorio); el correo es el opcional\nconst email = d.avisos_email === null ? u.avisos_email !== 'NO' : d.avisos_email;\nconst telegram = true;\nif (d.avisos_email !== null) {\n  cambios.avisos_email = email ? 'SI' : 'NO';\n  cambios.avisos_telegram = 'SI';\n  detalle.push(`avisos por correo: ${cambios.avisos_email}`);\n}\nreturn [{ json: { ok: true, ...cambios, _detalle: detalle.join(', ') || 'sin cambios', _email: u.email_normalizado, _avisos_email: email, _avisos_telegram: telegram } }];\n"
         },
-        "id": "af5e9c38-3fcb-4f70-8d61-df73b734804a",
+        "id": "56ee10ee-c82e-41d3-9c64-f3b3e00b0acb",
         "position": [
           1920,
           0
@@ -1294,7 +1294,7 @@
             },
             "conditions": [
               {
-                "id": "deabb1e0-30fa-428d-9653-1b4e3454c815",
+                "id": "265759cd-8e67-4767-87f5-1a28fc72e219",
                 "leftValue": "={{ $json.ok }}",
                 "rightValue": "",
                 "operator": {
@@ -1309,7 +1309,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "cdd89491-c318-4b77-93b5-e2b58977cad1",
+        "id": "7d317bb6-4ff4-4509-abde-6750d2790484",
         "position": [
           2160,
           0
@@ -1353,7 +1353,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "66a1e052-5bf1-46b7-9a4e-6fb1d1799ce6",
+        "id": "1b30702a-0417-4cf6-92d9-8d00f9505630",
         "position": [
           2400,
           0
@@ -1366,7 +1366,7 @@
         "parameters": {
           "jsCode": "const c = $('Validar cambios').first().json;\nreturn [{ json: { auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase(), usuario_id: c.usuario_id, accion: 'ACTUALIZAR', fecha: c.fecha_actualizacion, resultado: 'OK', detalle: 'Cambió: ' + c._detalle } }];\n"
         },
-        "id": "63f1f209-cd61-4d01-b1ac-4b27567e81dc",
+        "id": "a04dec77-bd97-4a77-9c8d-cca51790544f",
         "position": [
           2640,
           0
@@ -1408,7 +1408,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "8a31f816-1be6-4176-a935-b03995a081be",
+        "id": "7d84d4fd-8ca6-4f8d-a4ca-f4de28ed01b3",
         "position": [
           2880,
           0
@@ -1421,7 +1421,7 @@
         "parameters": {
           "jsCode": "const c = $('Validar cambios').first().json;\nreturn [{ json: { status: 200, body: { ok: true, mensaje: 'Perfil actualizado.', usuario: { usuario_id: c.usuario_id, nombre: c.nombre, email: c._email, avisos_email: c._avisos_email, avisos_telegram: c._avisos_telegram } } } }];\n"
         },
-        "id": "3d87d70a-aad2-4e51-b7e0-52e5bfde5af4",
+        "id": "c7455e2a-8b71-4ea4-9859-c7600ca0fdc6",
         "position": [
           3120,
           0
@@ -1456,7 +1456,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "c4eff648-5c85-4359-a752-f6325a3371df",
+        "id": "b128bfa7-32f5-4f5a-98e9-cd6bfb49740a",
         "position": [
           1680,
           204
@@ -1469,7 +1469,7 @@
         "parameters": {
           "jsCode": "const crypto = require('crypto');\nconst d = $('Normalizar solicitud').first().json;\nconst id = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst u = $('Leer usuarios (desactivar)').all().map(i => i.json).find(x => x.usuario_id === id);\nif (!u) return [{ json: { ok: false, error_status: 404, error_codigo: 'NO_ENCONTRADO', error_mensaje: 'No encontramos tu usuario.' } }];\nconst hash = crypto.pbkdf2Sync(d.password, String(u.password_salt), 100000, 32, 'sha256').toString('hex');\nif (hash !== String(u.password_hash)) {\n  return [{ json: { ok: false, error_status: 401, error_codigo: 'PASSWORD_INCORRECTO', error_mensaje: 'La contraseña no es correcta.' } }];\n}\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nreturn [{ json: { ok: true, usuario_id: id, estado: 'INACTIVO', fecha_actualizacion: ahora } }];\n"
         },
-        "id": "18e9e026-679d-4c22-9e25-8be4a1ec27c3",
+        "id": "91d948e6-6b80-4839-a638-e9e4e2bec54d",
         "position": [
           1920,
           204
@@ -1489,7 +1489,7 @@
             },
             "conditions": [
               {
-                "id": "9e0f3202-fdab-41a6-a689-f74c2a13d647",
+                "id": "a304d40f-7ca2-4353-a8d9-36ac5d5fe684",
                 "leftValue": "={{ $json.ok }}",
                 "rightValue": "",
                 "operator": {
@@ -1504,7 +1504,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "2b2b5202-1d09-42f2-9a9e-6746a64727c2",
+        "id": "78775d21-1a71-438f-a3fc-691aa30929f3",
         "position": [
           2160,
           204
@@ -1548,7 +1548,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "068b450a-7b6d-42af-86a4-cf3c31024cb4",
+        "id": "0baeea4d-fc47-4ccd-913f-53bd349269b9",
         "position": [
           2400,
           204
@@ -1561,7 +1561,7 @@
         "parameters": {
           "jsCode": "const c = $('Confirmar password').first().json;\nreturn [{ json: { auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase(), usuario_id: c.usuario_id, accion: 'DESACTIVAR', fecha: c.fecha_actualizacion, resultado: 'OK', detalle: 'Cuenta desactivada por el usuario (borrado lógico)' } }];\n"
         },
-        "id": "bd09b3ca-cc22-4a03-83e2-06edaae60599",
+        "id": "c8960ccb-654d-4f37-b543-c12afcf3415a",
         "position": [
           2640,
           204
@@ -1603,7 +1603,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "df7300d5-7eed-42f3-880e-869ec85288e6",
+        "id": "1a0a378f-3e9f-410e-9fbd-1c7362294377",
         "position": [
           2880,
           204
@@ -1616,7 +1616,7 @@
         "parameters": {
           "jsCode": "return [{ json: { status: 200, body: { ok: true, mensaje: 'Tu cuenta quedó desactivada.' } } }];\n"
         },
-        "id": "2cc9a0eb-f01e-4e9c-9402-a20e700b4270",
+        "id": "096e81ee-1ec3-4c17-a8b4-34e8a14e37a4",
         "position": [
           3120,
           204
@@ -1629,7 +1629,7 @@
         "parameters": {
           "jsCode": "return [{ json: { status: 400, body: { ok: false, error: 'ACCION_NO_VALIDA', mensaje: 'La acción enviada no existe.' } } }];\n"
         },
-        "id": "05261833-dc00-48f4-81e5-299bce1f8b1f",
+        "id": "b93375f6-d6e9-4517-b374-681af55cbd1e",
         "position": [
           720,
           408
@@ -1642,7 +1642,7 @@
         "parameters": {
           "jsCode": "const d = $input.first().json;\nreturn [{\n  json: {\n    status: d.error_status || 400,\n    body: { ok: false, error: d.error_codigo || 'ERROR', mensaje: d.error_mensaje || 'No se pudo procesar la solicitud.' },\n  },\n}];\n"
         },
-        "id": "310bb74f-3728-4951-aa86-c2c614fd428f",
+        "id": "91f98a1e-936b-4630-87c3-0427efb26823",
         "position": [
           2880,
           -374.00000000000006
@@ -1659,14 +1659,14 @@
             "responseCode": "={{ $json.status }}"
           }
         },
-        "id": "bc8b70eb-0ad2-4a91-828c-d77d7de70a28",
+        "id": "b40499e5-c438-4e7e-908a-e409b7c76ad2",
         "position": [
           3600,
           0
         ]
       },
       {
-        "id": "a9e191c5-2cde-4a9f-a664-8d7e1704ce9e",
+        "id": "ceed2f1a-4aca-4151-8895-4289200f79fa",
         "name": "Nota 1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
@@ -2433,9 +2433,9 @@
     "meta": null,
     "nodeGroups": [],
     "pinData": {},
-    "versionId": "640e973a-9cf3-4944-a624-d49e5aca8f47",
-    "activeVersionId": "640e973a-9cf3-4944-a624-d49e5aca8f47",
-    "versionCounter": 4,
+    "versionId": "d6d63f05-db58-452b-be8c-6f8cbd45a812",
+    "activeVersionId": "d6d63f05-db58-452b-be8c-6f8cbd45a812",
+    "versionCounter": 5,
     "triggerCount": 1,
     "sourceWorkflowId": null,
     "tags": [],

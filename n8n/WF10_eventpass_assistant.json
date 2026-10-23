@@ -1,6 +1,6 @@
 [
   {
-    "updatedAt": "2026-10-22T21:30:08.000Z",
+    "updatedAt": "2026-10-23T12:25:43.000Z",
     "createdAt": "2026-10-22T13:08:36.540Z",
     "id": "hnh0v8y0O013CFCD",
     "name": "WF10_eventpass_assistant",
@@ -21,7 +21,7 @@
             "responseMode": "lastNode"
           }
         },
-        "id": "9478af1b-8f39-4a46-8c2a-7e860b7920e8",
+        "id": "d8c167e8-71fc-4a8e-8a9e-6a83ad568429",
         "position": [
           0,
           0
@@ -34,7 +34,7 @@
         "parameters": {
           "jsCode": "const crypto = require('crypto');\nconst d = $input.first().json;\nconst meta = d.metadata || {};\nconst sessionId = String(d.sessionId || 'sin-sesion');\nreturn [{\n  json: {\n    conversation_id: 'CNV-' + crypto.createHash('sha1').update(sessionId).digest('hex').slice(0, 12).toUpperCase(),\n    visitor_id: String(meta.visitor_id || 'ANONIMO').slice(0, 40),\n    token: String(meta.token || ''),\n    mensaje: String(d.chatInput || '').slice(0, 1000),\n  },\n}];\n"
         },
-        "id": "152c44f5-595d-46e3-a750-493198d587f7",
+        "id": "de5e9b0a-8e97-4766-8e8b-4a044b004407",
         "position": [
           240,
           0
@@ -54,7 +54,7 @@
             },
             "conditions": [
               {
-                "id": "9bbdd695-98a2-4b6b-b0a9-435932b11992",
+                "id": "fb021e4f-437a-43a2-a115-16fff8065a88",
                 "leftValue": "={{ $json.token }}",
                 "rightValue": "",
                 "operator": {
@@ -69,7 +69,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "6c6c3906-a95a-4ad5-80be-440cc42c9a52",
+        "id": "ba9b3cde-5ab4-42cc-a4c8-33b6f9ebc9cc",
         "position": [
           480,
           0
@@ -98,7 +98,7 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "f80229de-b3ca-4f48-a67f-c8c2c045e991",
+        "id": "d1c26687-d228-4292-834c-5e2e569e62dd",
         "position": [
           720,
           -102
@@ -133,7 +133,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "c956fd60-5a5e-4633-ac34-2f090bb7f5dd",
+        "id": "2e24b7c5-6351-40d5-86a0-54deea5b46a6",
         "position": [
           960,
           0
@@ -168,7 +168,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "8250d398-af57-4caa-992c-22a0c7cd8885",
+        "id": "7f2b251b-f9b9-49ac-a5b8-860169072047",
         "position": [
           1200,
           0
@@ -203,7 +203,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "2ca2ab81-e3a9-4038-90f8-55c1cc9115c8",
+        "id": "8f4856e0-04a4-44f7-a3b5-dff51c50aad3",
         "position": [
           1440,
           0
@@ -214,9 +214,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const c = $('Identificar conversación').first().json;\n    let usuario = null;\n    try {\n      const v = $('Validar sesión (WF02)').first().json;\n      if (v.valida) usuario = v.usuario;\n    } catch (e) { /* visitante sin sesion */ }\n\n    const eventos = $('Leer eventos (solo lectura)').all().map(i => i.json).filter(e => e.evento_id && e.estado !== 'BORRADOR');\n    const ins = $('Leer inscripciones (solo lectura)').all().map(i => i.json).filter(i => i.inscripcion_id);\n    const ahora = new Date(Date.now() - 5 * 3600 * 1000);\n    const ahoraTxt = ahora.toISOString().slice(0, 16).replace('T', ' ');\n\n    const lineas = eventos.map(e => {\n      const conf = ins.filter(i => i.evento_id === e.evento_id && i.estado === 'CONFIRMADA').length;\n      const esp = ins.filter(i => i.evento_id === e.evento_id && i.estado === 'LISTA_ESPERA').length;\n      const libres = Math.max(Number(e.capacidad) - conf, 0);\n      return `- [${e.evento_id}] ${e.nombre} | ${e.categoria} | ${e.fecha} ${e.hora} | ${e.lugar} | estado ${e.estado} | cupos libres ${libres} de ${e.capacidad} | en espera ${esp} | organiza ${e.organizador} | ${String(e.descripcion || '').slice(0, 160)}`;\n    }).join('\\n');\n\n    let bloqueUsuario = 'El usuario es un VISITANTE sin sesión. Si pregunta por sus inscripciones, dile que inicie sesión en la página.';\n    if (usuario) {\n      const mias = ins.filter(i => i.usuario_id === usuario.usuario_id).map(i => {\n        const e = eventos.find(x => x.evento_id === i.evento_id) || {};\n        return `- ${e.nombre || i.evento_id} (${e.fecha || ''}): ${i.estado}`;\n      }).join('\\n') || '- (no tiene inscripciones)';\n      bloqueUsuario = `El usuario tiene sesión iniciada. Se llama ${usuario.nombre}. Sus inscripciones:\\n${mias}`;\n    }\n\n    const system = `Eres \"el Asistente del Barrio\", el asistente de soporte de EventPass Barrio, una página web para inscribirse a eventos culturales, deportivos y de comunidad del barrio.\nFecha y hora actual (Colombia): ${ahoraTxt}.\n\nREGLAS (obligatorias):\n1. Eres SOLO informativo. NO puedes crear usuarios, iniciar sesión, inscribir, cancelar inscripciones, modificar eventos, cambiar cupos ni cambiar ningún estado. Si te lo piden, explica amablemente que tú no puedes hacerlo y dile cómo hacerlo en la página.\n2. Usa solo la información de abajo. Si algo no está, di que no lo sabes. Nunca inventes eventos, fechas, lugares ni cupos.\n3. Responde en español, en tono cercano de barrio, corto (máximo 120 palabras). Puedes usar listas.\n4. Nunca pidas contraseñas ni códigos de vinculación.\n\nCÓMO FUNCIONA EVENTPASS:\n- Registro con nombre, correo y contraseña (mínimo 8 caracteres). Luego \"Ingresar\".\n- Vincular Telegram es opcional: en \"Mi perfil\" se genera un código (dura 15 minutos y sirve una vez) y se le envía al bot: /vincular CODIGO.\n- En \"Mi perfil\" la persona escoge por dónde recibir los avisos: correo, Telegram o ambos (mínimo uno).\n- En cada evento y en \"Mis inscripciones\" hay un botón para guardarse el recordatorio por WhatsApp.\n- Al inscribirse: si hay cupo queda CONFIRMADA; si el evento está lleno queda en LISTA_ESPERA.\n- Lista de espera: cuando alguien cancela, cada 2 minutos el sistema asigna el cupo a quien lleva más tiempo esperando (orden de inscripción) y le avisa.\n- Estados de inscripción: CONFIRMADA, LISTA_ESPERA, CANCELADA. Estados de evento: PUBLICADO (abierto), CERRADO (ya no recibe inscripciones), CANCELADO.\n- Cancelar: en \"Mis inscripciones\" → \"Cancelar inscripción\". Ahí también se edita el nombre de la escarapela.\n- Avisos: confirmaciones, cambios y recordatorios (24 horas y 2 horas antes) llegan por los canales que la persona escogió (correo y/o Telegram).\n- Categorías: Cultura, Deportes, Comunidad, Educación, Emprendimiento.\n\nEVENTOS ACTUALES (datos reales del sistema):\n${lineas || '- No hay eventos publicados en este momento.'}\n\nUSUARIO:\n${bloqueUsuario}`;\n\n    const existe = $('Leer conversaciones').all().some(i => i.json.conversation_id === c.conversation_id);\n    return [{ json: { ...c, usuario_id: usuario ? usuario.usuario_id : '', system_prompt: system, nueva: !existe } }];\n"
+          "jsCode": "const c = $('Identificar conversación').first().json;\n    let usuario = null;\n    try {\n      const v = $('Validar sesión (WF02)').first().json;\n      if (v.valida) usuario = v.usuario;\n    } catch (e) { /* visitante sin sesion */ }\n\n    const eventos = $('Leer eventos (solo lectura)').all().map(i => i.json).filter(e => e.evento_id && e.estado !== 'BORRADOR');\n    const ins = $('Leer inscripciones (solo lectura)').all().map(i => i.json).filter(i => i.inscripcion_id);\n    const ahora = new Date(Date.now() - 5 * 3600 * 1000);\n    const ahoraTxt = ahora.toISOString().slice(0, 16).replace('T', ' ');\n\n    const lineas = eventos.map(e => {\n      const conf = ins.filter(i => i.evento_id === e.evento_id && i.estado === 'CONFIRMADA').length;\n      const esp = ins.filter(i => i.evento_id === e.evento_id && i.estado === 'LISTA_ESPERA').length;\n      const libres = Math.max(Number(e.capacidad) - conf, 0);\n      return `- [${e.evento_id}] ${e.nombre} | ${e.categoria} | ${e.fecha} ${e.hora} | ${e.lugar} | estado ${e.estado} | cupos libres ${libres} de ${e.capacidad} | en espera ${esp} | organiza ${e.organizador} | ${String(e.descripcion || '').slice(0, 160)}`;\n    }).join('\\n');\n\n    let bloqueUsuario = 'El usuario es un VISITANTE sin sesión. Si pregunta por sus inscripciones, dile que inicie sesión en la página.';\n    if (usuario) {\n      const mias = ins.filter(i => i.usuario_id === usuario.usuario_id).map(i => {\n        const e = eventos.find(x => x.evento_id === i.evento_id) || {};\n        return `- ${e.nombre || i.evento_id} (${e.fecha || ''}): ${i.estado}`;\n      }).join('\\n') || '- (no tiene inscripciones)';\n      bloqueUsuario = `El usuario tiene sesión iniciada. Se llama ${usuario.nombre}. Sus inscripciones:\\n${mias}`;\n    }\n\n    const system = `Eres \"el Asistente del Barrio\", el asistente de soporte de EventPass Barrio, una página web para inscribirse a eventos culturales, deportivos y de comunidad del barrio.\nFecha y hora actual (Colombia): ${ahoraTxt}.\n\nREGLAS (obligatorias):\n1. Eres SOLO informativo. NO puedes crear usuarios, iniciar sesión, inscribir, cancelar inscripciones, modificar eventos, cambiar cupos ni cambiar ningún estado. Si te lo piden, explica amablemente que tú no puedes hacerlo y dile cómo hacerlo en la página.\n2. Usa solo la información de abajo. Si algo no está, di que no lo sabes. Nunca inventes eventos, fechas, lugares ni cupos.\n3. Responde en español, en tono cercano de barrio, corto (máximo 120 palabras). Puedes usar listas.\n4. Nunca pidas contraseñas ni códigos de vinculación.\n\nCÓMO FUNCIONA EVENTPASS:\n- Registro con nombre, correo y contraseña (mínimo 8 caracteres). Luego \"Ingresar\".\n- Para inscribirse es obligatorio vincular Telegram: en \"Mi perfil\" se genera un código (dura 15 minutos y sirve una vez) y se le envía al bot: /vincular CODIGO.\n- Los avisos siempre llegan por Telegram. Además, por correo si la persona deja activada esa opción en \"Mi perfil\" (viene activada).\n- En cada evento y en \"Mis inscripciones\" hay un botón para guardarse el recordatorio por WhatsApp.\n- Al inscribirse: si hay cupo queda CONFIRMADA; si el evento está lleno queda en LISTA_ESPERA.\n- Lista de espera: cuando alguien cancela, cada 2 minutos el sistema asigna el cupo a quien lleva más tiempo esperando (orden de inscripción) y le avisa.\n- Estados de inscripción: CONFIRMADA, LISTA_ESPERA, CANCELADA. Estados de evento: PUBLICADO (abierto), CERRADO (ya no recibe inscripciones), CANCELADO.\n- Cancelar: en \"Mis inscripciones\" → \"Cancelar inscripción\". Ahí también se edita el nombre de la escarapela.\n- Avisos: confirmaciones, cambios y recordatorios (24 horas y 2 horas antes) llegan por Telegram y, si la persona lo deja activado, también por correo.\n- Categorías: Cultura, Deportes, Comunidad, Educación, Emprendimiento.\n\nEVENTOS ACTUALES (datos reales del sistema):\n${lineas || '- No hay eventos publicados en este momento.'}\n\nUSUARIO:\n${bloqueUsuario}`;\n\n    const existe = $('Leer conversaciones').all().some(i => i.json.conversation_id === c.conversation_id);\n    return [{ json: { ...c, usuario_id: usuario ? usuario.usuario_id : '', system_prompt: system, nueva: !existe } }];\n"
         },
-        "id": "c98841a4-c940-4279-989c-adbe6e790548",
+        "id": "4922a5ec-8a24-429e-bcd4-67c55781c050",
         "position": [
           1680,
           0
@@ -236,7 +236,7 @@
             },
             "conditions": [
               {
-                "id": "cb5a4326-5b70-46db-b82e-1f7f139ffe84",
+                "id": "568acbcb-4c62-4648-abe2-2cdb629bbedd",
                 "leftValue": "={{ $json.nueva }}",
                 "rightValue": "",
                 "operator": {
@@ -251,7 +251,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "1361cc20-0592-4310-bb73-d3d9bf770de3",
+        "id": "cecd1d62-7780-4e1b-8dfa-18817afe4e0a",
         "position": [
           1920,
           0
@@ -264,7 +264,7 @@
         "parameters": {
           "jsCode": "const c = $input.first().json;\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nreturn [{ json: { conversation_id: c.conversation_id, usuario_id: c.usuario_id, visitor_id: c.visitor_id, fecha_inicio: ahora, fecha_ultima_interaccion: ahora, estado: 'ABIERTA' } }];\n"
         },
-        "id": "52043625-3811-487c-afb8-1db438e25818",
+        "id": "40c97518-9e85-489e-b8e9-d253a2cffa79",
         "position": [
           2160,
           -102
@@ -306,7 +306,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "8d1570f0-f33d-49b4-a8b2-27b2016a336c",
+        "id": "38c0fc44-0e65-4588-bd35-7e70e379aa1e",
         "position": [
           2400,
           -102
@@ -319,7 +319,7 @@
         "parameters": {
           "jsCode": "const c = $('Contexto para la IA').first().json;\nreturn [{\n  json: {\n    message_id: 'MSG-' + Date.now().toString(36).toUpperCase() + 'S',\n    conversation_id: c.conversation_id, usuario_id: c.usuario_id, visitor_id: c.visitor_id,\n    rol: 'SYSTEM', mensaje: 'Conversación iniciada. Asistente informativo, sin permisos de escritura sobre el negocio.',\n    timestamp: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n  },\n}];\n"
         },
-        "id": "f412b497-c462-4b98-aaac-2bf9e505de46",
+        "id": "c67084cf-36aa-495e-ab98-1205b94b9f38",
         "position": [
           2640,
           -102
@@ -361,7 +361,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "79b87723-c0b9-4e60-bbef-caaae0c1c5d3",
+        "id": "4e50dadf-31e7-485a-9a57-89ed9ca23d70",
         "position": [
           2880,
           -102
@@ -374,7 +374,7 @@
         "parameters": {
           "jsCode": "const c = $input.first().json;\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\n// si se despide se marca CERRADA; si vuelve a escribir se reabre\nconst despedida = /^(chao|ch[aá]o|adi[oó]s|bye|hasta luego|gracias,? chao)\\b/i.test(c.mensaje.trim());\nconst fila = { conversation_id: c.conversation_id, fecha_ultima_interaccion: ahora, estado: despedida ? 'CERRADA' : 'ABIERTA' };\nif (c.usuario_id) fila.usuario_id = c.usuario_id;\nreturn [{ json: fila }];\n"
         },
-        "id": "95a38553-867a-47a4-acb0-50935ea238e9",
+        "id": "fd86bbde-7151-443d-a2d5-cd3e22faf44d",
         "position": [
           2160,
           102
@@ -418,7 +418,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "efa9f06f-9403-490e-bb70-4e77268b4ec8",
+        "id": "3c815cad-85a4-42d0-b383-ab7b2d47627d",
         "position": [
           2400,
           102
@@ -431,7 +431,7 @@
         "parameters": {
           "jsCode": "const c = $('Contexto para la IA').first().json;\nreturn [{\n  json: {\n    message_id: 'MSG-' + Date.now().toString(36).toUpperCase() + 'U',\n    conversation_id: c.conversation_id, usuario_id: c.usuario_id, visitor_id: c.visitor_id,\n    rol: 'USER', mensaje: c.mensaje,\n    timestamp: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n  },\n}];\n"
         },
-        "id": "a1fbd191-d7f7-433e-ac9a-34424ab9d77f",
+        "id": "096d2e07-5e12-433e-8a24-9b36efad2efe",
         "position": [
           3120,
           0
@@ -473,7 +473,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "089e2569-c35d-4250-af96-85ac3fd95472",
+        "id": "59f5ec49-3478-4317-a2df-48cdb4edbd24",
         "position": [
           3360,
           0
@@ -495,7 +495,7 @@
         "maxTries": 3,
         "waitBetweenTries": 3000,
         "onError": "continueRegularOutput",
-        "id": "3c24fb1c-1a59-4e22-8a23-02361331841c",
+        "id": "a96048eb-d1ef-400f-a8b5-675dda0dc3a1",
         "position": [
           3600,
           0
@@ -518,7 +518,7 @@
             "name": "Gemini EventPass"
           }
         },
-        "id": "98e6a3fb-8d85-470a-a58c-354045cd3176",
+        "id": "f9bad97f-d416-4a95-ba3e-23246d3ddff6",
         "position": [
           3408,
           204
@@ -541,7 +541,7 @@
             "name": "Gemini EventPass"
           }
         },
-        "id": "ae5fbd22-e864-45b2-b7d8-8d177c609aa0",
+        "id": "bacc5229-7c91-412f-b672-f72dc08fbacd",
         "position": [
           3600,
           204
@@ -556,7 +556,7 @@
           "sessionKey": "={{ $('Contexto para la IA').first().json.conversation_id }}",
           "contextWindowLength": 10
         },
-        "id": "56f796a0-461a-4267-b013-71db9c0cd1f7",
+        "id": "bde7640a-560e-492f-9929-b6c6cffb1d15",
         "position": [
           3792,
           204
@@ -569,7 +569,7 @@
         "parameters": {
           "jsCode": "const c = $('Contexto para la IA').first().json;\nconst r = $input.first().json;\nconst texto = String(r.output || (r.error\n  ? 'Uy, vecino, en este momento el asistente está con mucha demanda. Intenta de nuevo en un minutico.'\n  : 'Uy, no te entendí bien. ¿Me lo repites?'));\nreturn [{\n  json: {\n    message_id: 'MSG-' + Date.now().toString(36).toUpperCase() + 'A',\n    conversation_id: c.conversation_id, usuario_id: c.usuario_id, visitor_id: c.visitor_id,\n    rol: 'ASSISTANT', mensaje: texto,\n    timestamp: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n  },\n}];\n"
         },
-        "id": "a6f49fe6-b705-4454-b23f-8d2466de554a",
+        "id": "abed92de-904e-4d76-8f4c-8e96c2e88695",
         "position": [
           3840,
           0
@@ -611,7 +611,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "9c71261b-35d2-421c-9320-c8f4239766e2",
+        "id": "d018db43-c259-4a0f-b501-ea236e98dbae",
         "position": [
           4080,
           0
@@ -624,14 +624,14 @@
         "parameters": {
           "jsCode": "return [{ json: { output: $('Mensaje ASSISTANT').first().json.mensaje } }];\n"
         },
-        "id": "9f3e08c2-5d7b-4cf5-8870-6a75e9216d59",
+        "id": "69ed5bed-9f71-490d-9fb2-057e12f4cbc2",
         "position": [
           4320,
           0
         ]
       },
       {
-        "id": "64c7783a-80f7-482b-acbb-6ffc9364ea49",
+        "id": "b54dcf8c-afe5-4506-823e-deafb3e963a7",
         "name": "Nota 1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
@@ -925,9 +925,9 @@
     "meta": null,
     "nodeGroups": [],
     "pinData": {},
-    "versionId": "1480a05b-137c-4227-9fb2-454d5b13b781",
-    "activeVersionId": "1480a05b-137c-4227-9fb2-454d5b13b781",
-    "versionCounter": 7,
+    "versionId": "f8bffa42-ddac-4d9b-a23e-933655f0bca0",
+    "activeVersionId": "f8bffa42-ddac-4d9b-a23e-933655f0bca0",
+    "versionCounter": 8,
     "triggerCount": 1,
     "sourceWorkflowId": null,
     "tags": [],
