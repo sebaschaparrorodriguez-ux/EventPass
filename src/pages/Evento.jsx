@@ -164,9 +164,9 @@ export default function Evento() {
             {errorInscripcion && (
               <div className="estado estado-error" role="alert">
                 <p>{errorInscripcion.message}</p>
-                {errorInscripcion.codigo === 'SIN_CANAL_DE_AVISO' && (
+                {errorInscripcion.codigo === 'TELEGRAM_NO_VINCULADO' && (
                   <Link to="/perfil" className="btn btn-sm">
-                    Ir a mi perfil
+                    Vincular Telegram
                   </Link>
                 )}
               </div>
@@ -183,7 +183,7 @@ export default function Evento() {
             <Exito
               mensaje={
                 resultado.inscripcion?.estado === 'CONFIRMADA'
-                  ? '¡Listo! Tu cupo está confirmado. Te enviamos la confirmación por los canales que escogiste.'
+                  ? '¡Listo! Tu cupo está confirmado. Te enviamos la confirmación por Telegram (y por correo si lo tienes activado).'
                   : `Quedaste en lista de espera (puesto ${resultado.inscripcion?.orden_espera}). Si se libera un cupo te avisamos.`
               }
             />

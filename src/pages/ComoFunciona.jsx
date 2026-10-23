@@ -6,8 +6,8 @@ const pasos = [
     texto: 'Solo nombre, correo y contraseña. Tu contraseña se guarda cifrada (hash + salt), nunca en texto plano.',
   },
   {
-    titulo: 'Escoge cómo te avisamos',
-    texto: 'En tu perfil eliges correo, Telegram o los dos. Telegram es opcional: se vincula mandándole al bot /vincular CODIGO.',
+    titulo: 'Vincula Telegram',
+    texto: 'En tu perfil generas un código y se lo mandas al bot con /vincular CODIGO. Es obligatorio para inscribirte.',
   },
   {
     titulo: 'Inscríbete',
@@ -15,7 +15,7 @@ const pasos = [
   },
   {
     titulo: 'Te avisamos',
-    texto: 'Confirmaciones, cambios y recordatorios te llegan por los canales que escogiste. Y si quieres, te lo guardas por WhatsApp.',
+    texto: 'Confirmaciones, cambios y recordatorios te llegan siempre por Telegram y, si lo dejas activado, también por correo. Y si quieres, te lo guardas por WhatsApp.',
   },
 ]
 

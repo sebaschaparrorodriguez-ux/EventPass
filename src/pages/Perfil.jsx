@@ -143,7 +143,6 @@ function DatosPerfil({ perfil, token, onGuardado, manejarError }) {
 
 function Avisos({ perfil, token, onGuardado, manejarError }) {
   const [correo, setCorreo] = useState(perfil.avisos_email !== false)
-  const [telegram, setTelegram] = useState(perfil.avisos_telegram !== false)
   const [guardando, setGuardando] = useState(false)
   const [ok, setOk] = useState('')
   const [error, setError] = useState('')
@@ -152,10 +151,9 @@ function Avisos({ perfil, token, onGuardado, manejarError }) {
     e.preventDefault()
     setOk('')
     setError('')
-    if (!correo && !telegram) return setError('Deja al menos un canal marcado.')
     setGuardando(true)
     try {
-      const r = await api.actualizarPerfil(token, { avisos_email: correo, avisos_telegram: telegram })
+      const r = await api.actualizarPerfil(token, { avisos_email: correo })
       onGuardado(r.usuario)
       setOk('Listo, te avisamos por ahí.')
     } catch (err) {
@@ -171,12 +169,12 @@ function Avisos({ perfil, token, onGuardado, manejarError }) {
       <p className="mini">Confirmaciones, cambios de los eventos y recordatorios (un día antes y dos horas antes).</p>
       <div className="avisos">
         <label>
-          <input type="checkbox" checked={correo} onChange={(e) => setCorreo(e.target.checked)} />
-          Correo electrónico
+          <input type="checkbox" checked readOnly disabled />
+          Telegram <span className="mini">(obligatorio, vincúlalo abajo)</span>
         </label>
         <label>
-          <input type="checkbox" checked={telegram} onChange={(e) => setTelegram(e.target.checked)} />
-          Telegram <span className="mini">(tienes que vincularlo abajo)</span>
+          <input type="checkbox" checked={correo} onChange={(e) => setCorreo(e.target.checked)} />
+          También por correo electrónico <span className="mini">(opcional)</span>
         </label>
       </div>
       <p className="mini">
@@ -232,7 +230,7 @@ function Telegram({ token, manejarError }) {
   return (
     <div className="caja">
       <h2>Telegram</h2>
-      <p className="mini">Opcional. Si lo vinculas, también te llegan los avisos por Telegram.</p>
+      <p className="mini">Lo necesitas para inscribirte: por aquí te llegan siempre las confirmaciones y recordatorios.</p>
 
       {cargando && <Cargando texto="Un momento..." />}
       <ErrorBox mensaje={error} />
