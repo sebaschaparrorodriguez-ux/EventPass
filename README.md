@@ -20,7 +20,7 @@ Desde la página se puede:
 - registrarse confirmando el correo con un código de 6 dígitos (y recibir un correo de bienvenida)
 - iniciar y cerrar sesión
 - ver y editar el perfil, cambiar la contraseña o desactivar la cuenta
-- escoger por dónde recibir los avisos (correo, Telegram o ambos) y vincular Telegram con un código, si quiere
+- vincular Telegram con un código (obligatorio para inscribirse) y decidir si además quiere los avisos por correo
 - guardarse el recordatorio de un evento por WhatsApp con un botón
 - inscribirse a un evento (si está lleno se entra a lista de espera)
 - ver, editar y cancelar las inscripciones
@@ -30,7 +30,7 @@ Y de forma automática:
 
 - cuando alguien cancela, el cupo pasa al que lleva más tiempo en la lista de espera
 - llegan recordatorios 24 horas y 2 horas antes del evento
-- todas las notificaciones pasan por un servicio central que intenta **Gmail y Telegram** por separado, según lo que la persona escogió
+- todas las notificaciones pasan por un servicio central que intenta **Telegram y Gmail** por separado
 
 Los eventos los administra solo el administrador, con un formulario de n8n.
 
@@ -221,20 +221,18 @@ WF09:
 2. revisa que no sea un duplicado (clave de idempotencia)
 3. manda el **Gmail**. El nodo tiene la salida de error activada: si falla, se anota `ERROR` con el mensaje y **se sigue**
 4. manda el **Telegram**, igual con su propia salida de error. Si el usuario no tiene Telegram queda `NO_APLICA`
-   - antes de cada canal se revisan las preferencias del usuario (`avisos_email`, `avisos_telegram`): si apagó un canal, ese queda `NO_APLICA`. El correo de bienvenida siempre sale por Gmail porque es la confirmación del registro
+   - Telegram se intenta siempre. El correo depende de la preferencia `avisos_email` del usuario (viene en `SI`); si la apagó, Gmail queda `NO_APLICA`. El correo de bienvenida siempre sale porque es la confirmación del registro
 5. guarda una fila en `EP09_Notificaciones` con `gmail_estado` y `telegram_estado` por separado
 
 Así un fallo de Gmail no esconde lo que pasó con Telegram, ni al revés.
 
 Tipos que se mandan: `CUENTA_CREADA`, `INSCRIPCION_CONFIRMADA`, `INGRESO_LISTA_ESPERA`, `INSCRIPCION_CANCELADA`, `REASIGNACION_CUPO`, `RECORDATORIO_24H`, `RECORDATORIO_2H`, `EVENTO_CANCELADO`, `EVENTO_ACTUALIZADO` (cuando el admin cambia fecha, hora o lugar).
 
-## Decisión: Telegram opcional y botón de WhatsApp
+## Canales de aviso: Telegram obligatorio, correo opcional y botón de WhatsApp
 
-El enunciado pide validar que el usuario tenga **Telegram vinculado** antes de inscribirse. Decidí cambiarlo a propósito porque en un barrio no todo el mundo usa Telegram (casi todos usan WhatsApp y correo), y no quería que eso impidiera inscribirse a un evento:
-
-- En **Mi perfil** cada persona escoge por dónde recibir los avisos: **correo, Telegram o los dos** (mínimo uno; se guarda en `avisos_email` y `avisos_telegram` de la hoja Usuarios).
-- WF06 ya no exige Telegram, pero **sí exige que haya al menos un canal que funcione**: correo activado, o Telegram activado y vinculado. Si no, responde `403 SIN_CANAL_DE_AVISO`. El nodo que lee la vinculación de Telegram sigue en el flujo para esa validación.
-- WF09 sigue intentando **Gmail y Telegram por separado** con su registro independiente; solo marca `NO_APLICA` el canal que la persona apagó o no tiene.
+- **Telegram es obligatorio**, como pide el enunciado: WF06 no deja inscribirse sin Telegram vinculado (`403 TELEGRAM_NO_VINCULADO`) y todos los avisos se intentan por Telegram.
+- **El correo es un extra**: en **Mi perfil**, en "¿Por dónde te avisamos?", Telegram aparece marcado y bloqueado, y debajo está la casilla **"También por correo electrónico"** (viene activada). Se guarda en la columna `avisos_email` de la hoja Usuarios; `avisos_telegram` siempre queda en `SI`.
+- WF09 sigue intentando **Gmail y Telegram por separado**, cada uno con su registro independiente.
 - **WhatsApp:** en el detalle del evento y en "Mis inscripciones" hay un botón **"Recordármelo por WhatsApp"** que abre WhatsApp con el recordatorio ya escrito (evento, fecha, hora, lugar y link) usando `wa.me`. No es un envío automático: para eso se necesita la API de WhatsApp Business de Meta, que pide cuenta de empresa y plantillas aprobadas, y no tenía sentido para un proyecto académico.
 
 ## Asistente IA (WF10)

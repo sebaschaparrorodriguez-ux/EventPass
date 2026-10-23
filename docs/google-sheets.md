@@ -21,7 +21,7 @@ Los 10 archivos se crean con el workflow **WF00_crear_hojas_y_datos_prueba**: se
 
 **EP01_Usuarios / Usuarios**
 `usuario_id, nombre, email_normalizado, password_hash, password_salt, estado, fecha_registro, fecha_actualizacion, avisos_email, avisos_telegram`
-Las dos últimas son extra (SI/NO): por dónde quiere la persona que le avisemos.
+Las dos últimas son extra (SI/NO): `avisos_email` es si también quiere los avisos por correo; `avisos_telegram` siempre queda en SI porque Telegram es obligatorio.
 
 **EP01_Usuarios / Auditoria_Usuarios**
 `auditoria_id, usuario_id, accion, fecha, resultado, detalle`

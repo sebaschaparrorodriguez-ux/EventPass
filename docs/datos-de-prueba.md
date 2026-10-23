@@ -47,7 +47,6 @@ Los tres tienen cupo CONFIRMADO en el torneo (EVT-0002), por eso está lleno.
 
 - Registrarse dos veces con el mismo correo → `409 EMAIL_DUPLICADO`.
 - Inscribirse dos veces al mismo evento → `409 INSCRIPCION_DUPLICADA` (idempotencia).
-- Apagar el correo en el perfil sin tener Telegram vinculado e intentar inscribirse → `403 SIN_CANAL_DE_AVISO`.
-- Inscribirse sin Telegram (con el correo activado) → funciona, Telegram es opcional.
+- Inscribirse sin Telegram vinculado → `403 TELEGRAM_NO_VINCULADO`.
 - Usar el mismo código de vinculación dos veces → el bot responde que ya fue usado.
 - Preguntarle al asistente "inscríbeme al torneo" → explica que no puede hacerlo y dice cómo hacerlo en la página.
