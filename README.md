@@ -246,7 +246,7 @@ Tipos que se mandan: `CUENTA_CREADA`, `INSCRIPCION_CONFIRMADA`, `INGRESO_LISTA_E
 |---|---|
 | `VECINO` | todo lo normal: ver eventos, inscribirse, su perfil. Es el rol con el que se crea toda cuenta |
 | `SUPERVISOR` | lo del vecino + el **Panel**: ver quién está inscrito en cada evento (confirmados, lista de espera con su puesto, cancelados), contadores de cupos y **descargar la lista en CSV** para Excel. Ve los correos tapados a medias (`ma***@gmail.com`) |
-| `ADMINISTRADOR` | lo del supervisor (con correos completos y también los eventos en BORRADOR) + **asignar roles** a cualquier usuario + usar el **formulario de administración de eventos** |
+| `ADMINISTRADOR` | lo del supervisor (con correos completos y también los eventos en BORRADOR) + **asignar roles** (Vecino, Supervisor o Administrador) a cualquier usuario, tanto en la pestaña "Usuarios y roles" como directamente en la lista de inscritos de cada evento + usar el **formulario de administración de eventos** |
 
 Cómo está hecho:
 
