@@ -5,7 +5,58 @@ import { useAuth } from '../auth'
 import { Cargando, ErrorBox, Exito } from '../components/Estado'
 import { ESTADO_INSCRIPCION, formatearFecha } from '../utils'
 
-const ROLES = ['VECINO', 'SUPERVISOR', 'ADMINISTRADOR']
+const ROLES = [
+  { valor: 'VECINO', texto: 'Vecino' },
+  { valor: 'SUPERVISOR', texto: 'Supervisor' },
+  { valor: 'ADMINISTRADOR', texto: 'Administrador' },
+]
+
+// selector de rol con su boton de guardar; lo usan las dos pestanas del panel
+function SelectorRol({ usuarioId, rol, onCambio }) {
+  const { token, usuario } = useAuth()
+  const [valor, setValor] = useState(rol)
+  const [guardando, setGuardando] = useState(false)
+  const [error, setError] = useState('')
+  const yo = usuarioId === usuario.usuario_id
+
+  useEffect(() => setValor(rol), [rol])
+
+  const guardar = async () => {
+    setGuardando(true)
+    setError('')
+    try {
+      const r = await api.asignarRol(token, usuarioId, valor)
+      onCambio(usuarioId, valor, r.mensaje)
+    } catch (e) {
+      setError(e.message)
+    } finally {
+      setGuardando(false)
+    }
+  }
+
+  return (
+    <div className="selector-rol">
+      <select
+        value={valor}
+        disabled={yo || guardando}
+        title={yo ? 'No puedes cambiar tu propio rol' : 'Cambiar rol'}
+        onChange={(e) => setValor(e.target.value)}
+      >
+        {ROLES.map((r) => (
+          <option key={r.valor} value={r.valor}>
+            {r.texto}
+          </option>
+        ))}
+      </select>
+      {!yo && valor !== rol && (
+        <button className="btn btn-sm" onClick={guardar} disabled={guardando}>
+          {guardando ? '...' : 'Guardar'}
+        </button>
+      )}
+      {error && <span className="error-mini">{error}</span>}
+    </div>
+  )
+}
 
 export default function Panel() {
   const { usuario } = useAuth()
@@ -72,7 +123,7 @@ function usePeticion(fn) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return { data, cargando, error, cargar, token }
+  return { data, setData, cargando, error, cargar, token }
 }
 
 function descargarCSV(evento) {
@@ -94,9 +145,24 @@ function descargarCSV(evento) {
 }
 
 function Inscritos() {
-  const { data, cargando, error, cargar } = usePeticion(api.inscritosPorEvento)
+  const { usuario } = useAuth()
+  const esAdmin = usuario.rol === 'ADMINISTRADOR'
+  const { data, setData, cargando, error, cargar } = usePeticion(api.inscritosPorEvento)
   const [elegido, setElegido] = useState(null)
   const [verCanceladas, setVerCanceladas] = useState(false)
+  const [aviso, setAviso] = useState('')
+
+  // al cambiar el rol de alguien se actualiza en todos los eventos donde aparece
+  const rolCambiado = (usuarioId, rol, mensaje) => {
+    setAviso(mensaje)
+    setData((d) => ({
+      ...d,
+      eventos: d.eventos.map((e) => ({
+        ...e,
+        inscritos: e.inscritos.map((i) => (i.usuario_id === usuarioId ? { ...i, rol } : i)),
+      })),
+    }))
+  }
 
   const eventos = data?.eventos || []
   const evento = useMemo(() => eventos.find((e) => e.evento_id === elegido) || eventos[0], [eventos, elegido])
@@ -152,6 +218,9 @@ function Inscritos() {
           Mostrar canceladas
         </label>
 
+        {esAdmin && <p className="mini">Como administrador puedes cambiar el rol de cada persona desde la columna <strong>Rol</strong>.</p>}
+        <Exito mensaje={aviso} />
+
         {lista.length === 0 ? (
           <p className="mini">Nadie inscrito todavía.</p>
         ) : (
@@ -165,6 +234,7 @@ function Inscritos() {
                   <th>Estado</th>
                   <th>Inscrito</th>
                   <th>Observaciones</th>
+                  {esAdmin && <th>Rol</th>}
                 </tr>
               </thead>
               <tbody>
@@ -183,6 +253,11 @@ function Inscritos() {
                       </td>
                       <td className="mini">{String(i.fecha_inscripcion).slice(0, 16).replace('T', ' ')}</td>
                       <td className="mini">{i.observaciones}</td>
+                      {esAdmin && (
+                        <td>
+                          {i.usuario_id ? <SelectorRol usuarioId={i.usuario_id} rol={i.rol} onCambio={rolCambiado} /> : '—'}
+                        </td>
+                      )}
                     </tr>
                   )
                 })}
@@ -197,11 +272,8 @@ function Inscritos() {
 
 function Usuarios() {
   const { usuario } = useAuth()
-  const { data, cargando, error, cargar, token } = usePeticion(api.listarUsuarios)
-  const [cambios, setCambios] = useState({})
-  const [guardando, setGuardando] = useState('')
+  const { data, setData, cargando, error, cargar } = usePeticion(api.listarUsuarios)
   const [aviso, setAviso] = useState('')
-  const [errorRol, setErrorRol] = useState('')
   const [buscar, setBuscar] = useState('')
 
   if (cargando) return <Cargando texto="Cargando usuarios..." />
@@ -211,20 +283,9 @@ function Usuarios() {
     `${u.nombre} ${u.email}`.toLowerCase().includes(buscar.toLowerCase()),
   )
 
-  const guardar = async (u) => {
-    setAviso('')
-    setErrorRol('')
-    setGuardando(u.usuario_id)
-    try {
-      const r = await api.asignarRol(token, u.usuario_id, cambios[u.usuario_id])
-      setAviso(r.mensaje)
-      setCambios((c) => ({ ...c, [u.usuario_id]: undefined }))
-      cargar()
-    } catch (e) {
-      setErrorRol(e.message)
-    } finally {
-      setGuardando('')
-    }
+  const rolCambiado = (usuarioId, rol, mensaje) => {
+    setAviso(mensaje)
+    setData((d) => ({ ...d, usuarios: d.usuarios.map((u) => (u.usuario_id === usuarioId ? { ...u, rol } : u)) }))
   }
 
   return (
@@ -238,7 +299,6 @@ function Usuarios() {
         administra los eventos. Al cambiar el rol le llega un aviso a la persona.
       </p>
       <Exito mensaje={aviso} />
-      <ErrorBox mensaje={errorRol} />
       <div className="tabla-scroll">
         <table className="tabla">
           <thead>
@@ -247,43 +307,21 @@ function Usuarios() {
               <th>Correo</th>
               <th>Estado</th>
               <th>Rol</th>
-              <th></th>
             </tr>
           </thead>
           <tbody>
-            {usuarios.map((u) => {
-              const yo = u.usuario_id === usuario.usuario_id
-              const valor = cambios[u.usuario_id] ?? u.rol
-              return (
-                <tr key={u.usuario_id}>
-                  <td>
-                    {u.nombre} {yo && <span className="mini">(tú)</span>}
-                  </td>
-                  <td className="mini">{u.email}</td>
-                  <td className="mini">{u.estado}</td>
-                  <td>
-                    <select
-                      value={valor}
-                      disabled={yo}
-                      onChange={(e) => setCambios((c) => ({ ...c, [u.usuario_id]: e.target.value }))}
-                    >
-                      {ROLES.map((r) => (
-                        <option key={r} value={r}>
-                          {r}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  <td>
-                    {!yo && valor !== u.rol && (
-                      <button className="btn btn-sm" onClick={() => guardar(u)} disabled={guardando === u.usuario_id}>
-                        {guardando === u.usuario_id ? 'Guardando...' : 'Guardar'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
+            {usuarios.map((u) => (
+              <tr key={u.usuario_id}>
+                <td>
+                  {u.nombre} {u.usuario_id === usuario.usuario_id && <span className="mini">(tú)</span>}
+                </td>
+                <td className="mini">{u.email}</td>
+                <td className="mini">{u.estado}</td>
+                <td>
+                  <SelectorRol usuarioId={u.usuario_id} rol={u.rol} onCambio={rolCambiado} />
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>

@@ -952,6 +952,19 @@ a.chip {
   text-decoration: none;
 }
 
+.selector-rol {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.error-mini {
+  color: var(--error);
+  font-size: 0.8rem;
+  width: 100%;
+}
+
 @media (max-width: 760px) {
   .panel-grid {
     grid-template-columns: 1fr;
