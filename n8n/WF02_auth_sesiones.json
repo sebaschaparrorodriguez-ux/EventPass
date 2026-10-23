@@ -1,6 +1,6 @@
 [
   {
-    "updatedAt": "2026-10-22T13:59:55.000Z",
+    "updatedAt": "2026-10-23T13:25:15.000Z",
     "createdAt": "2026-10-22T13:08:36.520Z",
     "id": "uMW3Nj6vVDn6i6um",
     "name": "WF02_auth_sesiones",
@@ -12,7 +12,7 @@
         "name": "Webhook auth",
         "type": "n8n-nodes-base.webhook",
         "typeVersion": 2.1,
-        "webhookId": "2da13aa7-5d5a-4d0b-91b5-1bb83cbc2fad",
+        "webhookId": "ad542f95-b3a9-44fe-b74c-db14625ca640",
         "parameters": {
           "httpMethod": "POST",
           "path": "ep/auth",
@@ -21,7 +21,7 @@
             "allowedOrigins": "*"
           }
         },
-        "id": "69641eb4-0734-46e2-98d4-b7ed15160446",
+        "id": "8ca6590a-6f51-4ee9-b73c-a3f72cb43d8d",
         "position": [
           0,
           0
@@ -34,7 +34,7 @@
         "parameters": {
           "jsCode": "const b = $input.first().json.body || {};\nreturn [{\n  json: {\n    accion: String(b.accion || '').trim().toLowerCase(),\n    email: String(b.email || '').trim().toLowerCase(),\n    password: String(b.password || ''),\n    token: String(b.token || '').trim(),\n  },\n}];\n"
         },
-        "id": "9a97d300-7283-4c7c-9660-a7bf2ff454ae",
+        "id": "fa715135-e581-4a42-8315-7708da8edda8",
         "position": [
           240,
           0
@@ -57,7 +57,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "d87dc049-c7d8-4e2e-89c4-40ce486dd7b6",
+                      "id": "67ce7ada-6add-4023-8a12-59c6ce1c1f77",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "login",
                       "operator": {
@@ -81,7 +81,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "d9fad822-3e81-4a47-a620-0a957e37e5b7",
+                      "id": "f5ada007-4e92-4041-b520-d43a88025e80",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "logout",
                       "operator": {
@@ -105,7 +105,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "d4bf3f91-1545-4385-a303-ab40b76e9d32",
+                      "id": "eaa48abb-fd8a-4154-b1ba-89ebeac55c3e",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "validar",
                       "operator": {
@@ -127,7 +127,7 @@
             "renameFallbackOutput": "otro"
           }
         },
-        "id": "03ba0463-9096-48ab-b2d9-39814fbe9e11",
+        "id": "019bb1a8-8c9a-4b92-9047-f2f093a7dfff",
         "position": [
           480,
           0
@@ -140,7 +140,7 @@
         "parameters": {
           "jsCode": "const d = $input.first().json;\nconst emailOk = d.email.length <= 120 && /^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(d.email);\nif (!emailOk || !d.password) {\n  return [{ json: { ...d, valido: false, error_status: 400, error_codigo: 'DATOS_INCOMPLETOS', error_mensaje: 'Escribe un correo válido y tu contraseña.' } }];\n}\nreturn [{ json: { ...d, valido: true } }];\n"
         },
-        "id": "31094163-49d7-4928-8f9e-504d4e1211aa",
+        "id": "d6470126-ac4a-426d-b74c-9bd04255e078",
         "position": [
           720,
           -340
@@ -160,7 +160,7 @@
             },
             "conditions": [
               {
-                "id": "896a1696-5521-421c-987f-7793a7214dde",
+                "id": "c72f2b3b-8892-45e9-a292-8192879f14b4",
                 "leftValue": "={{ $json.valido }}",
                 "rightValue": "",
                 "operator": {
@@ -175,7 +175,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "b47b6a65-867e-4ac5-a200-3dbbd4632afd",
+        "id": "38b8e96a-5c35-470f-bf45-dfeeec9f1674",
         "position": [
           960,
           -340
@@ -210,7 +210,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "f49a2c88-b5a6-4d4e-8714-ba4d825ffd13",
+        "id": "4202f5e5-089f-4b9b-b3ed-16ef0303c9b3",
         "position": [
           1200,
           -340
@@ -221,9 +221,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const crypto = require('crypto');\nconst d = $('Validar datos login').first().json;\nconst usuarios = $('Leer usuarios').all().map(i => i.json).filter(u => u.usuario_id);\nconst u = usuarios.find(x => x.email_normalizado === d.email);\nconst fallo = { ok: false, error_status: 401, error_codigo: 'CREDENCIALES', error_mensaje: 'Correo o contraseña incorrectos.' };\nif (!u) return [{ json: fallo }];\n\n// mismo calculo que en el registro: pbkdf2 con la sal del usuario\nconst hash = crypto.pbkdf2Sync(d.password, String(u.password_salt), 100000, 32, 'sha256').toString('hex');\nconst guardado = String(u.password_hash);\nconst iguales = hash.length === guardado.length &&\n  crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(guardado, 'hex'));\nif (!iguales) return [{ json: fallo }];\n\nif (u.estado !== 'ACTIVO') {\n  return [{ json: { ok: false, error_status: 403, error_codigo: 'USUARIO_INACTIVO', error_mensaje: 'Tu cuenta está desactivada.' } }];\n}\nreturn [{ json: { ok: true, usuario: { usuario_id: u.usuario_id, nombre: u.nombre, email: u.email_normalizado } } }];\n"
+          "jsCode": "const crypto = require('crypto');\nconst d = $('Validar datos login').first().json;\nconst usuarios = $('Leer usuarios').all().map(i => i.json).filter(u => u.usuario_id);\nconst u = usuarios.find(x => x.email_normalizado === d.email);\nconst fallo = { ok: false, error_status: 401, error_codigo: 'CREDENCIALES', error_mensaje: 'Correo o contraseña incorrectos.' };\nif (!u) return [{ json: fallo }];\n\n// mismo calculo que en el registro: pbkdf2 con la sal del usuario\nconst hash = crypto.pbkdf2Sync(d.password, String(u.password_salt), 100000, 32, 'sha256').toString('hex');\nconst guardado = String(u.password_hash);\nconst iguales = hash.length === guardado.length &&\n  crypto.timingSafeEqual(Buffer.from(hash, 'hex'), Buffer.from(guardado, 'hex'));\nif (!iguales) return [{ json: fallo }];\n\nif (u.estado !== 'ACTIVO') {\n  return [{ json: { ok: false, error_status: 403, error_codigo: 'USUARIO_INACTIVO', error_mensaje: 'Tu cuenta está desactivada.' } }];\n}\nreturn [{ json: { ok: true, usuario: { usuario_id: u.usuario_id, nombre: u.nombre, email: u.email_normalizado, rol: u.rol || 'VECINO' } } }];\n"
         },
-        "id": "3620e0b5-9d06-4dd9-b434-70333c746ed6",
+        "id": "b318505f-60be-4211-ab1e-9309e50a209f",
         "position": [
           1440,
           -340
@@ -243,7 +243,7 @@
             },
             "conditions": [
               {
-                "id": "fd903058-d15b-4bf2-9ed0-2522946a5462",
+                "id": "94d3d229-ddf9-491c-994c-8622069fdf8b",
                 "leftValue": "={{ $json.ok }}",
                 "rightValue": "",
                 "operator": {
@@ -258,7 +258,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "700e1465-665a-450d-9be2-08625db79a36",
+        "id": "aaa2653d-3215-4ab1-9c73-8112ae5ed4cf",
         "position": [
           1680,
           -340
@@ -271,7 +271,7 @@
         "parameters": {
           "jsCode": "const crypto = require('crypto');\nconst u = $input.first().json.usuario;\nconst horaCO = (ms) => new Date(ms - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst ahora = Date.now();\nconst HORAS_SESION = 8;\nreturn [{\n  json: {\n    session_id: 'SES-' + ahora.toString(36).toUpperCase() + crypto.randomBytes(2).toString('hex').toUpperCase(),\n    usuario_id: u.usuario_id,\n    session_token: crypto.randomBytes(24).toString('hex'),\n    creada_en: horaCO(ahora),\n    expira_en: horaCO(ahora + HORAS_SESION * 3600 * 1000),\n    estado: 'ACTIVA',\n    cerrada_en: '',\n    ultima_validacion: horaCO(ahora),\n  },\n}];\n"
         },
-        "id": "b33218ef-8af5-4682-9448-22934d47ca28",
+        "id": "7ec28ca0-e51f-4200-a74b-472a8752fdc2",
         "position": [
           1920,
           -340
@@ -313,7 +313,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "c25b81af-d4d8-4bfc-a638-cda7e3067514",
+        "id": "8db1cb45-255a-4fab-bf6e-09d655b83a32",
         "position": [
           2160,
           -340
@@ -326,7 +326,7 @@
         "parameters": {
           "jsCode": "const s = $('Crear token de sesión').first().json;\nconst u = $('Verificar password').first().json.usuario;\nreturn [{ json: { status: 200, body: { ok: true, token: s.session_token, expira_en: s.expira_en, usuario: u } } }];\n"
         },
-        "id": "122a1e85-eb0d-4c14-b6ef-7dee1d5a0de0",
+        "id": "b83ca08f-06d0-4f4e-b853-7cb58f377f8f",
         "position": [
           2400,
           -340
@@ -361,7 +361,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "cfcd27a5-a3ef-4fe8-b193-33b1a6f33043",
+        "id": "c30783a3-2a95-4328-9129-b65f5a5b4ff1",
         "position": [
           720,
           0
@@ -374,7 +374,7 @@
         "parameters": {
           "jsCode": "const token = $('Normalizar solicitud').first().json.token;\nconst sesiones = $('Leer sesiones (logout)').all().map(i => i.json).filter(s => s.session_id);\nconst s = token ? sesiones.find(x => x.session_token === token) : null;\nif (!s || s.estado !== 'ACTIVA') return [{ json: { cerrar: false } }];\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nreturn [{ json: { cerrar: true, session_id: s.session_id, estado: 'CERRADA', cerrada_en: ahora } }];\n"
         },
-        "id": "7b947432-2ac3-4874-968e-81e7a9cbf636",
+        "id": "2b7e868b-119d-454a-b447-0dde34975a14",
         "position": [
           960,
           0
@@ -394,7 +394,7 @@
             },
             "conditions": [
               {
-                "id": "b8c9335d-ef9c-4529-8de7-8dee616ff9cf",
+                "id": "0611b0f5-7a42-4547-aa20-d9661477da76",
                 "leftValue": "={{ $json.cerrar }}",
                 "rightValue": "",
                 "operator": {
@@ -409,7 +409,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "42ac561e-6a36-4dbc-9996-59d2ff8f9dfe",
+        "id": "0794b74f-b6c3-4e67-a7e1-a5404caef3b7",
         "position": [
           1200,
           0
@@ -453,7 +453,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "0d5b348d-9093-431d-9c2b-bc5f8bc57b04",
+        "id": "d6a3e3fa-e054-42e2-8436-c72ce499d5ce",
         "position": [
           1440,
           0
@@ -466,7 +466,7 @@
         "parameters": {
           "jsCode": "// si ya estaba cerrada respondemos igual, cerrar dos veces no es error\nreturn [{ json: { status: 200, body: { ok: true, mensaje: 'Sesión cerrada.' } } }];\n"
         },
-        "id": "1ea5b365-9688-4619-a051-11b3691abbe7",
+        "id": "7e019f88-43ec-455b-8b65-50fa8ac089a0",
         "position": [
           1680,
           0
@@ -495,7 +495,7 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "53c0a727-2463-487e-aa47-55676a14c0a9",
+        "id": "afdbddf1-1f72-4399-963f-e21642106a56",
         "position": [
           720,
           170
@@ -515,7 +515,7 @@
             },
             "conditions": [
               {
-                "id": "b8e3d613-884e-4353-b6b0-bcb585e632eb",
+                "id": "b12d03e7-5e12-408e-bf0d-fe59dcc64132",
                 "leftValue": "={{ $json.valida }}",
                 "rightValue": "",
                 "operator": {
@@ -530,7 +530,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "f0ea5739-e66c-4861-a0e5-d03968d75b01",
+        "id": "bde9bac1-c3fa-4b8a-83d7-e262bb8f2c04",
         "position": [
           960,
           170
@@ -543,7 +543,7 @@
         "parameters": {
           "jsCode": "return [{ json: { status: 200, body: { ok: true, usuario: $input.first().json.usuario } } }];\n"
         },
-        "id": "0c2b15a3-483b-4f82-ad2d-71d53501c110",
+        "id": "184d3bd7-af02-4b64-88e4-34fa8353fc5d",
         "position": [
           1200,
           170
@@ -556,7 +556,7 @@
         "parameters": {
           "jsCode": "const r = $input.first().json;\nconst mensajes = {\n  NO_EXISTE: 'Necesitas iniciar sesión.',\n  CERRADA: 'Tu sesión fue cerrada. Vuelve a ingresar.',\n  EXPIRADA: 'Tu sesión expiró. Vuelve a ingresar.',\n  USUARIO_INACTIVO: 'Tu cuenta está desactivada.',\n};\nreturn [{\n  json: {\n    status: 401,\n    body: { ok: false, error: 'SESION_' + (r.motivo || 'INVALIDA'), mensaje: mensajes[r.motivo] || 'Sesión no válida.' },\n  },\n}];\n"
         },
-        "id": "5a16585d-40db-487d-8660-7c081594e3ec",
+        "id": "dc75a930-8f18-4357-bd64-a96ea1cd55a1",
         "position": [
           1200,
           340
@@ -569,7 +569,7 @@
         "parameters": {
           "jsCode": "return [{ json: { status: 400, body: { ok: false, error: 'ACCION_NO_VALIDA', mensaje: 'La acción enviada no existe.' } } }];\n"
         },
-        "id": "2b7ab6cc-fa14-43b5-a1fb-3eb9d6dc0bfe",
+        "id": "a09f4101-0aa3-4331-921b-ad0a5de7708a",
         "position": [
           720,
           442
@@ -582,7 +582,7 @@
         "parameters": {
           "jsCode": "const d = $input.first().json;\nreturn [{\n  json: {\n    status: d.error_status || 400,\n    body: { ok: false, error: d.error_codigo || 'ERROR', mensaje: d.error_mensaje || 'No se pudo procesar la solicitud.' },\n  },\n}];\n"
         },
-        "id": "950479c3-379e-48a6-8d74-283ad070bb7b",
+        "id": "d75043cf-7022-42fa-977a-b767e80ecd01",
         "position": [
           1920,
           -170
@@ -599,7 +599,7 @@
             "responseCode": "={{ $json.status }}"
           }
         },
-        "id": "56a9586d-8606-471d-8b4a-7b6c898252a8",
+        "id": "b0096931-23be-420c-b919-d3fa0979e0cc",
         "position": [
           2640,
           0
@@ -612,7 +612,7 @@
         "parameters": {
           "inputSource": "passthrough"
         },
-        "id": "122c6f52-8313-44ac-bcf2-3ab882b60bdc",
+        "id": "9ced7709-3056-46b2-82e0-d6d0de173895",
         "position": [
           0,
           680
@@ -647,7 +647,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "0b6bf60c-efd5-49c4-b9ca-bf2527eafb98",
+        "id": "f22aef3c-ccc5-4967-9a09-734f148d0ab1",
         "position": [
           240,
           680
@@ -682,7 +682,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "d53173dd-1de3-48e3-9e8b-b8711ee12638",
+        "id": "dbeedcfa-0fc2-4982-9e50-157d2f738f46",
         "position": [
           480,
           680
@@ -693,9 +693,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "// una sesion NO es valida si: no existe, esta cerrada, expiro o el usuario esta inactivo\nconst token = String($('Al ser llamado (validar sesión)').first().json.token || '').trim();\nconst ahoraMs = Date.now();\nconst ahora = new Date(ahoraMs - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst sesiones = $('Leer sesiones').all().map(i => i.json).filter(s => s.session_id);\nconst usuarios = $('Leer usuarios (validación)').all().map(i => i.json).filter(u => u.usuario_id);\n\nlet r = { valida: false, motivo: 'NO_EXISTE', actualizar: false };\nconst s = token ? sesiones.find(x => x.session_token === token) : null;\nif (s) {\n  const u = usuarios.find(x => x.usuario_id === s.usuario_id);\n  if (s.estado === 'CERRADA') {\n    r.motivo = 'CERRADA';\n  } else if (s.estado === 'EXPIRADA') {\n    r.motivo = 'EXPIRADA';\n  } else if (new Date(s.expira_en).getTime() <= ahoraMs) {\n    r = { valida: false, motivo: 'EXPIRADA', actualizar: true, session_id: s.session_id, estado: 'EXPIRADA', ultima_validacion: ahora };\n  } else if (!u || u.estado !== 'ACTIVO') {\n    r.motivo = 'USUARIO_INACTIVO';\n  } else {\n    r = {\n      valida: true, motivo: 'OK', actualizar: true,\n      session_id: s.session_id, estado: 'ACTIVA', ultima_validacion: ahora,\n      usuario: { usuario_id: u.usuario_id, nombre: u.nombre, email: u.email_normalizado },\n    };\n  }\n}\nreturn [{ json: r }];\n"
+          "jsCode": "// una sesion NO es valida si: no existe, esta cerrada, expiro o el usuario esta inactivo\nconst token = String($('Al ser llamado (validar sesión)').first().json.token || '').trim();\nconst ahoraMs = Date.now();\nconst ahora = new Date(ahoraMs - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst sesiones = $('Leer sesiones').all().map(i => i.json).filter(s => s.session_id);\nconst usuarios = $('Leer usuarios (validación)').all().map(i => i.json).filter(u => u.usuario_id);\n\nlet r = { valida: false, motivo: 'NO_EXISTE', actualizar: false };\nconst s = token ? sesiones.find(x => x.session_token === token) : null;\nif (s) {\n  const u = usuarios.find(x => x.usuario_id === s.usuario_id);\n  if (s.estado === 'CERRADA') {\n    r.motivo = 'CERRADA';\n  } else if (s.estado === 'EXPIRADA') {\n    r.motivo = 'EXPIRADA';\n  } else if (new Date(s.expira_en).getTime() <= ahoraMs) {\n    r = { valida: false, motivo: 'EXPIRADA', actualizar: true, session_id: s.session_id, estado: 'EXPIRADA', ultima_validacion: ahora };\n  } else if (!u || u.estado !== 'ACTIVO') {\n    r.motivo = 'USUARIO_INACTIVO';\n  } else {\n    r = {\n      valida: true, motivo: 'OK', actualizar: true,\n      session_id: s.session_id, estado: 'ACTIVA', ultima_validacion: ahora,\n      usuario: { usuario_id: u.usuario_id, nombre: u.nombre, email: u.email_normalizado, rol: u.rol || 'VECINO' },\n    };\n  }\n}\nreturn [{ json: r }];\n"
         },
-        "id": "102ec4cb-fc84-428c-aa07-48aa9f787b1a",
+        "id": "b4fe2ea1-e7f6-409e-9e0b-9a7faccc6faa",
         "position": [
           720,
           680
@@ -715,7 +715,7 @@
             },
             "conditions": [
               {
-                "id": "7518f1ff-7d30-4ef5-ab0a-f9572b34d7c2",
+                "id": "c85d96b4-11c9-43e6-ab90-7de6ed7acf4d",
                 "leftValue": "={{ $json.actualizar }}",
                 "rightValue": "",
                 "operator": {
@@ -730,7 +730,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "33393cf7-94b2-436d-9f11-8bc71d979368",
+        "id": "d7d209b3-afc7-4694-a915-3d2d7e0629fb",
         "position": [
           960,
           680
@@ -774,7 +774,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "a7e39f4b-8e42-4ef4-b3c3-a5fb78774cad",
+        "id": "7b49867a-db38-42c0-8240-5a2e2596d5f2",
         "position": [
           1200,
           680
@@ -787,14 +787,14 @@
         "parameters": {
           "jsCode": "const r = $('Revisar sesión').first().json;\nreturn [{ json: { valida: r.valida, motivo: r.motivo, usuario: r.usuario || null, session_id: r.session_id || null } }];\n"
         },
-        "id": "deca9f09-b00c-4fcf-b6c6-7efc10cf0bcb",
+        "id": "2d24268c-30bd-43ea-b58a-6296c723cb3d",
         "position": [
           1440,
           680
         ]
       },
       {
-        "id": "eebb0704-1a25-4d99-b554-f6b7ff267b14",
+        "id": "e0eb7054-c343-4986-9de5-e56d573b907b",
         "name": "Nota 1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
@@ -810,7 +810,7 @@
         }
       },
       {
-        "id": "fe8c6341-993b-4436-932a-afd24dae700c",
+        "id": "f472d367-50d2-412e-92f6-aa89db14fd9e",
         "name": "Nota 2",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
@@ -1195,15 +1195,16 @@
     "settings": {
       "executionOrder": "v1",
       "timezone": "America/Bogota",
-      "callerPolicy": "workflowsFromSameOwner"
+      "callerPolicy": "workflowsFromSameOwner",
+      "saveDataSuccessExecution": "none"
     },
     "staticData": null,
     "meta": null,
     "nodeGroups": [],
     "pinData": {},
-    "versionId": "74fba018-be63-40bd-8c26-647737220787",
-    "activeVersionId": "74fba018-be63-40bd-8c26-647737220787",
-    "versionCounter": 3,
+    "versionId": "56844509-b5e9-4906-abd6-150819d38f5c",
+    "activeVersionId": "56844509-b5e9-4906-abd6-150819d38f5c",
+    "versionCounter": 4,
     "triggerCount": 1,
     "sourceWorkflowId": null,
     "tags": [],

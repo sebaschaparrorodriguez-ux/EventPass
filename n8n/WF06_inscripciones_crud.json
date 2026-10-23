@@ -1,6 +1,6 @@
 [
   {
-    "updatedAt": "2026-10-23T12:25:19.000Z",
+    "updatedAt": "2026-10-23T13:25:24.000Z",
     "createdAt": "2026-10-22T13:08:36.531Z",
     "id": "UWX5j7sBs4iUDmni",
     "name": "WF06_inscripciones_crud",
@@ -12,7 +12,7 @@
         "name": "Webhook inscripciones",
         "type": "n8n-nodes-base.webhook",
         "typeVersion": 2.1,
-        "webhookId": "d759cc0f-425b-4495-943c-9f6790479bda",
+        "webhookId": "27b2da21-2933-470b-a750-59a962a84e05",
         "parameters": {
           "httpMethod": "POST",
           "path": "ep/inscripciones",
@@ -21,7 +21,7 @@
             "allowedOrigins": "*"
           }
         },
-        "id": "6b41eaa4-4ee0-4e17-a4ba-485bdfbbf0b5",
+        "id": "3ca0bce6-49a0-4890-9fe2-76f0d5701222",
         "position": [
           0,
           0
@@ -34,7 +34,7 @@
         "parameters": {
           "jsCode": "const b = $input.first().json.body || {};\nreturn [{\n  json: {\n    accion: String(b.accion || '').trim().toLowerCase(),\n    token: String(b.token || '').trim(),\n    evento_id: String(b.evento_id || '').trim().toUpperCase(),\n    inscripcion_id: String(b.inscripcion_id || '').trim().toUpperCase(),\n    nombre_acreditacion: String(b.nombre_acreditacion ?? '').trim().replace(/\\s+/g, ' ').slice(0, 60),\n    observaciones: String(b.observaciones ?? '').trim().slice(0, 200),\n    _trae_nombre: b.nombre_acreditacion !== undefined,\n    _trae_obs: b.observaciones !== undefined,\n  },\n}];\n"
         },
-        "id": "e0c4949e-9b1e-4d57-bcec-a4838d4ae5a0",
+        "id": "27c75a03-6e29-4359-9ed3-4ec063119ca4",
         "position": [
           240,
           0
@@ -63,7 +63,7 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "2fe0943e-642f-4248-8c68-6095b8008c75",
+        "id": "db5f0bf4-1e49-4933-b3e9-fd26e74cc095",
         "position": [
           480,
           0
@@ -83,7 +83,7 @@
             },
             "conditions": [
               {
-                "id": "c1b68b3d-baa8-4208-8ded-2900e0fd7eae",
+                "id": "f6ef6256-9961-433c-affd-e9e8d5eca3f7",
                 "leftValue": "={{ $json.valida }}",
                 "rightValue": "",
                 "operator": {
@@ -98,7 +98,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "b4eda139-1bd9-4878-be9e-20cad0c8e780",
+        "id": "5f8c75d5-4358-42c3-a38d-817f4214aa9c",
         "position": [
           720,
           0
@@ -111,7 +111,7 @@
         "parameters": {
           "jsCode": "const r = $input.first().json;\nconst mensajes = {\n  NO_EXISTE: 'Necesitas iniciar sesión.',\n  CERRADA: 'Tu sesión fue cerrada. Vuelve a ingresar.',\n  EXPIRADA: 'Tu sesión expiró. Vuelve a ingresar.',\n  USUARIO_INACTIVO: 'Tu cuenta está desactivada.',\n};\nreturn [{\n  json: {\n    status: 401,\n    body: { ok: false, error: 'SESION_' + (r.motivo || 'INVALIDA'), mensaje: mensajes[r.motivo] || 'Sesión no válida.' },\n  },\n}];\n"
         },
-        "id": "c193a7d9-5d78-4949-937c-139c15f892aa",
+        "id": "0e8e61ee-22c4-4da7-a337-c87a3eb4caa7",
         "position": [
           960,
           442
@@ -134,7 +134,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "0f4a99c5-5f88-4dd0-9d3c-622560620389",
+                      "id": "ed81a4e5-7c57-45ee-ac23-0761c0c00f08",
                       "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
                       "rightValue": "crear",
                       "operator": {
@@ -158,7 +158,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "5655c894-0e54-49dc-af8b-b5c3abd3a31a",
+                      "id": "6f435097-babc-4571-8a8e-f21e3604d917",
                       "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
                       "rightValue": "mis",
                       "operator": {
@@ -182,7 +182,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "6c39b1b3-bc68-4d58-9f91-e52ee0f5c359",
+                      "id": "b44fa242-80ed-42d1-81f5-4050ee8c7313",
                       "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
                       "rightValue": "actualizar",
                       "operator": {
@@ -206,7 +206,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "bdf876af-5027-40ca-8839-2658d923ca1a",
+                      "id": "641a1203-cc87-457b-b5f9-a754ec4da912",
                       "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
                       "rightValue": "cancelar",
                       "operator": {
@@ -219,6 +219,30 @@
                 },
                 "renameOutput": true,
                 "outputKey": "cancelar"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "loose",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "78eab718-209c-446f-af62-c1b07e98ea0f",
+                      "leftValue": "={{ $('Normalizar solicitud').first().json.accion }}",
+                      "rightValue": "inscritos",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "inscritos"
               }
             ]
           },
@@ -228,7 +252,7 @@
             "renameFallbackOutput": "otro"
           }
         },
-        "id": "142ba61c-ce92-4d30-91f7-9b4ab7aa1da7",
+        "id": "dfe0f121-90d7-450f-8c9d-fdd55477b144",
         "position": [
           960,
           0
@@ -263,7 +287,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "7106b9a8-04c3-425a-8940-f5a5e1196c01",
+        "id": "0b8d1d9c-aaab-445e-9f8d-029fbcf2bdb0",
         "position": [
           1200,
           -510
@@ -298,7 +322,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "0747a065-53c0-4f1f-8420-ee148b06063c",
+        "id": "ec17fa2b-0bcf-4d42-9468-ea20820f06ed",
         "position": [
           1440,
           -510
@@ -333,7 +357,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "205915c4-6ed4-4b34-9707-5f3fd45df0d2",
+        "id": "4dab4bee-17ab-4f32-a353-fdf7c3bbf12e",
         "position": [
           1680,
           -510
@@ -368,7 +392,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "850a911a-b196-4f74-bcd2-d5fb72eac769",
+        "id": "03c046dc-44a1-4980-901f-46a4fa9d1f68",
         "position": [
           1920,
           -510
@@ -384,7 +408,7 @@
           "options": {}
         },
         "alwaysOutputData": true,
-        "id": "dde5b766-b9d9-4f6c-8a93-8f7fe568fd62",
+        "id": "37c70205-9cae-4282-8da8-009e0ab96017",
         "position": [
           2160,
           -510
@@ -397,7 +421,7 @@
         "parameters": {
           "jsCode": "const d = $('Normalizar solicitud').first().json;\nconst usuarioId = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst no = (status, codigo, mensaje) => [{ json: { ok: false, error_status: status, error_codigo: codigo, error_mensaje: mensaje } }];\n\nconst u = $('Leer usuario').all().map(i => i.json).find(x => x.usuario_id === usuarioId);\nif (!u || u.estado !== 'ACTIVO') return no(403, 'USUARIO_INACTIVO', 'Tu cuenta no está activa.');\n\n// Telegram es obligatorio: por ahi llegan siempre las confirmaciones y recordatorios\nconst tg = $('Leer vinculación Telegram').all().map(i => i.json).find(v => v.usuario_id === usuarioId && v.estado === 'ACTIVA');\nif (!tg) return no(403, 'TELEGRAM_NO_VINCULADO', 'Primero vincula tu Telegram desde tu perfil, así te llegan los avisos.');\n\nif (!d.evento_id) return no(400, 'DATOS_INCOMPLETOS', 'Falta el evento.');\nconst ev = $('Leer evento').all().map(i => i.json).find(e => e.evento_id === d.evento_id);\nif (!ev) return no(404, 'EVENTO_NO_EXISTE', 'Ese evento no existe.');\nif (ev.estado !== 'PUBLICADO') return no(409, 'EVENTO_NO_DISPONIBLE', 'Este evento no está recibiendo inscripciones.');\nconst inicio = new Date(`${ev.fecha}T${ev.hora || '00:00'}:00-05:00`).getTime();\nif (inicio <= Date.now()) return no(409, 'EVENTO_PASADO', 'Este evento ya empezó o ya pasó.');\n\nconst todas = ($input.first().json.inscripciones || []).filter(i => i.inscripcion_id);\nconst delEvento = todas.filter(i => i.evento_id === ev.evento_id);\n\n// idempotencia: usuario_id + evento_id no puede tener dos inscripciones activas\nconst activa = delEvento.find(i => i.usuario_id === usuarioId && i.estado !== 'CANCELADA');\nif (activa) {\n  const txt = activa.estado === 'CONFIRMADA' ? 'ya tienes cupo confirmado' : 'ya estás en la lista de espera';\n  return no(409, 'INSCRIPCION_DUPLICADA', `No te preocupes, ${txt} para este evento.`);\n}\n\nconst confirmados = delEvento.filter(i => i.estado === 'CONFIRMADA').length;\nconst enEspera = delEvento.filter(i => i.estado === 'LISTA_ESPERA').length;\nconst hayCupo = confirmados < Number(ev.capacidad);\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\n\nreturn [{\n  json: {\n    ok: true,\n    _evento: { nombre: ev.nombre, fecha: ev.fecha, hora: ev.hora, lugar: ev.lugar },\n    inscripcion_id: 'INS-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 4).toUpperCase(),\n    usuario_id: usuarioId,\n    evento_id: ev.evento_id,\n    estado: hayCupo ? 'CONFIRMADA' : 'LISTA_ESPERA',\n    fecha_inscripcion: ahora,\n    fecha_actualizacion: ahora,\n    nombre_acreditacion: d.nombre_acreditacion || u.nombre,\n    observaciones: d.observaciones,\n    origen: 'WEB',\n    orden_espera: hayCupo ? '' : enEspera + 1,\n  },\n}];\n"
         },
-        "id": "8a1bdc16-358e-4ff2-ad8e-78b50f2da3e1",
+        "id": "f35fa42f-aee7-411a-ab77-796a4eadd743",
         "position": [
           2400,
           -510
@@ -417,7 +441,7 @@
             },
             "conditions": [
               {
-                "id": "4bde3fd5-9df6-4f91-a659-64a031101563",
+                "id": "3b2b7cad-e5e5-4c8d-ac65-d67cbc99aae7",
                 "leftValue": "={{ $json.ok }}",
                 "rightValue": "",
                 "operator": {
@@ -432,7 +456,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "8c116a33-1d67-4806-8f04-21e1b617d9f0",
+        "id": "2a1fef58-be42-4ca1-89d7-d979f8486be2",
         "position": [
           2640,
           -510
@@ -474,7 +498,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "ee8b4d5d-feb6-484c-b0c5-7523941b6474",
+        "id": "faf14435-0840-451f-9e86-de3bfaa5d902",
         "position": [
           2880,
           -595
@@ -487,7 +511,7 @@
         "parameters": {
           "jsCode": "const i = $('Reglas de inscripción').first().json;\nreturn [{\n  json: {\n    auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase(),\n    inscripcion_id: i.inscripcion_id, usuario_id: i.usuario_id, evento_id: i.evento_id,\n    accion: 'CREAR', estado_anterior: '', estado_nuevo: i.estado, fecha: i.fecha_inscripcion,\n    resultado: 'OK', detalle: i.estado === 'CONFIRMADA' ? 'Había cupo' : `Sin cupo, puesto ${i.orden_espera} en espera`,\n  },\n}];\n"
         },
-        "id": "83600155-f363-49ad-a312-741599bd6d55",
+        "id": "17d0a92d-3b47-43e5-9f3d-1db7b2ae504f",
         "position": [
           3120,
           -595
@@ -529,7 +553,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "6a755dfd-0260-4494-8d1a-543ae398ccb7",
+        "id": "fc82ffb5-0fec-4e28-b564-41f0921a6e29",
         "position": [
           3360,
           -595
@@ -542,7 +566,7 @@
         "parameters": {
           "jsCode": "const i = $('Reglas de inscripción').first().json;\nconst { _evento, ok, ...inscripcion } = i;\nreturn [{\n  json: {\n    status: 201,\n    body: {\n      ok: true,\n      mensaje: i.estado === 'CONFIRMADA' ? 'Inscripción confirmada.' : 'Quedaste en lista de espera.',\n      inscripcion,\n    },\n  },\n}];\n"
         },
-        "id": "25873d18-633a-4f98-a5d9-5e31236b2279",
+        "id": "65549542-2c7b-4b26-becb-386bf69f23c5",
         "position": [
           3600,
           -595
@@ -559,7 +583,7 @@
             "responseCode": "={{ $json.status }}"
           }
         },
-        "id": "5d708130-cfe3-4da6-8a83-931863ba4341",
+        "id": "97583c5c-3536-4d3f-85b4-9e00bb7ff42a",
         "position": [
           3840,
           -595
@@ -572,7 +596,7 @@
         "parameters": {
           "jsCode": "const i = $('Reglas de inscripción').first().json;\nconst e = i._evento;\nconst confirmada = i.estado === 'CONFIRMADA';\nreturn [{\n  json: {\n    usuario_id: i.usuario_id, evento_id: i.evento_id, inscripcion_id: i.inscripcion_id,\n    tipo: confirmada ? 'INSCRIPCION_CONFIRMADA' : 'INGRESO_LISTA_ESPERA',\n    titulo: confirmada ? `Cupo confirmado: ${e.nombre}` : `Estás en lista de espera: ${e.nombre}`,\n    mensaje: confirmada\n      ? `Tu cupo para \"${e.nombre}\" está confirmado. Te esperamos el ${e.fecha} a las ${e.hora} en ${e.lugar}.`\n      : `El evento \"${e.nombre}\" está lleno. Quedaste en el puesto ${i.orden_espera} de la lista de espera; si se libera un cupo te lo asignamos automáticamente y te avisamos.`,\n  },\n}];\n"
         },
-        "id": "b2160c6e-644d-4eec-8028-78688538a67a",
+        "id": "d9262ba2-bc85-4ef3-838d-4240ec165a25",
         "position": [
           4080,
           -595
@@ -601,7 +625,7 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "41e63824-2c75-47ac-ad8b-cd7add3575f0",
+        "id": "4f9ab8eb-92cb-4d56-9d49-ad29f5bf777a",
         "position": [
           4320,
           -595
@@ -636,7 +660,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "be624429-3f0a-4fe1-bbfd-a79d32735fa8",
+        "id": "7cec06af-f56a-438e-8ef7-42ee2c5415ca",
         "position": [
           1200,
           -170
@@ -671,7 +695,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "865aa344-12a7-401a-a05b-a30e5c63fd5f",
+        "id": "47365671-ba3d-4ae8-af3f-b1205f823b53",
         "position": [
           1440,
           -170
@@ -684,7 +708,7 @@
         "parameters": {
           "jsCode": "const usuarioId = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst todas = $('Leer inscripciones (mis)').all().map(i => i.json).filter(i => i.inscripcion_id);\nconst eventos = $('Leer eventos (mis)').all().map(i => i.json);\n\nconst lista = todas.filter(i => i.usuario_id === usuarioId).map(i => {\n  const e = eventos.find(x => x.evento_id === i.evento_id) || {};\n  let posicion = null;\n  if (i.estado === 'LISTA_ESPERA') {\n    // mismo orden que usa WF07: fecha_inscripcion ascendente\n    const espera = todas.filter(x => x.evento_id === i.evento_id && x.estado === 'LISTA_ESPERA')\n      .sort((a, b) => String(a.fecha_inscripcion).localeCompare(String(b.fecha_inscripcion)));\n    posicion = espera.findIndex(x => x.inscripcion_id === i.inscripcion_id) + 1;\n  }\n  return {\n    inscripcion_id: i.inscripcion_id, evento_id: i.evento_id, estado: i.estado,\n    fecha_inscripcion: i.fecha_inscripcion, nombre_acreditacion: i.nombre_acreditacion,\n    observaciones: i.observaciones, posicion_espera: posicion,\n    evento: { nombre: e.nombre, fecha: e.fecha, hora: e.hora, lugar: e.lugar, estado: e.estado, categoria: e.categoria },\n  };\n}).sort((a, b) => String(b.fecha_inscripcion).localeCompare(String(a.fecha_inscripcion)));\n\nreturn [{ json: { status: 200, body: { ok: true, total: lista.length, inscripciones: lista } } }];\n"
         },
-        "id": "97f6c6c4-23e6-41bd-9146-32a7b8009f11",
+        "id": "e6a8b64d-bd8c-4e15-9512-36873e7b6e43",
         "position": [
           1680,
           -170
@@ -719,7 +743,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "855a1ce7-ce3d-474e-b997-3fe5800ef1cd",
+        "id": "ae752634-3c48-4e97-ad3c-5dca5a312d78",
         "position": [
           1200,
           68
@@ -732,7 +756,7 @@
         "parameters": {
           "jsCode": "const d = $('Normalizar solicitud').first().json;\nconst usuarioId = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst i = $('Leer inscripciones (actualizar)').all().map(x => x.json).find(x => x.inscripcion_id === d.inscripcion_id);\nconst no = (s, c, m) => [{ json: { ok: false, error_status: s, error_codigo: c, error_mensaje: m } }];\nif (!i || i.usuario_id !== usuarioId) return no(404, 'NO_ENCONTRADA', 'No encontramos esa inscripción.');\nif (i.estado === 'CANCELADA') return no(409, 'INSCRIPCION_CANCELADA', 'No puedes editar una inscripción cancelada.');\nif (d._trae_nombre && d.nombre_acreditacion.length < 3) return no(400, 'DATOS_INVALIDOS', 'El nombre para la escarapela debe tener mínimo 3 caracteres.');\n\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst fila = { inscripcion_id: i.inscripcion_id, fecha_actualizacion: ahora };\nif (d._trae_nombre) fila.nombre_acreditacion = d.nombre_acreditacion;\nif (d._trae_obs) fila.observaciones = d.observaciones;\nreturn [{ json: { ok: true, ...fila, _usuario_id: i.usuario_id, _evento_id: i.evento_id, _estado: i.estado } }];\n"
         },
-        "id": "b2d19d22-fc3d-47bb-9680-195b77906d1e",
+        "id": "dea451a6-af90-4be6-a9b3-8f95f2130fe8",
         "position": [
           1440,
           68
@@ -752,7 +776,7 @@
             },
             "conditions": [
               {
-                "id": "e6f871bd-cf08-45ff-a86a-652692c083d2",
+                "id": "feae876b-0830-4fd2-b04e-a6c7c3fb2100",
                 "leftValue": "={{ $json.ok }}",
                 "rightValue": "",
                 "operator": {
@@ -767,7 +791,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "772f0742-4433-4500-ae5e-a25b3065ba15",
+        "id": "b7ac6c45-5eea-43c8-9fb1-fe6919eda1b6",
         "position": [
           1680,
           68
@@ -811,7 +835,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "0141d9cc-2fee-4781-a4b8-58f2e53622b5",
+        "id": "15a47c1f-da1c-4355-aed3-9a391e60b0e7",
         "position": [
           1920,
           68
@@ -824,7 +848,7 @@
         "parameters": {
           "jsCode": "const v = $('Validar edición').first().json;\nreturn [{\n  json: {\n    auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase(),\n    inscripcion_id: v.inscripcion_id, usuario_id: v._usuario_id, evento_id: v._evento_id,\n    accion: 'ACTUALIZAR', estado_anterior: v._estado, estado_nuevo: v._estado, fecha: v.fecha_actualizacion,\n    resultado: 'OK', detalle: 'Editó datos de acreditación',\n  },\n}];\n"
         },
-        "id": "c9518a32-3a49-4e96-aac0-91b1d2148a4e",
+        "id": "cc232904-38c1-4b67-b5fe-b40dba22b31f",
         "position": [
           2160,
           68
@@ -866,7 +890,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "c306998d-51f1-460a-9dea-2c0b71b16d18",
+        "id": "8e54649d-7f33-477c-be9b-9e22c124036d",
         "position": [
           2400,
           68
@@ -879,7 +903,7 @@
         "parameters": {
           "jsCode": "return [{ json: { status: 200, body: { ok: true, mensaje: 'Inscripción actualizada.' } } }];\n"
         },
-        "id": "cd6aac44-0f01-4a95-a53f-268e099a9c41",
+        "id": "3b2edd19-c125-4daa-b43f-07dbfe4bbae6",
         "position": [
           2640,
           68
@@ -914,7 +938,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "bf5cf32a-e2b2-430a-ae86-254f6b91cd81",
+        "id": "0e5a1eff-2541-466b-a483-1a3aa2424cee",
         "position": [
           1200,
           272
@@ -949,7 +973,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "53fb9d0f-7975-4e23-9fe3-5136f1288c63",
+        "id": "f1a57a64-c220-49b0-81bf-4a5774ec1e30",
         "position": [
           1440,
           272
@@ -962,7 +986,7 @@
         "parameters": {
           "jsCode": "const d = $('Normalizar solicitud').first().json;\nconst usuarioId = $('Validar sesión (WF02)').first().json.usuario.usuario_id;\nconst i = $('Leer inscripciones (cancelar)').all().map(x => x.json).find(x => x.inscripcion_id === d.inscripcion_id);\nconst no = (s, c, m) => [{ json: { ok: false, error_status: s, error_codigo: c, error_mensaje: m } }];\nif (!i || i.usuario_id !== usuarioId) return no(404, 'NO_ENCONTRADA', 'No encontramos esa inscripción.');\nif (i.estado === 'CANCELADA') return no(409, 'YA_CANCELADA', 'Esta inscripción ya estaba cancelada.');\nconst e = $('Leer evento (cancelar)').all().map(x => x.json).find(x => x.evento_id === i.evento_id) || {};\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nreturn [{\n  json: {\n    ok: true, inscripcion_id: i.inscripcion_id, estado: 'CANCELADA', fecha_actualizacion: ahora, orden_espera: '',\n    _usuario_id: i.usuario_id, _evento_id: i.evento_id, _estado_anterior: i.estado, _evento_nombre: e.nombre || i.evento_id,\n  },\n}];\n"
         },
-        "id": "984af5ab-49e0-4321-b67d-ff1d91627627",
+        "id": "f16a8389-9b40-40b4-9244-d367926c0c24",
         "position": [
           1680,
           272
@@ -982,7 +1006,7 @@
             },
             "conditions": [
               {
-                "id": "f69a81dd-6b5d-4e7b-a7a7-4f868b438269",
+                "id": "189f11cd-2280-485d-a5da-aafca33ff4a2",
                 "leftValue": "={{ $json.ok }}",
                 "rightValue": "",
                 "operator": {
@@ -997,7 +1021,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "44e3d21e-025c-445d-a841-85106c56da13",
+        "id": "6ae46078-eae0-4277-a3b3-50b2b8583d27",
         "position": [
           1920,
           272
@@ -1041,7 +1065,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "744b4ffb-6f3e-4564-9f30-752244406ef8",
+        "id": "27cfcf15-e9c0-41a9-b903-dfebf3520fa4",
         "position": [
           2160,
           272
@@ -1054,7 +1078,7 @@
         "parameters": {
           "jsCode": "const v = $('Validar cancelación').first().json;\nreturn [{\n  json: {\n    auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase(),\n    inscripcion_id: v.inscripcion_id, usuario_id: v._usuario_id, evento_id: v._evento_id,\n    accion: 'CANCELAR', estado_anterior: v._estado_anterior, estado_nuevo: 'CANCELADA', fecha: v.fecha_actualizacion,\n    resultado: 'OK', detalle: v._estado_anterior === 'CONFIRMADA' ? 'Se libera un cupo (WF07 lo reasigna)' : 'Sale de la lista de espera',\n  },\n}];\n"
         },
-        "id": "b3f21663-1e5c-4c13-aa7b-1913d1bc4b7e",
+        "id": "6543b3ba-6e9c-4e24-bfea-12747c12ae9f",
         "position": [
           2400,
           272
@@ -1096,7 +1120,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "a0874eed-3567-4c9e-b5bd-a22f43f82752",
+        "id": "535d84bd-b7bd-4fb6-802f-d3744f76a4f5",
         "position": [
           2640,
           272
@@ -1109,7 +1133,7 @@
         "parameters": {
           "jsCode": "return [{ json: { status: 200, body: { ok: true, mensaje: 'Inscripción cancelada.' } } }];\n"
         },
-        "id": "b4881ede-11ed-462c-9432-d8fce9799ae9",
+        "id": "36281df1-5ce4-4461-ac94-caac9c55c142",
         "position": [
           2880,
           272
@@ -1126,7 +1150,7 @@
             "responseCode": "={{ $json.status }}"
           }
         },
-        "id": "7ef8ee3f-2a26-4216-b162-56ec7ec7a4f3",
+        "id": "ccedff2e-22ef-42d2-b6fb-36782c6a61dc",
         "position": [
           3120,
           272
@@ -1139,7 +1163,7 @@
         "parameters": {
           "jsCode": "const v = $('Validar cancelación').first().json;\nreturn [{\n  json: {\n    usuario_id: v._usuario_id, evento_id: v._evento_id, inscripcion_id: v.inscripcion_id,\n    tipo: 'INSCRIPCION_CANCELADA',\n    titulo: `Cancelaste tu inscripción: ${v._evento_nombre}`,\n    mensaje: `Tu inscripción a \"${v._evento_nombre}\" quedó cancelada. Si fue un error, puedes volver a inscribirte mientras haya cupo o lista de espera.`,\n  },\n}];\n"
         },
-        "id": "2ddc52a8-bf88-44ad-9311-2ec26076f426",
+        "id": "22dc862a-7fd9-4030-998f-dddb7bb6cc98",
         "position": [
           3360,
           272
@@ -1168,10 +1192,128 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "4e134419-f568-418f-bf67-5ac84b6029a3",
+        "id": "6681302d-de0d-4f37-b5f7-6afe2462366c",
         "position": [
           3600,
           272
+        ]
+      },
+      {
+        "name": "Leer inscripciones (panel)",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1C3iNDCd5gcdKHzicEzzHqWbNlFnp35t4_Wzhl59Nr7o",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Inscripciones",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "5fcf7b19-bbdc-48d2-a51c-5bd66a363993",
+        "position": [
+          1200,
+          493
+        ]
+      },
+      {
+        "name": "Leer eventos (panel)",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1ofqyN2hdDDF_k0fwaMA3ME37Y6qMfEsQYCRenW8gfpQ",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Eventos",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "fb45b8f0-65eb-4906-bcd5-63efb8bfea09",
+        "position": [
+          1440,
+          493
+        ]
+      },
+      {
+        "name": "Leer usuarios (panel)",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1YrsfCMzmB51WhgNdi4Wg-2K1OOMFaZ7L_sT3IvpciG4",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Usuarios",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "1f5871eb-e7ac-4f17-b48d-016378f30bd8",
+        "position": [
+          1680,
+          493
+        ]
+      },
+      {
+        "name": "Armar inscritos por evento",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "parameters": {
+          "jsCode": "const yo = $('Validar sesión (WF02)').first().json.usuario;\nif (!['SUPERVISOR', 'ADMINISTRADOR'].includes(yo.rol)) {\n  return [{ json: { status: 403, body: { ok: false, error: 'SIN_PERMISO', mensaje: 'Solo supervisores y administradores pueden ver los inscritos.' } } }];\n}\nconst esAdmin = yo.rol === 'ADMINISTRADOR';\nconst ins = $('Leer inscripciones (panel)').all().map(i => i.json).filter(i => i.inscripcion_id);\nconst usuarios = $('Leer usuarios (panel)').all().map(i => i.json);\n// el supervisor ve el correo a medias, el admin lo ve completo\nconst tapar = (e) => {\n  if (esAdmin || !e) return e || '';\n  const [u, d] = String(e).split('@');\n  return u.slice(0, 2) + '***@' + (d || '');\n};\nconst eventos = $('Leer eventos (panel)').all().map(i => i.json)\n  .filter(e => e.evento_id && (esAdmin || e.estado !== 'BORRADOR'))\n  .map(e => {\n    const del = ins.filter(i => i.evento_id === e.evento_id);\n    const espera = del.filter(i => i.estado === 'LISTA_ESPERA')\n      .sort((a, b) => String(a.fecha_inscripcion).localeCompare(String(b.fecha_inscripcion)));\n    const inscritos = del.map(i => {\n      const u = usuarios.find(x => x.usuario_id === i.usuario_id) || {};\n      return {\n        inscripcion_id: i.inscripcion_id, estado: i.estado, fecha_inscripcion: i.fecha_inscripcion,\n        nombre: u.nombre || i.usuario_id, email: tapar(u.email_normalizado),\n        nombre_acreditacion: i.nombre_acreditacion, observaciones: i.observaciones,\n        puesto_espera: i.estado === 'LISTA_ESPERA' ? espera.findIndex(x => x.inscripcion_id === i.inscripcion_id) + 1 : null,\n      };\n    }).sort((a, b) => String(a.fecha_inscripcion).localeCompare(String(b.fecha_inscripcion)));\n    return {\n      evento_id: e.evento_id, nombre: e.nombre, categoria: e.categoria, fecha: e.fecha, hora: e.hora, lugar: e.lugar,\n      estado: e.estado, capacidad: Number(e.capacidad) || 0,\n      confirmados: del.filter(i => i.estado === 'CONFIRMADA').length,\n      en_espera: espera.length,\n      canceladas: del.filter(i => i.estado === 'CANCELADA').length,\n      inscritos,\n    };\n  })\n  .sort((a, b) => `${a.fecha} ${a.hora}`.localeCompare(`${b.fecha} ${b.hora}`));\nreturn [{ json: { status: 200, body: { ok: true, rol: yo.rol, eventos } } }];\n"
+        },
+        "id": "01506d62-065b-48e0-8935-c006cb9d57ab",
+        "position": [
+          1920,
+          493
         ]
       },
       {
@@ -1181,10 +1323,10 @@
         "parameters": {
           "jsCode": "return [{ json: { status: 400, body: { ok: false, error: 'ACCION_NO_VALIDA', mensaje: 'La acción enviada no existe.' } } }];\n"
         },
-        "id": "fcb58e8f-f21e-4890-8daf-54998ff9075f",
+        "id": "8d68504d-d5d4-4186-85bc-e2a6f600d594",
         "position": [
           1200,
-          475.99999999999994
+          663
         ]
       },
       {
@@ -1194,7 +1336,7 @@
         "parameters": {
           "jsCode": "const d = $input.first().json;\nreturn [{\n  json: {\n    status: d.error_status || 400,\n    body: { ok: false, error: d.error_codigo || 'ERROR', mensaje: d.error_mensaje || 'No se pudo procesar la solicitud.' },\n  },\n}];\n"
         },
-        "id": "681b2fa3-d681-4f9d-b2de-a68cab148cb1",
+        "id": "da68d408-81cd-42f2-98c9-94b3dfabcf4f",
         "position": [
           2880,
           -306
@@ -1211,14 +1353,14 @@
             "responseCode": "={{ $json.status }}"
           }
         },
-        "id": "74a7f612-95ea-4db5-ae8c-80647f78605b",
+        "id": "7212fbc2-3be9-4f56-a8de-d850e7b116a2",
         "position": [
           3120,
           -102
         ]
       },
       {
-        "id": "07e061ce-5aed-4062-b958-38cbe4736212",
+        "id": "a03ab29d-4eb1-47c5-80ad-3ce6be64e7e7",
         "name": "Nota 1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
@@ -1329,7 +1471,58 @@
           ],
           [
             {
+              "node": "Leer inscripciones (panel)",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
               "node": "Acción no válida",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer inscripciones (panel)": {
+        "main": [
+          [
+            {
+              "node": "Leer eventos (panel)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer eventos (panel)": {
+        "main": [
+          [
+            {
+              "node": "Leer usuarios (panel)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer usuarios (panel)": {
+        "main": [
+          [
+            {
+              "node": "Armar inscritos por evento",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Armar inscritos por evento": {
+        "main": [
+          [
+            {
+              "node": "Responder",
               "type": "main",
               "index": 0
             }
@@ -1752,9 +1945,9 @@
     "meta": null,
     "nodeGroups": [],
     "pinData": {},
-    "versionId": "553ea830-3858-4326-bd24-00341f743209",
-    "activeVersionId": "553ea830-3858-4326-bd24-00341f743209",
-    "versionCounter": 5,
+    "versionId": "7a4a90e8-beda-4f36-99e5-7ebe2fe5bc44",
+    "activeVersionId": "7a4a90e8-beda-4f36-99e5-7ebe2fe5bc44",
+    "versionCounter": 6,
     "triggerCount": 1,
     "sourceWorkflowId": null,
     "tags": [],

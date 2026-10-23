@@ -1,6 +1,6 @@
 [
   {
-    "updatedAt": "2026-10-22T20:49:17.000Z",
+    "updatedAt": "2026-10-23T13:25:20.000Z",
     "createdAt": "2026-10-22T13:08:36.526Z",
     "id": "HMvUFNpE6ROa0yFs",
     "name": "WF04_eventos_crud",
@@ -12,13 +12,23 @@
         "name": "Formulario admin eventos",
         "type": "n8n-nodes-base.formTrigger",
         "typeVersion": 2.3,
-        "webhookId": "a75799a2-3253-436f-8015-2df97b675c41",
+        "webhookId": "83b8c887-4514-415c-b1ee-de4466e7e674",
         "parameters": {
           "path": "ep-admin-eventos",
           "formTitle": "EventPass Barrio · Administración de eventos",
           "formDescription": "Solo para el administrador. CREAR: llena todos los datos. CONSULTAR / CANCELAR / CERRAR: basta el ID. ACTUALIZAR: ID + solo los campos que quieras cambiar.",
           "formFields": {
             "values": [
+              {
+                "fieldLabel": "Tu correo (administrador)",
+                "fieldType": "email",
+                "requiredField": true
+              },
+              {
+                "fieldLabel": "Tu contraseña",
+                "fieldType": "password",
+                "requiredField": true
+              },
               {
                 "fieldLabel": "Acción",
                 "fieldType": "dropdown",
@@ -136,7 +146,7 @@
             "buttonLabel": "Guardar"
           }
         },
-        "id": "2ad0df01-91dc-4970-b66f-7bf678e60c19",
+        "id": "fb376990-cbf5-4257-b2b1-cdab4dac0a75",
         "position": [
           0,
           0
@@ -147,9 +157,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const f = $input.first().json;\nconst t = (k) => String(f[k] ?? '').trim();\nconst sinCambio = (v) => (v === '(sin cambio)' ? '' : v);\nreturn [{\n  json: {\n    accion: t('Acción'),\n    evento_id: t('ID del evento').toUpperCase(),\n    nombre: t('Nombre'),\n    categoria: sinCambio(t('Categoría')),\n    descripcion: t('Descripción'),\n    fecha: t('Fecha').slice(0, 10),\n    hora: t('Hora'),\n    lugar: t('Lugar'),\n    capacidad: t('Capacidad'),\n    imagen_url: t('URL de imagen'),\n    organizador: t('Organizador'),\n    estado: sinCambio(t('Estado')),\n    motivo: t('Motivo / nota'),\n  },\n}];\n"
+          "jsCode": "const f = $input.first().json;\nconst t = (k) => String(f[k] ?? '').trim();\nconst sinCambio = (v) => (v === '(sin cambio)' ? '' : v);\nreturn [{\n  json: {\n    admin_email: t('Tu correo (administrador)').toLowerCase(),\n    admin_password: String(f['Tu contraseña'] ?? ''),\n    accion: t('Acción'),\n    evento_id: t('ID del evento').toUpperCase(),\n    nombre: t('Nombre'),\n    categoria: sinCambio(t('Categoría')),\n    descripcion: t('Descripción'),\n    fecha: t('Fecha').slice(0, 10),\n    hora: t('Hora'),\n    lugar: t('Lugar'),\n    capacidad: t('Capacidad'),\n    imagen_url: t('URL de imagen'),\n    organizador: t('Organizador'),\n    estado: sinCambio(t('Estado')),\n    motivo: t('Motivo / nota'),\n  },\n}];\n"
         },
-        "id": "f0a572b3-d938-4f33-94e5-d37ecc8031bb",
+        "id": "6f15af00-3c92-4ff4-859d-ac7a82afb47e",
         "position": [
           240,
           0
@@ -184,10 +194,45 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "7e77f8df-f70d-4d3a-be2a-5e2a7fae31a4",
+        "id": "5eab05da-97b6-44e7-abdc-e522bbaf25e7",
         "position": [
           480,
           0
+        ]
+      },
+      {
+        "name": "Leer usuarios (admin)",
+        "type": "n8n-nodes-base.googleSheets",
+        "typeVersion": 4.7,
+        "parameters": {
+          "operation": "read",
+          "documentId": {
+            "__rl": true,
+            "value": "1YrsfCMzmB51WhgNdi4Wg-2K1OOMFaZ7L_sT3IvpciG4",
+            "mode": "id"
+          },
+          "sheetName": {
+            "__rl": true,
+            "value": "Usuarios",
+            "mode": "name"
+          },
+          "options": {}
+        },
+        "credentials": {
+          "googleSheetsOAuth2Api": {
+            "id": "Qp0izdmTpzY84glu",
+            "name": "Google Sheets EventPass"
+          }
+        },
+        "executeOnce": true,
+        "alwaysOutputData": true,
+        "retryOnFail": true,
+        "maxTries": 4,
+        "waitBetweenTries": 5000,
+        "id": "97bfba33-a046-496e-90d5-5a997e03fa4a",
+        "position": [
+          600,
+          136
         ]
       },
       {
@@ -195,9 +240,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const f = $('Normalizar formulario').first().json;\nconst eventos = $('Leer eventos').all().map(i => i.json).filter(e => e.evento_id);\nconst CATEGORIAS = ['Cultura', 'Deportes', 'Comunidad', 'Educación', 'Emprendimiento'];\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst errores = [];\nconst fail = () => [{ json: { valido: false, accion: f.accion, errores } }];\n\nconst revisar = (e, parcial) => {\n  const req = (campo, nombre) => { if (!parcial && !e[campo]) errores.push(`Falta ${nombre}`); };\n  req('nombre', 'el nombre'); req('categoria', 'la categoría'); req('fecha', 'la fecha'); req('hora', 'la hora');\n  req('lugar', 'el lugar'); req('capacidad', 'la capacidad'); req('organizador', 'el organizador'); req('descripcion', 'la descripción');\n  if (e.categoria && !CATEGORIAS.includes(e.categoria)) errores.push('Categoría no válida');\n  if (e.fecha && !/^\\d{4}-\\d{2}-\\d{2}$/.test(e.fecha)) errores.push('La fecha debe ser AAAA-MM-DD');\n  if (e.hora && !/^([01]\\d|2[0-3]):[0-5]\\d$/.test(e.hora)) errores.push('La hora debe ser HH:MM (24 horas)');\n  if (e.capacidad !== '' && e.capacidad !== undefined && (!Number.isInteger(Number(e.capacidad)) || Number(e.capacidad) <= 0)) errores.push('La capacidad debe ser un entero mayor a 0');\n  if (e.imagen_url && !/^(https?:\\/\\/|\\/)/.test(e.imagen_url)) errores.push('La URL de imagen debe empezar por http(s):// o /');\n};\n\nif (f.accion === 'CREAR') {\n  revisar(f, false);\n  if (f.estado === 'CERRADO') errores.push('Un evento nuevo solo puede quedar en BORRADOR o PUBLICADO');\n  if (errores.length) return fail();\n  const nums = eventos.map(e => parseInt(String(e.evento_id).replace(/\\D/g, ''), 10)).filter(x => !isNaN(x));\n  const sig = (nums.length ? Math.max(...nums) : 0) + 1;\n  const fila = {\n    evento_id: 'EVT-' + String(sig).padStart(4, '0'),\n    nombre: f.nombre, categoria: f.categoria, descripcion: f.descripcion, fecha: f.fecha, hora: f.hora,\n    lugar: f.lugar, capacidad: Number(f.capacidad), imagen_url: f.imagen_url, organizador: f.organizador,\n    estado: f.estado || 'BORRADOR', fecha_creacion: ahora, fecha_actualizacion: ahora,\n  };\n  return [{ json: { valido: true, accion: f.accion, fila, motivo: f.motivo, detalle: `Creado en estado ${fila.estado}` } }];\n}\n\nif (!f.evento_id) { errores.push('Escribe el ID del evento'); return fail(); }\nconst actual = eventos.find(e => e.evento_id === f.evento_id);\nif (!actual) { errores.push(`No existe el evento ${f.evento_id}`); return fail(); }\n\nif (f.accion === 'CONSULTAR') return [{ json: { valido: true, accion: f.accion, fila: actual } }];\n\nif (actual.estado === 'CANCELADO') { errores.push('El evento está CANCELADO y ya no se puede modificar'); return fail(); }\n\nif (f.accion === 'CANCELAR' || f.accion === 'CERRAR') {\n  const nuevo = f.accion === 'CANCELAR' ? 'CANCELADO' : 'CERRADO';\n  if (actual.estado === nuevo) { errores.push(`El evento ya está ${nuevo}`); return fail(); }\n  return [{\n    json: {\n      valido: true, accion: f.accion, motivo: f.motivo, estado_anterior: actual.estado,\n      fila: { evento_id: actual.evento_id, estado: nuevo, fecha_actualizacion: ahora },\n      evento: { ...actual, estado: nuevo },\n      detalle: `${actual.estado} -> ${nuevo}${f.motivo ? '. ' + f.motivo : ''}`,\n    },\n  }];\n}\n\nif (f.accion === 'ACTUALIZAR') {\n  revisar(f, true);\n  if (errores.length) return fail();\n  const campos = ['nombre', 'categoria', 'descripcion', 'fecha', 'hora', 'lugar', 'capacidad', 'imagen_url', 'organizador', 'estado'];\n  const fila = { evento_id: actual.evento_id };\n  const cambiados = [];\n  for (const c of campos) {\n    if (f[c] !== '' && String(f[c]) !== String(actual[c])) { fila[c] = c === 'capacidad' ? Number(f[c]) : f[c]; cambiados.push(c); }\n  }\n  if (!cambiados.length) { errores.push('No cambiaste ningún dato'); return fail(); }\n  fila.fecha_actualizacion = ahora;\n  return [{\n    json: {\n      valido: true, accion: f.accion, motivo: f.motivo, estado_anterior: actual.estado, fila, cambiados,\n      evento: { ...actual, ...fila },\n      detalle: 'Cambió: ' + cambiados.join(', '),\n    },\n  }];\n}\n\nerrores.push('Acción no reconocida');\nreturn fail();\n"
+          "jsCode": "const crypto = require('crypto');\nconst f = $('Normalizar formulario').first().json;\n\n// solo un ADMINISTRADOR activo puede usar este formulario\nconst admin = $('Leer usuarios (admin)').all().map(i => i.json).find(u => u.email_normalizado === f.admin_email);\nconst hash = admin ? crypto.pbkdf2Sync(f.admin_password, String(admin.password_salt), 100000, 32, 'sha256').toString('hex') : '';\nif (!admin || hash !== String(admin.password_hash) || admin.estado !== 'ACTIVO' || admin.rol !== 'ADMINISTRADOR') {\n  return [{ json: { valido: false, accion: f.accion, errores: ['Correo o contraseña incorrectos, o tu cuenta no es de ADMINISTRADOR.'] } }];\n}\n\nconst eventos = $('Leer eventos').all().map(i => i.json).filter(e => e.evento_id);\nconst CATEGORIAS = ['Cultura', 'Deportes', 'Comunidad', 'Educación', 'Emprendimiento'];\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst errores = [];\nconst fail = () => [{ json: { valido: false, accion: f.accion, errores } }];\n\nconst revisar = (e, parcial) => {\n  const req = (campo, nombre) => { if (!parcial && !e[campo]) errores.push(`Falta ${nombre}`); };\n  req('nombre', 'el nombre'); req('categoria', 'la categoría'); req('fecha', 'la fecha'); req('hora', 'la hora');\n  req('lugar', 'el lugar'); req('capacidad', 'la capacidad'); req('organizador', 'el organizador'); req('descripcion', 'la descripción');\n  if (e.categoria && !CATEGORIAS.includes(e.categoria)) errores.push('Categoría no válida');\n  if (e.fecha && !/^\\d{4}-\\d{2}-\\d{2}$/.test(e.fecha)) errores.push('La fecha debe ser AAAA-MM-DD');\n  if (e.hora && !/^([01]\\d|2[0-3]):[0-5]\\d$/.test(e.hora)) errores.push('La hora debe ser HH:MM (24 horas)');\n  if (e.capacidad !== '' && e.capacidad !== undefined && (!Number.isInteger(Number(e.capacidad)) || Number(e.capacidad) <= 0)) errores.push('La capacidad debe ser un entero mayor a 0');\n  if (e.imagen_url && !/^(https?:\\/\\/|\\/)/.test(e.imagen_url)) errores.push('La URL de imagen debe empezar por http(s):// o /');\n};\n\nif (f.accion === 'CREAR') {\n  revisar(f, false);\n  if (f.estado === 'CERRADO') errores.push('Un evento nuevo solo puede quedar en BORRADOR o PUBLICADO');\n  if (errores.length) return fail();\n  const nums = eventos.map(e => parseInt(String(e.evento_id).replace(/\\D/g, ''), 10)).filter(x => !isNaN(x));\n  const sig = (nums.length ? Math.max(...nums) : 0) + 1;\n  const fila = {\n    evento_id: 'EVT-' + String(sig).padStart(4, '0'),\n    nombre: f.nombre, categoria: f.categoria, descripcion: f.descripcion, fecha: f.fecha, hora: f.hora,\n    lugar: f.lugar, capacidad: Number(f.capacidad), imagen_url: f.imagen_url, organizador: f.organizador,\n    estado: f.estado || 'BORRADOR', fecha_creacion: ahora, fecha_actualizacion: ahora,\n  };\n  return [{ json: { valido: true, accion: f.accion, fila, motivo: f.motivo, detalle: `Creado en estado ${fila.estado}` } }];\n}\n\nif (!f.evento_id) { errores.push('Escribe el ID del evento'); return fail(); }\nconst actual = eventos.find(e => e.evento_id === f.evento_id);\nif (!actual) { errores.push(`No existe el evento ${f.evento_id}`); return fail(); }\n\nif (f.accion === 'CONSULTAR') return [{ json: { valido: true, accion: f.accion, fila: actual } }];\n\nif (actual.estado === 'CANCELADO') { errores.push('El evento está CANCELADO y ya no se puede modificar'); return fail(); }\n\nif (f.accion === 'CANCELAR' || f.accion === 'CERRAR') {\n  const nuevo = f.accion === 'CANCELAR' ? 'CANCELADO' : 'CERRADO';\n  if (actual.estado === nuevo) { errores.push(`El evento ya está ${nuevo}`); return fail(); }\n  return [{\n    json: {\n      valido: true, accion: f.accion, motivo: f.motivo, estado_anterior: actual.estado,\n      fila: { evento_id: actual.evento_id, estado: nuevo, fecha_actualizacion: ahora },\n      evento: { ...actual, estado: nuevo },\n      detalle: `${actual.estado} -> ${nuevo}${f.motivo ? '. ' + f.motivo : ''}`,\n    },\n  }];\n}\n\nif (f.accion === 'ACTUALIZAR') {\n  revisar(f, true);\n  if (errores.length) return fail();\n  const campos = ['nombre', 'categoria', 'descripcion', 'fecha', 'hora', 'lugar', 'capacidad', 'imagen_url', 'organizador', 'estado'];\n  const fila = { evento_id: actual.evento_id };\n  const cambiados = [];\n  for (const c of campos) {\n    if (f[c] !== '' && String(f[c]) !== String(actual[c])) { fila[c] = c === 'capacidad' ? Number(f[c]) : f[c]; cambiados.push(c); }\n  }\n  if (!cambiados.length) { errores.push('No cambiaste ningún dato'); return fail(); }\n  fila.fecha_actualizacion = ahora;\n  return [{\n    json: {\n      valido: true, accion: f.accion, motivo: f.motivo, estado_anterior: actual.estado, fila, cambiados,\n      evento: { ...actual, ...fila },\n      detalle: 'Cambió: ' + cambiados.join(', '),\n    },\n  }];\n}\n\nerrores.push('Acción no reconocida');\nreturn fail();\n"
         },
-        "id": "82894c91-f665-4896-b9fc-656a60ad599a",
+        "id": "57bd4f30-92a9-42b4-abe3-33c19b7eb6f0",
         "position": [
           720,
           0
@@ -217,7 +262,7 @@
             },
             "conditions": [
               {
-                "id": "cf57f565-bc80-42ed-9a91-d2e0f2dbd11d",
+                "id": "c903576b-d737-4a6b-bf42-e2f67fd1ef55",
                 "leftValue": "={{ $json.valido }}",
                 "rightValue": "",
                 "operator": {
@@ -232,7 +277,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "e74fcea6-2592-4aab-a764-0c4080bccb67",
+        "id": "558950fe-d417-432a-883f-b47ab4cc7ad5",
         "position": [
           960,
           0
@@ -255,7 +300,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "799de3fb-2776-4888-92f3-4c72cf251252",
+                      "id": "cdb7f4f6-05b9-4fc5-a645-22b17681eaed",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "CREAR",
                       "operator": {
@@ -279,7 +324,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "105888a2-e7ce-403a-9fe6-e52322a62c19",
+                      "id": "4357e560-0bf7-4ad0-ab26-6b5f5d54aa5c",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "CONSULTAR",
                       "operator": {
@@ -303,7 +348,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "1698f1a4-dc41-42e9-9b71-c4c1cdda268b",
+                      "id": "07629d17-8492-465f-ac55-8464c1ea17b2",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "ACTUALIZAR",
                       "operator": {
@@ -327,7 +372,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "f15dcd59-5658-4ab3-a2da-82be6a4f576e",
+                      "id": "c4b1bbce-2d56-4a7e-9ead-72954af06050",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "CANCELAR",
                       "operator": {
@@ -351,7 +396,7 @@
                   },
                   "conditions": [
                     {
-                      "id": "504c28b2-9e75-4cae-b515-ff1ae0791e32",
+                      "id": "f4aac8d7-6dc1-45df-96ab-391bbe2c6606",
                       "leftValue": "={{ $json.accion }}",
                       "rightValue": "CERRAR",
                       "operator": {
@@ -373,7 +418,7 @@
             "renameFallbackOutput": "otro"
           }
         },
-        "id": "d276d954-a46f-428f-ab28-178fcf2e4ad7",
+        "id": "8b5afaaa-5033-4ca9-9805-bd0f03f40c38",
         "position": [
           1200,
           -85
@@ -386,7 +431,7 @@
         "parameters": {
           "jsCode": "return [{ json: $input.first().json.fila }];\n"
         },
-        "id": "c5daf3e4-96be-47de-a9be-8033febd47a1",
+        "id": "3533158d-7d5f-4dfe-8425-11b1a28eff88",
         "position": [
           1440,
           -340
@@ -428,7 +473,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "4de4dd57-7cbe-4011-900f-f5a1943edb41",
+        "id": "4f2840e8-564a-463a-8166-314f4af02ee3",
         "position": [
           1680,
           -340
@@ -438,7 +483,7 @@
         "name": "Mostrar evento",
         "type": "n8n-nodes-base.form",
         "typeVersion": 2.3,
-        "webhookId": "23ede21c-0545-4383-94cb-c392d64eed73",
+        "webhookId": "513cdc8b-3cc1-4000-94d6-2c6a14e28dca",
         "parameters": {
           "operation": "completion",
           "respondWith": "text",
@@ -446,7 +491,7 @@
           "completionMessage": "=Estado: {{ $json.fila.estado }}\nCategoría: {{ $json.fila.categoria }}\nFecha: {{ $json.fila.fecha }} {{ $json.fila.hora }}\nLugar: {{ $json.fila.lugar }}\nCapacidad: {{ $json.fila.capacidad }}\nOrganiza: {{ $json.fila.organizador }}\n\n{{ $json.fila.descripcion }}",
           "options": {}
         },
-        "id": "a3de1ac0-4e6c-4568-b27f-a9a3f4c9d41d",
+        "id": "fb4a828b-6361-4609-b133-722afab0a6a1",
         "position": [
           1440,
           -170
@@ -459,7 +504,7 @@
         "parameters": {
           "jsCode": "return [{ json: $input.first().json.fila }];\n"
         },
-        "id": "e7933ac6-a96d-4929-800c-6d3b9d5e6298",
+        "id": "9992c21f-85e2-43f9-afa4-2f321e158453",
         "position": [
           1440,
           51
@@ -503,7 +548,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "de1a3fb8-1f53-42cb-a7d6-e9c396f31f3b",
+        "id": "5b0240cb-3001-4136-8072-d6ab900a4701",
         "position": [
           1680,
           51
@@ -514,9 +559,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const v = $('Validar formulario').first().json;\nreturn [{\n  json: {\n    auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase(),\n    evento_id: v.fila.evento_id,\n    accion: v.accion,\n    fecha: v.fila.fecha_actualizacion,\n    resultado: 'OK',\n    detalle: v.detalle,\n  },\n}];\n"
+          "jsCode": "const v = $('Validar formulario').first().json;\nreturn [{\n  json: {\n    auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase(),\n    evento_id: v.fila.evento_id,\n    accion: v.accion,\n    fecha: v.fila.fecha_actualizacion,\n    resultado: 'OK',\n    detalle: v.detalle + ' · por ' + $('Normalizar formulario').first().json.admin_email,\n  },\n}];\n"
         },
-        "id": "474cdd6b-31f5-4f1f-a565-24fd52d1c9a6",
+        "id": "7e63014c-b100-42e4-ac87-c2ffbcae2cb4",
         "position": [
           1920,
           -136
@@ -558,7 +603,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "38608201-76b4-479f-914d-64e7e5e0dc71",
+        "id": "c82a820f-7054-425f-845c-81bd9a8e474e",
         "position": [
           2160,
           -136
@@ -568,7 +613,7 @@
         "name": "Listo",
         "type": "n8n-nodes-base.form",
         "typeVersion": 2.3,
-        "webhookId": "48f7e6d8-d57c-43fb-8930-d7829afea666",
+        "webhookId": "9f042083-101f-4fc2-a9a3-f5f8d65062c3",
         "parameters": {
           "operation": "completion",
           "respondWith": "text",
@@ -576,7 +621,7 @@
           "completionMessage": "=ID: {{ $('Validar formulario').first().json.fila.evento_id }}\n{{ $('Validar formulario').first().json.detalle }}",
           "options": {}
         },
-        "id": "b92a37d3-f3c0-45df-b396-1e135d3c17fa",
+        "id": "e095e46e-9549-45f1-a477-a157d3bae631",
         "position": [
           2400,
           -204
@@ -611,7 +656,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "d492c970-16b2-4020-ba26-ce1c42be4d50",
+        "id": "80e75532-f874-4f42-a695-b9051aaf6dc0",
         "position": [
           2400,
           -51
@@ -624,7 +669,7 @@
         "parameters": {
           "jsCode": "// siempre devuelve algo para que el flujo llegue a la pagina final del formulario\nconst nadie = [{ json: { sin_avisos: true } }];\nconst v = $('Validar formulario').first().json;\nif (v.accion === 'CREAR') return nadie;\nconst importantes = ['fecha', 'hora', 'lugar'];\nconst cambioImportante = v.accion === 'ACTUALIZAR' && (v.cambiados || []).some(c => importantes.includes(c));\nif (v.accion !== 'CANCELAR' && !cambioImportante) return nadie;\n\nconst ev = v.evento;\nconst activas = $('Leer inscripciones').all().map(i => i.json)\n  .filter(i => i.evento_id === ev.evento_id && (i.estado === 'CONFIRMADA' || i.estado === 'LISTA_ESPERA'));\nif (!activas.length) return nadie;\n\nreturn activas.map(i => ({\n  json: v.accion === 'CANCELAR'\n    ? {\n      usuario_id: i.usuario_id, evento_id: ev.evento_id, inscripcion_id: i.inscripcion_id,\n      tipo: 'EVENTO_CANCELADO',\n      titulo: `Se canceló: ${ev.nombre}`,\n      mensaje: `Lo sentimos, el evento \"${ev.nombre}\" del ${ev.fecha} fue cancelado por los organizadores.${v.motivo ? ' Motivo: ' + v.motivo : ''}`,\n      clave_extra: v.fila.fecha_actualizacion,\n    }\n    : {\n      usuario_id: i.usuario_id, evento_id: ev.evento_id, inscripcion_id: i.inscripcion_id,\n      tipo: 'EVENTO_ACTUALIZADO',\n      titulo: `Cambios en: ${ev.nombre}`,\n      mensaje: `El evento \"${ev.nombre}\" cambió. Ahora es el ${ev.fecha} a las ${ev.hora} en ${ev.lugar}.${v.motivo ? ' Nota: ' + v.motivo : ''}`,\n      clave_extra: v.fila.fecha_actualizacion,\n    },\n}));\n"
         },
-        "id": "399be7ef-c0f5-432e-bdcb-5a7a110628e8",
+        "id": "a7d97887-c686-4609-9e73-a39458fd5298",
         "position": [
           2640,
           -51
@@ -644,7 +689,7 @@
             },
             "conditions": [
               {
-                "id": "830e3abc-159b-49b4-8d21-36921e34547e",
+                "id": "7329158b-c746-416b-876b-5e425bd61e86",
                 "leftValue": "={{ $json.sin_avisos }}",
                 "rightValue": "",
                 "operator": {
@@ -659,7 +704,7 @@
           "looseTypeValidation": true,
           "options": {}
         },
-        "id": "b1478152-6ad2-4613-8abb-bf1ebb244691",
+        "id": "95d634ea-ed1a-42bc-b3da-1bcc74e393b9",
         "position": [
           2880,
           -51
@@ -688,7 +733,7 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "ed2b497e-4784-4a31-adfe-86e872230548",
+        "id": "d8b8b060-5a9d-4b6d-be48-634bfc06ff68",
         "position": [
           3120,
           -102
@@ -698,7 +743,7 @@
         "name": "Mostrar errores",
         "type": "n8n-nodes-base.form",
         "typeVersion": 2.3,
-        "webhookId": "039c5f96-f3fa-414d-a99e-1e82af748721",
+        "webhookId": "7646b831-e0de-4701-b5f9-741a4132b08d",
         "parameters": {
           "operation": "completion",
           "respondWith": "text",
@@ -706,14 +751,14 @@
           "completionMessage": "={{ $json.errores.join('\\n') }}",
           "options": {}
         },
-        "id": "ab59d71f-cc4d-40eb-bd8b-6bcaff76d622",
+        "id": "ed33de1f-dd34-48d9-9a63-907c410ca971",
         "position": [
           1200,
           221
         ]
       },
       {
-        "id": "de4223aa-8618-4362-a0f0-83fbcd5739fe",
+        "id": "1fbd84c7-1e13-47a5-9ef5-73d5f10e56b9",
         "name": "Nota 1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
@@ -753,6 +798,17 @@
         ]
       },
       "Leer eventos": {
+        "main": [
+          [
+            {
+              "node": "Leer usuarios (admin)",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Leer usuarios (admin)": {
         "main": [
           [
             {
@@ -952,15 +1008,16 @@
     "settings": {
       "executionOrder": "v1",
       "timezone": "America/Bogota",
-      "callerPolicy": "workflowsFromSameOwner"
+      "callerPolicy": "workflowsFromSameOwner",
+      "saveDataSuccessExecution": "none"
     },
     "staticData": null,
     "meta": null,
     "nodeGroups": [],
     "pinData": {},
-    "versionId": "7f40ecff-ec67-40ab-aefe-8110864fbccd",
-    "activeVersionId": "7f40ecff-ec67-40ab-aefe-8110864fbccd",
-    "versionCounter": 5,
+    "versionId": "cc92a03c-f9a7-4871-a9ef-31407219e513",
+    "activeVersionId": "cc92a03c-f9a7-4871-a9ef-31407219e513",
+    "versionCounter": 6,
     "triggerCount": 1,
     "sourceWorkflowId": null,
     "tags": [],
