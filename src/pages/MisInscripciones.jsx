@@ -5,6 +5,7 @@ import { useAuth } from '../auth'
 import { Cargando, ErrorBox, Exito } from '../components/Estado'
 import { ESTADO_INSCRIPCION, formatearFecha } from '../utils'
 import BotonWhatsApp from '../components/BotonWhatsApp'
+import PaseQR from '../components/PaseQR'
 
 export default function MisInscripciones() {
   const { token, sesionVencida } = useAuth()
@@ -91,7 +92,9 @@ function Inscripcion({ item, token, onCambio }) {
   const [ocupado, setOcupado] = useState(false)
   const [error, setError] = useState('')
   const est = ESTADO_INSCRIPCION[item.estado] || { texto: item.estado, clase: '' }
-  const activa = item.estado !== 'CANCELADA'
+  // las que ya asistieron o se cancelaron ya no se pueden editar ni cancelar
+  const activa = item.estado === 'CONFIRMADA' || item.estado === 'LISTA_ESPERA'
+  const [verPase, setVerPase] = useState(false)
 
   const guardar = async (e) => {
     e.preventDefault()
@@ -123,7 +126,7 @@ function Inscripcion({ item, token, onCambio }) {
   }
 
   return (
-    <article className={`inscripcion ${!activa ? 'apagada' : ''}`}>
+    <article className={`inscripcion ${item.estado === 'CANCELADA' ? 'apagada' : ''}`}>
       <div className="inscripcion-top">
         <div>
           <Link to={`/evento/${item.evento_id}`}>
@@ -181,8 +184,16 @@ function Inscripcion({ item, token, onCambio }) {
 
       <ErrorBox mensaje={error} />
 
+      {item.estado === 'ASISTIO' && <p className="nota">Ya registraste tu ingreso a este evento. ¡Gracias por venir!</p>}
+      {item.estado === 'CONFIRMADA' && verPase && <PaseQR inscripcion={item} />}
+
       {activa && !editando && (
         <div className="fila">
+          {item.estado === 'CONFIRMADA' && (
+            <button className="btn btn-sm" onClick={() => setVerPase(!verPase)}>
+              {verPase ? 'Ocultar mi pase' : 'Ver mi pase de entrada'}
+            </button>
+          )}
           <button className="btn btn-sec btn-sm" onClick={() => setEditando(true)} disabled={ocupado}>
             Editar datos
           </button>

@@ -1,9 +1,130 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import * as api from '../api'
 import { useAuth } from '../auth'
 import { Cargando, ErrorBox, Exito } from '../components/Estado'
-import { ESTADO_INSCRIPCION, formatearFecha } from '../utils'
+import { ESTADO_INSCRIPCION, formatearFecha, getVisitorId } from '../utils'
+
+// ---------- check-in (WF11) ----------
+const RESULTADO = {
+  EXITOSO: { clase: 'ok', titulo: '✔ Ingreso registrado' },
+  DUPLICADO: { clase: 'dup', titulo: '⚠ Ya había ingresado' },
+  RECHAZADO: { clase: 'no', titulo: '✖ No puede ingresar' },
+}
+
+// acepta el codigo solo (INS-...) o el link completo del QR
+function leerCodigo(texto) {
+  const t = String(texto || '').trim()
+  try {
+    const u = new URL(t)
+    return { inscripcion: u.searchParams.get('checkin') || '', evento: u.searchParams.get('evento') || '' }
+  } catch {
+    return { inscripcion: t.toUpperCase(), evento: '' }
+  }
+}
+
+async function hacerCheckin(token, inscripcionId, eventoId) {
+  try {
+    const r = await api.registrarCheckin(token, inscripcionId, eventoId)
+    return r
+  } catch (e) {
+    // duplicado y rechazado llegan como error HTTP pero traen el detalle en el body
+    if (e.data?.resultado) return e.data
+    return { resultado: 'RECHAZADO', mensaje: e.message }
+  }
+}
+
+function TarjetaResultado({ r }) {
+  if (!r) return null
+  const cfg = RESULTADO[r.resultado] || RESULTADO.RECHAZADO
+  return (
+    <div className={`resultado-checkin resultado-${cfg.clase}`} role="status">
+      <strong>{cfg.titulo}</strong>
+      <p>{r.mensaje}</p>
+      {r.asistente && (
+        <p className="mini">
+          {r.asistente.nombre} · escarapela: <strong>{r.asistente.nombre_acreditacion}</strong>
+        </p>
+      )}
+      {r.evento && <p className="mini">{r.evento.nombre}</p>}
+    </div>
+  )
+}
+
+function Checkin({ inscripcionInicial, eventoInicial }) {
+  const { token } = useAuth()
+  const [eventos, setEventos] = useState([])
+  const [eventoId, setEventoId] = useState(eventoInicial)
+  const [codigo, setCodigo] = useState(inscripcionInicial)
+  const [enviando, setEnviando] = useState(false)
+  const [resultado, setResultado] = useState(null)
+
+  useEffect(() => {
+    api
+      .listarEventos(getVisitorId())
+      .then((r) => {
+        const lista = (r.eventos || []).filter((e) => e.estado === 'PUBLICADO')
+        setEventos(lista)
+        if (!eventoInicial && lista[0]) setEventoId(lista[0].evento_id)
+      })
+      .catch(() => setEventos([]))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  const registrar = async (e) => {
+    e.preventDefault()
+    const leido = leerCodigo(codigo)
+    const evento = leido.evento || eventoId
+    if (!leido.inscripcion || !evento) return
+    setEnviando(true)
+    setResultado(null)
+    const r = await hacerCheckin(token, leido.inscripcion, evento)
+    setResultado(r)
+    setEnviando(false)
+    if (r.resultado === 'EXITOSO') setCodigo('')
+  }
+
+  return (
+    <div className="checkin-grid">
+      <form className="form caja" onSubmit={registrar}>
+        <h2>Registrar ingreso</h2>
+        <p className="mini">
+          Escanea el QR del pase con la cámara del celular (abre esta pantalla con todo listo) o escribe el código de la
+          inscripción.
+        </p>
+        <label>
+          Evento
+          <select value={eventoId} onChange={(e) => setEventoId(e.target.value)} required>
+            {eventoInicial && !eventos.some((e) => e.evento_id === eventoInicial) && (
+              <option value={eventoInicial}>{eventoInicial}</option>
+            )}
+            {eventos.map((e) => (
+              <option key={e.evento_id} value={e.evento_id}>
+                {e.nombre} ({e.fecha})
+              </option>
+            ))}
+          </select>
+        </label>
+        <label>
+          Código de inscripción
+          <input
+            value={codigo}
+            onChange={(e) => setCodigo(e.target.value)}
+            placeholder="INS-XXXXXXXX o el link del QR"
+            required
+          />
+        </label>
+        <button className="btn" disabled={enviando}>
+          {enviando ? 'Verificando...' : 'Registrar ingreso'}
+        </button>
+      </form>
+      <div>
+        {enviando && <Cargando texto="Verificando la inscripción..." />}
+        <TarjetaResultado r={resultado} />
+      </div>
+    </div>
+  )
+}
 
 const ROLES = [
   { valor: 'VECINO', texto: 'Vecino' },
@@ -61,7 +182,9 @@ function SelectorRol({ usuarioId, rol, onCambio }) {
 export default function Panel() {
   const { usuario } = useAuth()
   const esAdmin = usuario?.rol === 'ADMINISTRADOR'
-  const [pestana, setPestana] = useState('inscritos')
+  // si llegan desde el QR del pase (/panel?checkin=INS-..&evento=EVT-..) se abre directo el check-in
+  const [params] = useSearchParams()
+  const [pestana, setPestana] = useState(params.get('checkin') ? 'checkin' : 'inscritos')
 
   if (!['SUPERVISOR', 'ADMINISTRADOR'].includes(usuario?.rol)) return <Navigate to="/" replace />
 
@@ -73,6 +196,9 @@ export default function Panel() {
       </div>
 
       <div className="filtros">
+        <button className={`chip ${pestana === 'checkin' ? 'activo' : ''}`} onClick={() => setPestana('checkin')}>
+          Check-in
+        </button>
         <button className={`chip ${pestana === 'inscritos' ? 'activo' : ''}`} onClick={() => setPestana('inscritos')}>
           Inscritos por evento
         </button>
@@ -88,6 +214,9 @@ export default function Panel() {
         )}
       </div>
 
+      {pestana === 'checkin' && (
+        <Checkin inscripcionInicial={params.get('checkin') || ''} eventoInicial={params.get('evento') || ''} />
+      )}
       {pestana === 'inscritos' && <Inscritos />}
       {pestana === 'usuarios' && esAdmin && <Usuarios />}
     </div>
@@ -164,6 +293,31 @@ function Inscritos() {
     }))
   }
 
+  // check-in desde la lista: misma llamada al WF11 que la pestana de check-in
+  const { token } = useAuth()
+  const [resultadoFila, setResultadoFila] = useState(null)
+  const [registrando, setRegistrando] = useState('')
+  const checkinFila = async (ev, i) => {
+    setRegistrando(i.inscripcion_id)
+    const r = await hacerCheckin(token, i.inscripcion_id, ev.evento_id)
+    setResultadoFila(r)
+    setRegistrando('')
+    if (r.resultado === 'EXITOSO' || r.resultado === 'DUPLICADO') {
+      setData((d) => ({
+        ...d,
+        eventos: d.eventos.map((e) =>
+          e.evento_id !== ev.evento_id
+            ? e
+            : {
+                ...e,
+                asistieron: (e.asistieron || 0) + (r.resultado === 'EXITOSO' ? 1 : 0),
+                inscritos: e.inscritos.map((x) => (x.inscripcion_id === i.inscripcion_id ? { ...x, estado: 'ASISTIO' } : x)),
+              },
+        ),
+      }))
+    }
+  }
+
   const eventos = data?.eventos || []
   const evento = useMemo(() => eventos.find((e) => e.evento_id === elegido) || eventos[0], [eventos, elegido])
 
@@ -207,11 +361,13 @@ function Inscritos() {
         </div>
 
         <div className="contadores">
-          <div><strong>{evento.confirmados}</strong><span>confirmados</span></div>
+          <div><strong>{evento.confirmados}</strong><span>con cupo</span></div>
+          <div><strong>{evento.asistieron || 0}</strong><span>ya ingresaron</span></div>
           <div><strong>{Math.max(evento.capacidad - evento.confirmados, 0)}</strong><span>cupos libres</span></div>
           <div><strong>{evento.en_espera}</strong><span>en espera</span></div>
           <div><strong>{evento.canceladas}</strong><span>canceladas</span></div>
         </div>
+        <TarjetaResultado r={resultadoFila} />
 
         <label className="check">
           <input type="checkbox" checked={verCanceladas} onChange={(e) => setVerCanceladas(e.target.checked)} />
@@ -234,6 +390,7 @@ function Inscritos() {
                   <th>Estado</th>
                   <th>Inscrito</th>
                   <th>Observaciones</th>
+                  <th>Ingreso</th>
                   {esAdmin && <th>Rol</th>}
                 </tr>
               </thead>
@@ -253,6 +410,18 @@ function Inscritos() {
                       </td>
                       <td className="mini">{String(i.fecha_inscripcion).slice(0, 16).replace('T', ' ')}</td>
                       <td className="mini">{i.observaciones}</td>
+                      <td>
+                        {i.estado === 'CONFIRMADA' && evento.estado === 'PUBLICADO' && (
+                          <button
+                            className="btn btn-sm"
+                            onClick={() => checkinFila(evento, i)}
+                            disabled={registrando === i.inscripcion_id}
+                          >
+                            {registrando === i.inscripcion_id ? '...' : 'Registrar ingreso'}
+                          </button>
+                        )}
+                        {i.estado === 'ASISTIO' && <span className="mini">✔ Ingresó</span>}
+                      </td>
                       {esAdmin && (
                         <td>
                           {i.usuario_id ? <SelectorRol usuarioId={i.usuario_id} rol={i.rol} onCambio={rolCambiado} /> : '—'}

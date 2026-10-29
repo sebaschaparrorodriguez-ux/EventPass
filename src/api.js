@@ -2,10 +2,11 @@
 const BASE = (import.meta.env.VITE_N8N_URL || '').replace(/\/$/, '')
 
 export class ApiError extends Error {
-  constructor(mensaje, status, codigo) {
+  constructor(mensaje, status, codigo, data) {
     super(mensaje)
     this.status = status
     this.codigo = codigo
+    this.data = data
   }
 }
 
@@ -45,7 +46,7 @@ async function llamar(ruta, { method = 'POST', body, query } = {}) {
 
   if (!res.ok || !data || data.ok === false) {
     const msg = data?.mensaje || `Algo salió mal (error ${res.status})`
-    throw new ApiError(msg, res.status, data?.error)
+    throw new ApiError(msg, res.status, data?.error, data)
   }
   return data
 }
@@ -119,6 +120,10 @@ export const asignarRol = (token, usuarioId, rol) =>
   llamar('ep/usuarios', { body: { accion: 'asignar_rol', token, usuario_id: usuarioId, rol } })
 
 export const urlFormularioEventos = () => `${BASE}/form/ep-admin-eventos`
+
+// ---- WF11 check-in (SUPERVISOR y ADMINISTRADOR)
+export const registrarCheckin = (token, inscripcionId, eventoId) =>
+  llamar('ep/checkin', { body: { token, inscripcion_id: inscripcionId, evento_id: eventoId } })
 
 export const cancelarInscripcion = (token, inscripcionId) =>
   llamar('ep/inscripciones', {

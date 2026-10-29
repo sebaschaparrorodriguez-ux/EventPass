@@ -49,4 +49,9 @@ export const ESTADO_INSCRIPCION = {
   CONFIRMADA: { texto: 'Confirmada', clase: 'ok' },
   LISTA_ESPERA: { texto: 'En lista de espera', clase: 'espera' },
   CANCELADA: { texto: 'Cancelada', clase: 'off' },
+  ASISTIO: { texto: 'Asistió', clase: 'ok' },
 }
+
+// el QR del pase abre el panel con el check-in listo (lo escanea el supervisor con la camara del celular)
+export const urlCheckin = (inscripcionId, eventoId) =>
+  `${window.location.origin}/panel?checkin=${encodeURIComponent(inscripcionId)}&evento=${encodeURIComponent(eventoId)}`
