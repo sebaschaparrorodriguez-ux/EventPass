@@ -89,6 +89,7 @@ Están exportados desde mi instancia de n8n en la carpeta [`n8n/`](n8n/).
 | WF08_recordatorios | Schedule (cada 15 min) | EP08_Recordatorios | recordatorios 24 h y 2 h |
 | WF09_notificaciones | Execute Sub-workflow Trigger | EP09_Notificaciones | envío central Gmail + Telegram |
 | WF10_eventpass_assistant | Chat Trigger | EP10_Soporte | asistente con Gemini |
+| WF11_checkin_digital _(extensión)_ | Webhook `POST ep/checkin` | EP11_Checkin | check-in digital: registra el ingreso y pasa la inscripción a ASISTIO |
 | WF00_crear_hojas_y_datos_prueba _(adicional)_ | Webhook `GET ep-setup-hojas` | crea EP01…EP10 | setup inicial, se corre una vez |
 
 Cómo se llaman entre ellos:
@@ -122,6 +123,7 @@ Resumen (con ejemplos completos en [`docs/api.md`](docs/api.md)):
 | POST | `/webhook/ep/usuarios` | `enviar_codigo`, `crear`, `perfil`, `actualizar`, `desactivar`, `usuarios`*, `asignar_rol`* |
 | POST | `/webhook/ep/auth` | `login`, `logout`, `validar` |
 | POST | `/webhook/ep/telegram` | `solicitar`, `estado` |
+| POST | `/webhook/ep/checkin` | check-in (`inscripcion_id`, `evento_id`, `token`)** |
 | GET | `/webhook/ep/catalogo` | `tipo=LISTADO \| FILTRO \| DETALLE` |
 | POST | `/webhook/ep/inscripciones` | `crear`, `mis`, `actualizar`, `cancelar`, `inscritos`** |
 | POST | `/webhook/<id>/chat` | chat del asistente (lo usa el widget) |
@@ -142,7 +144,8 @@ Resumen (con ejemplos completos en [`docs/api.md`](docs/api.md)):
 | Rol de usuario | `VECINO`, `SUPERVISOR`, `ADMINISTRADOR` |
 | Vinculación Telegram | `ACTIVA`, `INACTIVA` |
 | Evento | `BORRADOR`, `PUBLICADO`, `CERRADO`, `CANCELADO` |
-| Inscripción | `CONFIRMADA`, `LISTA_ESPERA`, `CANCELADA` |
+| Inscripción | `CONFIRMADA`, `LISTA_ESPERA`, `CANCELADA`, `ASISTIO` |
+| Resultado de check-in | `EXITOSO`, `RECHAZADO`, `DUPLICADO` |
 | Recordatorio | `PENDIENTE`, `ENVIADO`, `ERROR`, `OMITIDO` |
 | Canal de notificación | `PENDIENTE`, `ENVIADO`, `ERROR`, `NO_APLICA` |
 | Conversación | `ABIERTA`, `CERRADA` |
@@ -257,6 +260,37 @@ Cómo está hecho:
 - **WF04** (formulario de eventos) ahora pide **correo y contraseña de un ADMINISTRADOR** antes de hacer cualquier cosa; antes cualquiera con el link podía usarlo. En la auditoría de eventos queda qué admin hizo el cambio.
 - Como en WF01, WF02 y WF04 viajan contraseñas, esos workflows **no guardan las ejecuciones exitosas** (`saveDataSuccessExecution: none`), para que no queden contraseñas en el historial de n8n.
 - Los eventos se siguen creando y editando **solo desde el formulario de n8n**, como pide el enunciado; el panel del administrador tiene un botón que lo abre.
+
+## Check-in digital (WF11 · extensión)
+
+Controla el ingreso real de los asistentes el día del evento.
+
+- **Trigger:** Webhook `POST /webhook/ep/checkin` con `inscripcion_id`, `evento_id` y el `token` de quien registra (solo **SUPERVISOR** o **ADMINISTRADOR**, los que están en la puerta).
+- **Archivo nuevo e independiente:** `EP11_Checkin`, hoja `Checkins` (`checkin_id, inscripcion_id, evento_id, usuario_id, fecha_checkin, resultado, detalle`). No se guarda nada del check-in dentro de EP06.
+
+Cómo funciona:
+
+1. Lee la inscripción (EP06), el evento (EP04) y el historial de check-in (EP11).
+2. Valida en este orden: sesión y rol → la inscripción existe → el evento existe → la inscripción es de ese evento → no tiene un check-in EXITOSO previo → está en `CONFIRMADA`.
+3. Genera el `checkin_id` y **registra todo intento** en `Checkins` con su fecha y un `detalle` de qué pasó (incluido quién lo registró):
+   - `EXITOSO`: la inscripción pasa de `CONFIRMADA` a **`ASISTIO`** (solo esa fila), queda en la auditoría de inscripciones, se responde a la página y se llama a **WF09** para avisar por **Gmail + Telegram** (este aviso siempre va por los dos canales).
+   - `DUPLICADO`: ya tenía check-in. No se crea otro válido ni se toca la inscripción; responde "El ingreso ya había sido registrado".
+   - `RECHAZADO`: inscripción o evento inexistente, inscripción de otro evento, `LISTA_ESPERA`, `CANCELADA` o sin permiso. Responde el motivo.
+4. La duplicidad se revisa antes que el estado, porque después del primer ingreso la inscripción ya está en `ASISTIO`.
+
+Respuestas HTTP: `200` EXITOSO · `409` DUPLICADO · `400/401/403/404/409` RECHAZADO (todas con `{ ok, resultado, mensaje }`).
+
+Para no romper lo que ya funcionaba:
+
+- **`ASISTIO` sigue ocupando su cupo**: catálogo (WF05), inscripciones (WF06), reasignación (WF07), panel y asistente cuentan `CONFIRMADA + ASISTIO`. Si no, al hacer check-in se "liberaría" el cupo y WF07 metería a alguien de la lista de espera a un evento lleno.
+- Una inscripción en `ASISTIO` no se puede cancelar ni editar.
+- Los recordatorios (WF08) siguen yendo solo a `CONFIRMADA`.
+
+En la página:
+
+- **Mis inscripciones → "Ver mi pase de entrada"**: muestra el código y un **QR**. El QR es un link a `/panel?checkin=INS-...&evento=EVT-...`: el supervisor lo escanea con la cámara del celular y se le abre el check-in ya lleno.
+- **Panel → pestaña "Check-in"**: se escoge el evento, se escribe o pega el código (o el link del QR) y sale una tarjeta **verde** (éxito), **amarilla** (duplicado) o **roja** (rechazado, con el motivo).
+- **Panel → "Inscritos por evento"**: botón "Registrar ingreso" en cada fila confirmada y contador de cuántos ya ingresaron.
 
 ## Asistente IA (WF10)
 
