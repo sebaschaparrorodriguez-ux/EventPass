@@ -1,6 +1,6 @@
 [
   {
-    "updatedAt": "2026-10-22T14:00:15.000Z",
+    "updatedAt": "2026-10-29T13:41:20.000Z",
     "createdAt": "2026-10-22T13:08:36.533Z",
     "id": "GvE69f81Wu5RV8Ys",
     "name": "WF07_reasignacion_lista_espera",
@@ -22,7 +22,7 @@
             ]
           }
         },
-        "id": "69354170-02c1-4649-a24f-28d2850e67e7",
+        "id": "d5277e86-f95c-4cae-a007-c8e2cf69a16d",
         "position": [
           0,
           0
@@ -57,7 +57,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "3b627879-d403-4d3a-b2dc-0b70e7e51984",
+        "id": "669bec55-b21c-4858-95c5-d9c5080c0740",
         "position": [
           240,
           0
@@ -77,7 +77,7 @@
             },
             "conditions": [
               {
-                "id": "68853cb8-3f50-4b56-a3dd-04764143d499",
+                "id": "eeae2d83-f6b0-4e2a-9270-8a80d4167f1a",
                 "leftValue": "={{ $json.estado }}",
                 "rightValue": "PUBLICADO",
                 "operator": {
@@ -92,7 +92,7 @@
           "options": {}
         },
         "alwaysOutputData": true,
-        "id": "4e5c7b7b-0a49-4e91-bf7b-0e626f03b2cc",
+        "id": "75021898-ab24-4b4d-843b-02b02d4ec935",
         "position": [
           480,
           0
@@ -127,7 +127,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "fa17d517-8992-4a9e-81ab-9b137c253cf2",
+        "id": "c23989ab-9810-4e85-87e4-16810f1c3244",
         "position": [
           720,
           0
@@ -147,7 +147,7 @@
             },
             "conditions": [
               {
-                "id": "c766d7b4-cc33-442d-a907-dd32b74370eb",
+                "id": "4a36431c-468a-41ea-a50e-b69284dc3cf0",
                 "leftValue": "={{ $json.estado }}",
                 "rightValue": "CANCELADA",
                 "operator": {
@@ -156,7 +156,7 @@
                 }
               },
               {
-                "id": "fb745fb2-1cab-4650-bb21-b475637d0ffd",
+                "id": "b3ec9771-4481-4a2e-b5e9-105e18edf8f3",
                 "leftValue": "={{ $json.inscripcion_id }}",
                 "rightValue": "",
                 "operator": {
@@ -172,7 +172,7 @@
           "options": {}
         },
         "alwaysOutputData": true,
-        "id": "9458e3cd-a755-4913-a2fa-9212124fe69e",
+        "id": "4e9a5b5c-a3b0-4d74-b5e8-29f96debe960",
         "position": [
           960,
           0
@@ -188,7 +188,7 @@
           "options": {}
         },
         "alwaysOutputData": true,
-        "id": "b11d0fcd-9741-4ae0-b2ae-9bda3aa4310c",
+        "id": "1a7d0128-c24d-4fc6-94b1-ccd9505697c8",
         "position": [
           1200,
           0
@@ -199,9 +199,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const eventos = $('Eventos publicados').all().map(i => i.json).filter(e => e.evento_id);\nconst ins = ($input.first().json.inscripciones || []).filter(i => i.inscripcion_id);\nconst ahoraMs = Date.now();\nconst salida = [];\nfor (const e of eventos) {\n  const inicio = new Date(`${e.fecha}T${e.hora || '00:00'}:00-05:00`).getTime();\n  if (inicio <= ahoraMs) continue; // si ya empezo no se reasigna\n  const confirmados = ins.filter(i => i.evento_id === e.evento_id && i.estado === 'CONFIRMADA').length;\n  const libres = Number(e.capacidad) - confirmados;\n  if (libres <= 0) continue;\n  ins.filter(i => i.evento_id === e.evento_id && i.estado === 'LISTA_ESPERA').forEach(i => {\n    salida.push({ json: { ...i, _libres: libres, _evento_nombre: e.nombre, _fecha: e.fecha, _hora: e.hora, _lugar: e.lugar } });\n  });\n}\nreturn salida; // si no hay nada que reasignar el flujo termina aqui\n"
+          "jsCode": "const eventos = $('Eventos publicados').all().map(i => i.json).filter(e => e.evento_id);\nconst ins = ($input.first().json.inscripciones || []).filter(i => i.inscripcion_id);\nconst ahoraMs = Date.now();\nconst salida = [];\nfor (const e of eventos) {\n  const inicio = new Date(`${e.fecha}T${e.hora || '00:00'}:00-05:00`).getTime();\n  if (inicio <= ahoraMs) continue; // si ya empezo no se reasigna\n  const confirmados = ins.filter(i => i.evento_id === e.evento_id && (i.estado === 'CONFIRMADA' || i.estado === 'ASISTIO')).length; // los que ya asistieron siguen ocupando su cupo\n  const libres = Number(e.capacidad) - confirmados;\n  if (libres <= 0) continue;\n  ins.filter(i => i.evento_id === e.evento_id && i.estado === 'LISTA_ESPERA').forEach(i => {\n    salida.push({ json: { ...i, _libres: libres, _evento_nombre: e.nombre, _fecha: e.fecha, _hora: e.hora, _lugar: e.lugar } });\n  });\n}\nreturn salida; // si no hay nada que reasignar el flujo termina aqui\n"
         },
-        "id": "7900826e-7e8d-4891-9fed-621f9e821d08",
+        "id": "a22dcc2f-cbb8-4a0e-8611-af3e6ca0fbeb",
         "position": [
           1440,
           0
@@ -222,7 +222,7 @@
           },
           "options": {}
         },
-        "id": "a8c5385a-7fc6-47b1-aa9e-62583e8fd4c1",
+        "id": "d6e6fca4-b067-47d5-bb3d-d6b49df1e4a2",
         "position": [
           1680,
           0
@@ -235,7 +235,7 @@
         "parameters": {
           "jsCode": "// ya vienen ordenados: el que lleva mas tiempo esperando primero\nconst usados = {};\nconst ahora = new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00';\nconst out = [];\nlet orden = {};\nfor (const it of $input.all()) {\n  const i = it.json;\n  orden[i.evento_id] = (orden[i.evento_id] || 0) + 1;\n  usados[i.evento_id] = usados[i.evento_id] || 0;\n  if (usados[i.evento_id] >= i._libres) continue;\n  usados[i.evento_id]++;\n  out.push({\n    json: {\n      inscripcion_id: i.inscripcion_id,\n      estado: 'CONFIRMADA',\n      fecha_actualizacion: ahora,\n      orden_espera: '',\n      _usuario_id: i.usuario_id, _evento_id: i.evento_id, _orden_lista: orden[i.evento_id],\n      _evento_nombre: i._evento_nombre, _fecha: i._fecha, _hora: i._hora, _lugar: i._lugar,\n    },\n  });\n}\nreturn out;\n"
         },
-        "id": "20304930-e95a-483d-a665-ed4712b424ba",
+        "id": "0a7c5e7a-9133-4e27-a292-16e458f1d897",
         "position": [
           1920,
           0
@@ -279,7 +279,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "9bd7a304-f158-4908-9425-de328e48ed22",
+        "id": "04b94d90-efc0-4f84-935d-924c3e049289",
         "position": [
           2160,
           0
@@ -292,7 +292,7 @@
         "parameters": {
           "jsCode": "return $('Elegir promovidos').all().map(it => ({\n  json: {\n    auditoria_id: 'AUD-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(),\n    inscripcion_id: it.json.inscripcion_id, usuario_id: it.json._usuario_id, evento_id: it.json._evento_id,\n    accion: 'REASIGNAR', estado_anterior: 'LISTA_ESPERA', estado_nuevo: 'CONFIRMADA', fecha: it.json.fecha_actualizacion,\n    resultado: 'OK', detalle: `Promovido automáticamente (puesto ${it.json._orden_lista} en la lista)`,\n  },\n}));\n"
         },
-        "id": "1bca015a-bbb5-46dc-839a-6cb763c5cb92",
+        "id": "a70fb0e7-d17b-4b9a-b5b0-f5d7873f60ef",
         "position": [
           2400,
           0
@@ -334,7 +334,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "e1cb3325-2b7e-4616-b9bc-665cfb793aa5",
+        "id": "c24efa8c-64c9-4caa-88c7-012d449108bc",
         "position": [
           2640,
           0
@@ -347,7 +347,7 @@
         "parameters": {
           "jsCode": "return $('Elegir promovidos').all().map(it => {\n  const p = it.json;\n  return {\n    json: {\n      usuario_id: p._usuario_id, evento_id: p._evento_id, inscripcion_id: p.inscripcion_id,\n      tipo: 'REASIGNACION_CUPO',\n      titulo: `¡Se liberó un cupo! ${p._evento_nombre}`,\n      mensaje: `Buenas noticias: se liberó un cupo en \"${p._evento_nombre}\" y era tuyo por orden de llegada. Tu inscripción pasó a CONFIRMADA. Te esperamos el ${p._fecha} a las ${p._hora} en ${p._lugar}.`,\n    },\n  };\n});\n"
         },
-        "id": "9d0830b2-8fda-4d01-80d2-ac91104da933",
+        "id": "6228c3b3-6410-4c53-8d71-07381388561a",
         "position": [
           2880,
           0
@@ -376,7 +376,7 @@
             "waitForSubWorkflow": true
           }
         },
-        "id": "ac3e0f4d-872a-4a8d-9a7a-8e8bea5d6440",
+        "id": "cab357df-0c8b-41c5-a28a-5918d8c31eb4",
         "position": [
           3120,
           0
@@ -389,7 +389,7 @@
         "parameters": {
           "jsCode": "const promovidos = $('Elegir promovidos').all();\nconst notifs = $input.all();\nreturn promovidos.map((it, idx) => {\n  const p = it.json;\n  const r = (notifs[idx] && notifs[idx].json) || {};\n  return {\n    json: {\n      reasignacion_id: 'REA-' + Date.now().toString(36).toUpperCase() + idx,\n      evento_id: p._evento_id,\n      inscripcion_id: p.inscripcion_id,\n      usuario_id: p._usuario_id,\n      fecha: p.fecha_actualizacion,\n      orden_lista: p._orden_lista,\n      estado_anterior: 'LISTA_ESPERA',\n      estado_nuevo: 'CONFIRMADA',\n      resultado_notificacion: `GMAIL:${r.gmail_estado || 'SIN_DATO'} | TELEGRAM:${r.telegram_estado || 'SIN_DATO'}`,\n    },\n  };\n});\n"
         },
-        "id": "c9684453-4a7a-4d04-8be7-f3425ef838fe",
+        "id": "32923e61-7691-439d-b8c0-87c5821ab84f",
         "position": [
           3360,
           0
@@ -431,14 +431,14 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "d987951a-bd2d-4564-b3a5-70f1c4ef3a08",
+        "id": "9818078c-c949-4132-8d2a-e924f37d8012",
         "position": [
           3600,
           0
         ]
       },
       {
-        "id": "eb927606-f29a-46b7-be94-bacc5fcc85cd",
+        "id": "92a915cc-ee8b-4a88-882b-ad958efd8bc8",
         "name": "Nota 1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
@@ -639,9 +639,9 @@
     "meta": null,
     "nodeGroups": [],
     "pinData": {},
-    "versionId": "e95fb123-715c-4d7b-b9e2-cb24ca0b9d0e",
-    "activeVersionId": "e95fb123-715c-4d7b-b9e2-cb24ca0b9d0e",
-    "versionCounter": 3,
+    "versionId": "d624d502-cd09-4387-897c-22928356cde4",
+    "activeVersionId": "d624d502-cd09-4387-897c-22928356cde4",
+    "versionCounter": 4,
     "triggerCount": 1,
     "sourceWorkflowId": null,
     "tags": [],

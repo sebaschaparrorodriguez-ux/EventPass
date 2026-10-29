@@ -1,6 +1,6 @@
 [
   {
-    "updatedAt": "2026-10-22T14:00:07.000Z",
+    "updatedAt": "2026-10-29T13:41:11.000Z",
     "createdAt": "2026-10-22T13:08:36.528Z",
     "id": "RD1qqKdr6E96Ce3E",
     "name": "WF05_catalogo_publico",
@@ -12,7 +12,7 @@
         "name": "Webhook catálogo",
         "type": "n8n-nodes-base.webhook",
         "typeVersion": 2.1,
-        "webhookId": "2a328373-493f-493c-b37c-e4101ec379af",
+        "webhookId": "a8e0a821-5cbd-4230-9c68-927ab1c3369d",
         "parameters": {
           "httpMethod": "GET",
           "path": "ep/catalogo",
@@ -21,7 +21,7 @@
             "allowedOrigins": "*"
           }
         },
-        "id": "d56c7bd8-b4cd-4aeb-8dd9-752d0ec9c163",
+        "id": "69bfbd1e-d4e3-490c-9e6e-dddd6a14e486",
         "position": [
           0,
           0
@@ -34,7 +34,7 @@
         "parameters": {
           "jsCode": "const q = $input.first().json.query || {};\nlet tipo = String(q.tipo || 'LISTADO').toUpperCase();\nif (!['LISTADO', 'DETALLE', 'FILTRO'].includes(tipo)) tipo = 'LISTADO';\nreturn [{\n  json: {\n    tipo,\n    categoria: String(q.categoria || '').trim(),\n    evento_id: String(q.evento_id || '').trim().toUpperCase(),\n    visitor_id: String(q.visitor_id || 'ANONIMO').slice(0, 40),\n  },\n}];\n"
         },
-        "id": "f062f35e-b723-47b8-86fc-635c0f750af6",
+        "id": "73fad99b-567f-484a-9967-0a35f3b2d3ef",
         "position": [
           240,
           0
@@ -69,7 +69,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "9d038a68-d8d0-4639-aef8-ffc972728203",
+        "id": "486ad4ff-7d5f-4960-a3f0-01694d22a6bd",
         "position": [
           480,
           0
@@ -89,7 +89,7 @@
             },
             "conditions": [
               {
-                "id": "85d5a42d-6372-4992-9394-7a9396961717",
+                "id": "31a16d30-ac1f-4e66-bf06-d18dc5b58b3a",
                 "leftValue": "={{ $json.evento_id }}",
                 "rightValue": "",
                 "operator": {
@@ -99,7 +99,7 @@
                 }
               },
               {
-                "id": "0814d5fe-9ff6-42d9-8d6b-e6fe572cabe2",
+                "id": "5de25a18-e17c-48f1-a7ac-66b9e89034d9",
                 "leftValue": "={{ $json.estado }}",
                 "rightValue": "BORRADOR",
                 "operator": {
@@ -114,7 +114,7 @@
           "options": {}
         },
         "alwaysOutputData": true,
-        "id": "4c0366e3-5a8d-4304-b496-3f6eb9b9e590",
+        "id": "c5360fcc-7900-491a-8abe-706c20a004f7",
         "position": [
           720,
           0
@@ -149,7 +149,7 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "f7377e2e-b993-40b2-87f5-f6b87ff0f54d",
+        "id": "dd2ac9da-afab-4b5a-bdce-6a76ad31e5a7",
         "position": [
           960,
           0
@@ -169,7 +169,7 @@
             },
             "conditions": [
               {
-                "id": "9644e3c7-a74d-451d-9ec7-b2b2a2785b83",
+                "id": "9480f58e-112f-43a1-ad96-ceec9cdce095",
                 "leftValue": "={{ $json.estado }}",
                 "rightValue": "CANCELADA",
                 "operator": {
@@ -178,7 +178,7 @@
                 }
               },
               {
-                "id": "bddba4b9-ae3b-48b1-8b71-8d7c63ad8a8a",
+                "id": "02c13ce1-7c3d-4af3-a018-0aaa84ed62ee",
                 "leftValue": "={{ $json.inscripcion_id }}",
                 "rightValue": "",
                 "operator": {
@@ -194,7 +194,7 @@
           "options": {}
         },
         "alwaysOutputData": true,
-        "id": "671a55d4-042d-461a-8a85-224769b61e14",
+        "id": "cc4ae8d1-d70e-409f-a0f4-df0c9c1f6138",
         "position": [
           1200,
           0
@@ -210,7 +210,7 @@
           "options": {}
         },
         "alwaysOutputData": true,
-        "id": "823e13f5-95df-4d26-bb14-a9f5b182b102",
+        "id": "e1ec4c40-3bcf-4f6b-b375-06ce68c7c499",
         "position": [
           1440,
           0
@@ -221,9 +221,9 @@
         "type": "n8n-nodes-base.code",
         "typeVersion": 2,
         "parameters": {
-          "jsCode": "const p = $('Leer parámetros').first().json;\nconst eventos = $('Solo publicables').all().map(i => i.json).filter(e => e.evento_id);\nconst inscripciones = ($input.first().json.inscripciones || []).filter(i => i.inscripcion_id);\nconst ahoraMs = Date.now();\n\n// cupos = capacidad - inscripciones CONFIRMADAS (no se guarda a mano en ningun lado)\nconst conCupos = eventos.map(e => {\n  const delEvento = inscripciones.filter(i => i.evento_id === e.evento_id);\n  const confirmados = delEvento.filter(i => i.estado === 'CONFIRMADA').length;\n  const enEspera = delEvento.filter(i => i.estado === 'LISTA_ESPERA').length;\n  const capacidad = Number(e.capacidad) || 0;\n  const inicio = new Date(`${e.fecha}T${e.hora || '00:00'}:00-05:00`).getTime();\n  return {\n    evento_id: e.evento_id, nombre: e.nombre, categoria: e.categoria, descripcion: e.descripcion,\n    fecha: e.fecha, hora: e.hora, lugar: e.lugar, capacidad, imagen_url: e.imagen_url,\n    organizador: e.organizador, estado: e.estado,\n    confirmados, en_espera: enEspera,\n    cupos_disponibles: Math.max(capacidad - confirmados, 0),\n    inscripcion_abierta: e.estado === 'PUBLICADO' && inicio > ahoraMs,\n  };\n});\n\nlet status = 200;\nlet body;\nlet resultado = conCupos;\nif (p.tipo === 'DETALLE') {\n  const ev = conCupos.find(e => e.evento_id === p.evento_id);\n  resultado = ev ? [ev] : [];\n  if (!ev) { status = 404; body = { ok: false, error: 'NO_ENCONTRADO', mensaje: 'No encontramos ese evento.' }; }\n  else body = { ok: true, evento: ev };\n} else {\n  if (p.tipo === 'FILTRO' && p.categoria) resultado = conCupos.filter(e => e.categoria === p.categoria);\n  body = { ok: true, total: resultado.length, eventos: resultado };\n}\nreturn [{ json: { status, body, _count: resultado.length } }];\n"
+          "jsCode": "const p = $('Leer parámetros').first().json;\nconst eventos = $('Solo publicables').all().map(i => i.json).filter(e => e.evento_id);\nconst inscripciones = ($input.first().json.inscripciones || []).filter(i => i.inscripcion_id);\nconst ahoraMs = Date.now();\n\n// cupos = capacidad - inscripciones CONFIRMADAS (no se guarda a mano en ningun lado)\nconst conCupos = eventos.map(e => {\n  const delEvento = inscripciones.filter(i => i.evento_id === e.evento_id);\n  const confirmados = delEvento.filter(i => i.estado === 'CONFIRMADA' || i.estado === 'ASISTIO').length; // ASISTIO tambien ocupa cupo\n  const enEspera = delEvento.filter(i => i.estado === 'LISTA_ESPERA').length;\n  const capacidad = Number(e.capacidad) || 0;\n  const inicio = new Date(`${e.fecha}T${e.hora || '00:00'}:00-05:00`).getTime();\n  return {\n    evento_id: e.evento_id, nombre: e.nombre, categoria: e.categoria, descripcion: e.descripcion,\n    fecha: e.fecha, hora: e.hora, lugar: e.lugar, capacidad, imagen_url: e.imagen_url,\n    organizador: e.organizador, estado: e.estado,\n    confirmados, en_espera: enEspera,\n    cupos_disponibles: Math.max(capacidad - confirmados, 0),\n    inscripcion_abierta: e.estado === 'PUBLICADO' && inicio > ahoraMs,\n  };\n});\n\nlet status = 200;\nlet body;\nlet resultado = conCupos;\nif (p.tipo === 'DETALLE') {\n  const ev = conCupos.find(e => e.evento_id === p.evento_id);\n  resultado = ev ? [ev] : [];\n  if (!ev) { status = 404; body = { ok: false, error: 'NO_ENCONTRADO', mensaje: 'No encontramos ese evento.' }; }\n  else body = { ok: true, evento: ev };\n} else {\n  if (p.tipo === 'FILTRO' && p.categoria) resultado = conCupos.filter(e => e.categoria === p.categoria);\n  body = { ok: true, total: resultado.length, eventos: resultado };\n}\nreturn [{ json: { status, body, _count: resultado.length } }];\n"
         },
-        "id": "bf1286a3-dae7-412b-8d33-3f6816468010",
+        "id": "1ecc9376-b5fe-433e-b1bc-3b7fe08e3b5d",
         "position": [
           1680,
           0
@@ -240,7 +240,7 @@
             "responseCode": "={{ $json.status }}"
           }
         },
-        "id": "98066b89-8675-422c-9556-71bff6f3a9e4",
+        "id": "b05c0d1f-c4c3-42e3-a18b-27a4a7e3c165",
         "position": [
           1920,
           0
@@ -253,7 +253,7 @@
         "parameters": {
           "jsCode": "const p = $('Leer parámetros').first().json;\nconst r = $('Calcular cupos').first().json;\nreturn [{\n  json: {\n    consulta_id: 'CON-' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).slice(2, 5).toUpperCase(),\n    fecha: new Date(Date.now() - 5 * 3600 * 1000).toISOString().slice(0, 19) + '-05:00',\n    tipo: p.tipo,\n    evento_id: p.evento_id,\n    categoria: p.categoria,\n    resultado_count: r._count,\n    visitor_id: p.visitor_id,\n    status_http: r.status,\n  },\n}];\n"
         },
-        "id": "5d643c4a-80a9-4377-9293-e6fd90153528",
+        "id": "5a08c0a3-534a-465b-a102-2a28aa42ae95",
         "position": [
           2160,
           0
@@ -295,14 +295,14 @@
         "retryOnFail": true,
         "maxTries": 4,
         "waitBetweenTries": 5000,
-        "id": "12b7e48f-f6b3-49cb-ae48-4e41b93665d5",
+        "id": "321dd3d7-4dde-4ed6-9e1e-49a28b25c174",
         "position": [
           2400,
           0
         ]
       },
       {
-        "id": "935a4020-8330-4786-919d-5477ce5c6024",
+        "id": "b1126aac-3cc5-4059-836e-2a843db97a2d",
         "name": "Nota 1",
         "type": "n8n-nodes-base.stickyNote",
         "typeVersion": 1,
@@ -439,9 +439,9 @@
     "meta": null,
     "nodeGroups": [],
     "pinData": {},
-    "versionId": "bbf538de-dc9a-4a14-8504-b47d83f0d2c4",
-    "activeVersionId": "bbf538de-dc9a-4a14-8504-b47d83f0d2c4",
-    "versionCounter": 3,
+    "versionId": "f09d9dea-90a1-4a58-8a19-89c3060a4fbc",
+    "activeVersionId": "f09d9dea-90a1-4a58-8a19-89c3060a4fbc",
+    "versionCounter": 4,
     "triggerCount": 1,
     "sourceWorkflowId": null,
     "tags": [],
